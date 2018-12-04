@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -17,6 +19,8 @@ namespace XMLReader
     {
         public Socket Handler;
         private Socket _listener;
+
+        public Dictionary<int, WeatherStation> WeatherStationsDictionary = new Dictionary<int, WeatherStation>();
 
         private ConcurrentBag<MeasurementData> measurementList = new ConcurrentBag<MeasurementData>();
         byte[] bytes = new byte[256];
@@ -112,12 +116,12 @@ namespace XMLReader
         {
             MeasurementData measurement = new MeasurementData();
             var element = string.Empty;
-            var value = string.Empty;
+            var count = 0;
             var date = string.Empty;
-            
+
             while (reader.Read())
             {
-                if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "MEASUREMENT")
+                if (count == 14 || (reader.NodeType == XmlNodeType.EndElement && reader.Name == "MEASUREMENT"))
                 {
                     break;
                 }
@@ -133,14 +137,22 @@ namespace XMLReader
                         continue;
 
                     case XmlNodeType.Text:
+                        if (element == string.Empty)
+                            continue;
+
                         switch (element)
                         {
                             case "STN":
                                 measurement.STN = reader.ReadContentAsInt();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "DATE":
                                 date = reader.Value;
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "TIME":
@@ -148,60 +160,110 @@ namespace XMLReader
                                 {
                                     measurement.dateTime = dateTime;
                                 }
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "TEMP":
                                 measurement.TEMP = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "DEWP":
                                 measurement.DEWP = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "STP":
                                 measurement.STP = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "SLP":
                                 measurement.SLP = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "VISIB":
                                 measurement.VISIB = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "WDSP":
                                 measurement.WDSP = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "PRCP":
                                 measurement.PRCP = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "SNDP":
                                 measurement.SNDP = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "FRSHTT":
                                 measurement.FRSHTT = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "CLDC":
                                 
                                 measurement.CLDC = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
 
                             case "WNDDIR":
                                 measurement.WNDDIR = reader.ReadContentAsFloat();
+                                reader.ReadEndElement();
+                                element = string.Empty;
+                                count++;
                                 continue;
-
+                            
+                            default:
+                                continue;
                         }
-                        
-                        continue;
-
-
                 }
             }
+
+            /*
+            if (count != 14)
+            {
+                //Simulate the correction of data, should take around 100 ms, not more I think.
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                //Add some blyats to a string to express your frustration on missing values.
+                var blyats = "";
+                while (stopwatch.ElapsedMilliseconds < 100)
+                {
+                    // Simulate being busy
+                    blyats += "ayy blyat";
+                }
+            }*/
+            // FYI: We're gonna need to keep the time the correction
+            // takes below 100 milliseconds, happy funtime.
+
             return measurement;
         }
     }
@@ -238,8 +300,59 @@ namespace XMLReader
         public float CLDC;
         public float WNDDIR;
 
+        /// <summary>
+        /// Wether the data has already been added to database.
+        /// to avoid duplicates and still be able to keep history of 30 values.
+        /// </summary>
+        public bool AddedToDatabase;
+
         public void CheckValues()
         {
         }
+    }
+
+    public class WeatherStation
+    {
+        public int StationNumber;
+        // Since a little delay of 30 seconds in the database shouldn't really matter choose to split the queues
+        // Makes processing easier, just put elements in sqlQueue if count is bigger than 30.
+        public Queue<MeasurementData> MeasurementDatas = new Queue<MeasurementData>(30);
+        public List<MeasurementData> SqlQueue = new List<MeasurementData>();
+
+        public WeatherStation(int stationNumber)
+        {
+            StationNumber = stationNumber;
+        }
+
+        public void Enqueue(MeasurementData measurement)
+        {
+            // Check if count equals 30, and if so move element to the SQL queue
+            if (MeasurementDatas.Count == 30)
+            {
+                SqlQueue.Add(MeasurementDatas.Dequeue());
+                SqlDequeue();
+            }
+
+            MeasurementDatas.Enqueue(measurement);
+        }
+
+        public MeasurementData Dequeue()
+        {
+            return MeasurementDatas.Dequeue();
+        }
+
+        /// <summary>
+        /// Sends back the values which are queued to be added to the database.
+        /// </summary>
+        /// <param name="sqlDatas">A list which is supposed to contain the measurements</param>
+        /// <returns></returns>
+        public List<MeasurementData> SqlDequeue()
+        {
+            var sqlDatas = SqlQueue;
+            SqlQueue.Clear();
+            Console.WriteLine("Cleared" + sqlDatas.Count);
+            return sqlDatas;
+        }
+
     }
 }
