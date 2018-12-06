@@ -55,48 +55,54 @@ namespace XMLReader
             StateObject so = (StateObject) ar.AsyncState;
             Socket s = so.workSocket;
 
-            int read = s.EndReceive(ar);
-
-            if (read > 0)
+            try
             {
-                string str = Encoding.ASCII.GetString(so.buffer, 0, read);
-                so.sb.Append(str);
-                if (str.IndexOf("</WEATHERDATA>", str.Length - 20 >= 0 ? str.Length - 20 : 0, StringComparison.Ordinal) > -1)
+                int read = s.EndReceive(ar);
+
+                if (read > 0)
                 {
-                    var strContent = so.sb.ToString();
-                    Task.Run(() =>
+                    string str = Encoding.ASCII.GetString(so.buffer, 0, read);
+                    so.sb.Append(str);
+                    if (str.IndexOf("</WEATHERDATA>", str.Length - 20 >= 0 ? str.Length - 20 : 0,
+                            StringComparison.Ordinal) > -1)
+                    {
+                        var strContent = so.sb.ToString();
+                        Task.Run(() => { ParseXML(strContent, so); });
+                        so.sb.Clear();
+                    }
+
+                    // if stringbuilder is longer than a XML file clear it.
+                    if (so.sb.Length > 4000)
+                    {
+                        var strContent = so.sb.ToString();
+                        // Check if the stringbuilder contains a xml definition and if so substring it to start there.
+                        if (strContent.Contains("<?xml"))
                         {
-                            ParseXML(strContent, so);
-                        });
-                    so.sb.Clear();
-                }
+                            strContent = strContent.Substring(strContent.IndexOf("<?xml", StringComparison.Ordinal));
+                            so.sb.Clear();
+                            so.sb.Append(strContent);
+                        }
+                        else
+                        {
+                            so.sb.Clear();
+                        }
+                    }
 
-                // if stringbuilder is longer than a XML file clear it.
-                if (so.sb.Length > 4000)
+                    s.BeginReceive(so.buffer, 0, StateObject.BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), so);
+                }
+                else
                 {
-                    var strContent = so.sb.ToString();
-                    // Check if the stringbuilder contains a xml definition and if so substring it to start there.
-                    if (strContent.Contains("<?xml"))
-                    {
-                        strContent = strContent.Substring(strContent.IndexOf("<?xml", StringComparison.Ordinal));
-                        so.sb.Clear();
-                        so.sb.Append(strContent);
-                    }
-                    else
+                    if (so.sb.Length > 1)
                     {
                         so.sb.Clear();
                     }
-                }
 
-                s.BeginReceive(so.buffer, 0, StateObject.BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), so);
+                    s.Close();
+                }
             }
-            else
+            catch (Exception e)
             {
-                if (so.sb.Length > 1)
-                {
-                    so.sb.Clear();
-                }
-                s.Close();
+                Console.WriteLine(e);
             }
         }
 
@@ -121,7 +127,7 @@ namespace XMLReader
 
                         // Parse the measurement and add it to the history queue.
                         var measurement = ParseMeasurement(reader);
-                        if (measurement.STN == 0)
+                        if (measurement.StationNumber == 0)
                         {
                             Console.WriteLine("Uhoh");
                         }
@@ -129,10 +135,10 @@ namespace XMLReader
 
                         measurementList.Add(measurement);
 
-                        if (!WeatherStationsDictionary.TryGetValue(measurement.STN, out var weatherStation))
+                        if (!WeatherStationsDictionary.TryGetValue(measurement.StationNumber, out var weatherStation))
                         {
-                            weatherStation = new WeatherStation(measurement.STN);
-                            WeatherStationsDictionary.TryAdd(measurement.STN, weatherStation);
+                            weatherStation = new WeatherStation(measurement.StationNumber);
+                            WeatherStationsDictionary.TryAdd(measurement.StationNumber, weatherStation);
                         }
                         weatherStation.Enqueue(measurement);
                     }
@@ -157,7 +163,7 @@ namespace XMLReader
                 // The code now following. Plis ignore, lot of repetitive code, since using objects for performance.
                 try
                 {
-                    measurement.STN = reader.ReadElementContentAsInt();
+                    measurement.StationNumber = reader.ReadElementContentAsInt();
                     // reader.Skip skips one node (Skips to next start element in this XML file)
                     // Doesn't validate the XML so is quicker than calling .read multiple times
                     reader.Skip();
@@ -178,7 +184,7 @@ namespace XMLReader
 
                     if (reader.Name.Equals("TEMP"))
                     {
-                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.TEMP))
+                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.Temperature))
                         {
                             Console.WriteLine("Temp is missing blyat.");
                         }
@@ -187,7 +193,7 @@ namespace XMLReader
 
                     if (reader.Name.Equals("DEWP"))
                     {
-                        if(!float.TryParse(reader.ReadElementContentAsString(), out measurement.DEWP))
+                        if(!float.TryParse(reader.ReadElementContentAsString(), out measurement.Dewpoint))
                             Console.WriteLine("DEWP missing.");
                         reader.Skip();
                     }
@@ -236,7 +242,7 @@ namespace XMLReader
 
                     if (reader.Name.Equals("FRSHTT"))
                     {
-                        float.TryParse(reader.ReadElementContentAsString(), out measurement.FRSHTT);
+                        byte.TryParse(reader.ReadElementContentAsString(), out measurement.FRSHTT);
                         reader.Skip();
                     }
 
@@ -295,20 +301,20 @@ namespace XMLReader
         /// <summary> DateTime of recording </summary>
         public string dateTime;
         /// <summary> Station ID </summary>
-        public int STN;
+        public int StationNumber;
 
         /// <summary> Temperature </summary>
-        public float TEMP;
+        public float Temperature;
 
         /// <summary> Dewpoint </summary>
-        public float DEWP;
+        public float Dewpoint;
         public float STP;
         public float SLP;
         public float VISIB;
         public float WDSP;
         public float PRCP;
         public float SNDP;
-        public float FRSHTT;
+        public byte FRSHTT;
         public float CLDC;
         public int WNDDIR;
 
