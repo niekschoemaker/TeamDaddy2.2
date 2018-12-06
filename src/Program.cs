@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -14,6 +15,8 @@ namespace XMLReader
     {
         static void Main(string[] args)
         {
+            // Make sure you get exceptions in English. Can't quite Google something if it's Dutch.
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
             Listener listener = new Listener();
 
             //TODO: Add some actual data handling, without ReadLine program just closes since nothing runs on main thread whatsoever.
