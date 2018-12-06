@@ -17,10 +17,9 @@ namespace XMLReader
 {
     class Listener
     {
-        public Socket Handler;
         private Socket _listener;
 
-        public Dictionary<int, WeatherStation> WeatherStationsDictionary = new Dictionary<int, WeatherStation>();
+        public ConcurrentDictionary<int, WeatherStation> WeatherStationsDictionary = new ConcurrentDictionary<int, WeatherStation>();
 
         private ConcurrentBag<MeasurementData> measurementList = new ConcurrentBag<MeasurementData>();
         byte[] bytes = new byte[256];
@@ -42,7 +41,6 @@ namespace XMLReader
             //In real-life applications this shouldn't be a problem.
             Socket listener = (Socket) ar.AsyncState;
             Socket handler = listener.EndAccept(ar);
-            Handler = handler;
 
             StateObject stateObject = new StateObject
             {
@@ -63,12 +61,31 @@ namespace XMLReader
             {
                 string str = Encoding.ASCII.GetString(so.buffer, 0, read);
                 so.sb.Append(str);
-                if (str.IndexOf("</WEATHERDATA>", str.Length - 20) > -1)
+                if (str.IndexOf("</WEATHERDATA>", str.Length - 20 >= 0 ? str.Length - 20 : 0, StringComparison.Ordinal) > -1)
                 {
-                    string strContent = so.sb.ToString();
-                    if(so.CurrentTask.IsCompleted)
-                        so.CurrentTask = Task.Run(() => { ParseXML(strContent, so); });
+                    var strContent = so.sb.ToString();
+                    Task.Run(() =>
+                        {
+                            ParseXML(strContent, so);
+                        });
                     so.sb.Clear();
+                }
+
+                // if stringbuilder is longer than a XML file clear it.
+                if (so.sb.Length > 4000)
+                {
+                    var strContent = so.sb.ToString();
+                    // Check if the stringbuilder contains a xml definition and if so substring it to start there.
+                    if (strContent.Contains("<?xml"))
+                    {
+                        strContent = strContent.Substring(strContent.IndexOf("<?xml", StringComparison.Ordinal));
+                        so.sb.Clear();
+                        so.sb.Append(strContent);
+                    }
+                    else
+                    {
+                        so.sb.Clear();
+                    }
                 }
 
                 s.BeginReceive(so.buffer, 0, StateObject.BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), so);
@@ -85,29 +102,44 @@ namespace XMLReader
 
         void ParseXML(string XML, StateObject so)
         {
-            var XMLDeclerationIndex = XML.IndexOf("<?xml");
-            if (XMLDeclerationIndex != 0)
+            if (!XML.StartsWith("<?x") || !XML.EndsWith("TA>\n"))
             {
-                so.sb.Clear();
-                return;
+                XML = XML.Substring(XML.IndexOf("<?xml", StringComparison.Ordinal),
+                    XML.IndexOf("</WEATHERDATA>", StringComparison.Ordinal) + 15);
             }
-            
+
             // Is inside a using Statement because XmlReader and StringReader are ignored by GC
             // Forgetting GC in such cases causes quite significant memory leaks.
             using (var reader = XmlReader.Create(new StringReader(XML)))
             {
                 try
                 {
-                    reader.MoveToContent();
-                    while (reader.Read())
+                    var count = 0;
+                    while (count != 10)
                     {
-                        if (reader.NodeType == XmlNodeType.Element && reader.Name == "MEASUREMENT")
-                            measurementList.Add(ParseMeasurement(reader));
+                        reader.ReadToFollowing("MEASUREMENT");
+
+                        // Parse the measurement and add it to the history queue.
+                        var measurement = ParseMeasurement(reader);
+                        if (measurement.STN == 0)
+                        {
+                            Console.WriteLine("Uhoh");
+                        }
+                        count++;
+
+                        measurementList.Add(measurement);
+
+                        if (!WeatherStationsDictionary.TryGetValue(measurement.STN, out var weatherStation))
+                        {
+                            weatherStation = new WeatherStation(measurement.STN);
+                            WeatherStationsDictionary.TryAdd(measurement.STN, weatherStation);
+                        }
+                        weatherStation.Enqueue(measurement);
                     }
                 }
                 catch (Exception e)
                 {
-                    //Console.WriteLine(e);
+                    Console.WriteLine(e);
                 }
             }
         }
@@ -119,132 +151,111 @@ namespace XMLReader
             var count = 0;
             var date = string.Empty;
 
-            while (reader.Read())
+
+            if (reader.ReadToFollowing("STN"))
             {
-                if (count == 14 || (reader.NodeType == XmlNodeType.EndElement && reader.Name == "MEASUREMENT"))
+                // The code now following. Plis ignore, lot of repetitive code, since using objects for performance.
+                try
                 {
-                    break;
-                }
+                    measurement.STN = reader.ReadElementContentAsInt();
+                    // reader.Skip skips one node (Skips to next start element in this XML file)
+                    // Doesn't validate the XML so is quicker than calling .read multiple times
+                    reader.Skip();
 
-                switch (reader.NodeType)
-                {
-                    case XmlNodeType.Element:
-                        element = reader.Name;
-                        continue;
+                    if (reader.Name.Equals("DATE"))
+                    {
+                        date = reader.ReadElementContentAsString();
+                        reader.Skip();
+                    }
 
-                    case XmlNodeType.EndElement:
-                        element = string.Empty;
-                        continue;
+                    if (reader.Name.Equals("TIME"))
+                    {
+                        
+                        measurement.dateTime = date + " " + reader.ReadElementContentAsString();
+                        
+                        reader.Skip();
+                    }
 
-                    case XmlNodeType.Text:
-                        if (element == string.Empty)
-                            continue;
-
-                        switch (element)
+                    if (reader.Name.Equals("TEMP"))
+                    {
+                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.TEMP))
                         {
-                            case "STN":
-                                measurement.STN = reader.ReadContentAsInt();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "DATE":
-                                date = reader.Value;
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "TIME":
-                                if (DateTime.TryParse(date + " " + reader.Value, out DateTime dateTime))
-                                {
-                                    measurement.dateTime = dateTime;
-                                }
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "TEMP":
-                                measurement.TEMP = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "DEWP":
-                                measurement.DEWP = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "STP":
-                                measurement.STP = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "SLP":
-                                measurement.SLP = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "VISIB":
-                                measurement.VISIB = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "WDSP":
-                                measurement.WDSP = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "PRCP":
-                                measurement.PRCP = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "SNDP":
-                                measurement.SNDP = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "FRSHTT":
-                                measurement.FRSHTT = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "CLDC":
-                                
-                                measurement.CLDC = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-
-                            case "WNDDIR":
-                                measurement.WNDDIR = reader.ReadContentAsFloat();
-                                reader.ReadEndElement();
-                                element = string.Empty;
-                                count++;
-                                continue;
-                            
-                            default:
-                                continue;
+                            Console.WriteLine("Temp is missing blyat.");
                         }
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("DEWP"))
+                    {
+                        if(!float.TryParse(reader.ReadElementContentAsString(), out measurement.DEWP))
+                            Console.WriteLine("DEWP missing.");
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("STP"))
+                    {
+                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.STP))
+                        {
+                            Console.WriteLine("STP missing.");
+                        }
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("SLP"))
+                    {
+                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.SLP))
+                        {
+                            Console.WriteLine("SLP missing.");
+                        }
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("VISIB"))
+                    {
+                        float.TryParse(reader.ReadElementContentAsString(), out measurement.VISIB);
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("WDSP"))
+                    {
+                        float.TryParse(reader.ReadElementContentAsString(), out measurement.WDSP);
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("PRCP"))
+                    {
+                        float.TryParse(reader.ReadElementContentAsString(), out measurement.PRCP);
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("SNDP"))
+                    {
+                        float.TryParse(reader.ReadElementContentAsString(), out measurement.SNDP);
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("FRSHTT"))
+                    {
+                        float.TryParse(reader.ReadElementContentAsString(), out measurement.FRSHTT);
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("CLDC"))
+                    {
+                        float.TryParse(reader.ReadElementContentAsString(), out measurement.CLDC);
+                        reader.Skip();
+                    }
+
+                    if (reader.Name.Equals("WNDDIR"))
+                    {
+                        int.TryParse(reader.ReadElementContentAsString(), out measurement.WNDDIR);
+                        reader.Skip();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
                 }
             }
 
@@ -270,6 +281,7 @@ namespace XMLReader
 
     public class StateObject
     {
+        public Dictionary<int, WeatherStation> WeatherStations = new Dictionary<int, WeatherStation>(10);
         public Socket workSocket = null;
         public const int BUFFER_SIZE = 1024;
         public byte[] buffer = new byte[BUFFER_SIZE];
@@ -278,10 +290,10 @@ namespace XMLReader
         public Task CurrentTask = Task.Run(() => { });
     }
 
-    public struct MeasurementData
+    public class MeasurementData
     {
         /// <summary> DateTime of recording </summary>
-        public DateTime dateTime;
+        public string dateTime;
         /// <summary> Station ID </summary>
         public int STN;
 
@@ -298,7 +310,7 @@ namespace XMLReader
         public float SNDP;
         public float FRSHTT;
         public float CLDC;
-        public float WNDDIR;
+        public int WNDDIR;
 
         /// <summary>
         /// Wether the data has already been added to database.
@@ -327,9 +339,11 @@ namespace XMLReader
         public void Enqueue(MeasurementData measurement)
         {
             // Check if count equals 30, and if so move element to the SQL queue
-            if (MeasurementDatas.Count == 30)
+            while (MeasurementDatas.Count >= 30)
             {
-                SqlQueue.Add(MeasurementDatas.Dequeue());
+                var toAdd = MeasurementDatas.Dequeue();
+                lock(SqlQueue)
+                    SqlQueue.Add(toAdd);
                 SqlDequeue();
             }
 
@@ -348,9 +362,14 @@ namespace XMLReader
         /// <returns></returns>
         public List<MeasurementData> SqlDequeue()
         {
-            var sqlDatas = SqlQueue;
-            SqlQueue.Clear();
-            Console.WriteLine("Cleared" + sqlDatas.Count);
+            // Use ToList here to copy the List instead of making a reference since it is cleared right after.
+            List<MeasurementData> sqlDatas;
+            lock (SqlQueue)
+            {
+                sqlDatas = SqlQueue.ToList();
+                SqlQueue.Clear();
+            }
+
             return sqlDatas;
         }
 
