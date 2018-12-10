@@ -21,9 +21,6 @@ namespace XMLReader
 
         public ConcurrentDictionary<int, WeatherStation> WeatherStationsDictionary = new ConcurrentDictionary<int, WeatherStation>();
 
-        private ConcurrentBag<MeasurementData> measurementList = new ConcurrentBag<MeasurementData>();
-        byte[] bytes = new byte[256];
-
         public Listener()
         {
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, 7789);
@@ -133,8 +130,6 @@ namespace XMLReader
                         }
                         count++;
 
-                        measurementList.Add(measurement);
-
                         if (!WeatherStationsDictionary.TryGetValue(measurement.StationNumber, out var weatherStation))
                         {
                             weatherStation = new WeatherStation(measurement.StationNumber);
@@ -153,7 +148,7 @@ namespace XMLReader
         MeasurementData ParseMeasurement(XmlReader reader)
         {
             MeasurementData measurement = new MeasurementData();
-            var element = string.Empty;
+
             var count = 0;
             var date = string.Empty;
 
@@ -186,15 +181,16 @@ namespace XMLReader
                     {
                         if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.Temperature))
                         {
-                            Console.WriteLine("Temp is missing blyat.");
                         }
                         reader.Skip();
                     }
 
                     if (reader.Name.Equals("DEWP"))
                     {
-                        if(!float.TryParse(reader.ReadElementContentAsString(), out measurement.Dewpoint))
-                            Console.WriteLine("DEWP missing.");
+                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.Dewpoint))
+                        {
+                        }
+
                         reader.Skip();
                     }
 
@@ -202,7 +198,6 @@ namespace XMLReader
                     {
                         if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.STP))
                         {
-                            Console.WriteLine("STP missing.");
                         }
                         reader.Skip();
                     }
@@ -211,7 +206,7 @@ namespace XMLReader
                     {
                         if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.SLP))
                         {
-                            Console.WriteLine("SLP missing.");
+                            
                         }
                         reader.Skip();
                     }
