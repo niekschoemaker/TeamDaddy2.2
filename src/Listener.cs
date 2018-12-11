@@ -12,6 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using Console = System.Console;
+using Random = System.Random;
 
 namespace XMLReader
 {
@@ -64,7 +66,14 @@ namespace XMLReader
                             StringComparison.Ordinal) > -1)
                     {
                         var strContent = so.sb.ToString();
-                        Task.Run(() => { ParseXML(strContent, so); });
+                        Task task = so.CurrentTask;
+                        so.CurrentTask = Task.Run(() =>
+                        {
+                            StateObject.currentlyActiveTasks++;
+                            Task.WaitAll(task);
+                            ParseXML(strContent, so);
+                            StateObject.currentlyActiveTasks--;
+                        });
                         so.sb.Clear();
                     }
 
@@ -75,7 +84,7 @@ namespace XMLReader
                         // Check if the stringbuilder contains a xml definition and if so substring it to start there.
                         if (strContent.Contains("<?xml"))
                         {
-                            strContent = strContent.Substring(strContent.IndexOf("<?xml", StringComparison.Ordinal));
+                            strContent = strContent.Substring(strContent.LastIndexOf("<?xml", strContent.Length - 3900, StringComparison.Ordinal));
                             so.sb.Clear();
                             so.sb.Append(strContent);
                         }
@@ -158,105 +167,140 @@ namespace XMLReader
                 // The code now following. Plis ignore, lot of repetitive code, since using objects for performance.
                 try
                 {
-                    measurement.StationNumber = reader.ReadElementContentAsInt();
+                    if (!int.TryParse(reader.ReadElementString(), NumberStyles.None, null,
+                        out measurement.StationNumber))
+                    {
+                        Console.WriteLine("Skipped measurement.");
+                        return null;
+                    }
                     // reader.Skip skips one node (Skips to next start element in this XML file)
                     // Doesn't validate the XML so is quicker than calling .read multiple times
                     reader.Skip();
 
                     if (reader.Name.Equals("DATE"))
                     {
-                        date = reader.ReadElementContentAsString();
+                        date = reader.ReadElementString();
                         reader.Skip();
                     }
 
                     if (reader.Name.Equals("TIME"))
                     {
-                        
-                        measurement.dateTime = date + " " + reader.ReadElementContentAsString();
-                        
+                        measurement.dateTime = date + " " + reader.ReadElementString();
                         reader.Skip();
                     }
 
+                    var numberStyleNegative = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint;
+                    var numberStylePositive = NumberStyles.AllowDecimalPoint;
+
+                    var culture = NumberFormatInfo.InvariantInfo;
                     if (reader.Name.Equals("TEMP"))
                     {
-                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.Temperature))
+                        if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.Temperature))
                         {
+                            Console.WriteLine(NumberFormatInfo.InvariantInfo.NumberDecimalSeparator);
                         }
                         reader.Skip();
+                        count++;
                     }
 
                     if (reader.Name.Equals("DEWP"))
                     {
-                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.Dewpoint))
+                        if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.Dewpoint))
                         {
                         }
 
                         reader.Skip();
+                        count++;
                     }
 
                     if (reader.Name.Equals("STP"))
                     {
-                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.STP))
+                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.STP))
                         {
                         }
                         reader.Skip();
+                        count++;
                     }
 
                     if (reader.Name.Equals("SLP"))
                     {
-                        if (!float.TryParse(reader.ReadElementContentAsString(), out measurement.SLP))
+                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.SLP))
                         {
                             
                         }
                         reader.Skip();
+                        count++;
                     }
 
                     if (reader.Name.Equals("VISIB"))
                     {
-                        float.TryParse(reader.ReadElementContentAsString(), out measurement.VISIB);
+                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.VISIB))
+                        {
+
+                        }
                         reader.Skip();
+                        count++;
                     }
 
                     if (reader.Name.Equals("WDSP"))
                     {
-                        float.TryParse(reader.ReadElementContentAsString(), out measurement.WDSP);
+                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.WDSP))
+                        {
+
+                        }
                         reader.Skip();
                     }
 
                     if (reader.Name.Equals("PRCP"))
                     {
-                        float.TryParse(reader.ReadElementContentAsString(), out measurement.PRCP);
+                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.PRCP))
+                        {
+
+                        }
                         reader.Skip();
                     }
 
                     if (reader.Name.Equals("SNDP"))
                     {
-                        float.TryParse(reader.ReadElementContentAsString(), out measurement.SNDP);
+                        if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.SNDP))
+                        {
+
+                        }
                         reader.Skip();
                     }
 
                     if (reader.Name.Equals("FRSHTT"))
                     {
-                        byte.TryParse(reader.ReadElementContentAsString(), out measurement.FRSHTT);
+                        var frshtt = reader.ReadElementString().ToCharArray();
+                        
+                        byte total = 0;
+                        if (frshtt.Length != 0)
+                        {
+                            for (int i = 0; i < frshtt.Length; i++)
+                            {
+                                total += frshtt[i] == '0' ? (byte)0 : (byte)Math.Pow(2, 5 - i);
+                            }
+                        }
+                        measurement.FRSHTT = total;
+
                         reader.Skip();
                     }
 
                     if (reader.Name.Equals("CLDC"))
                     {
-                        float.TryParse(reader.ReadElementContentAsString(), out measurement.CLDC);
+                        float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.CLDC);
                         reader.Skip();
                     }
 
                     if (reader.Name.Equals("WNDDIR"))
                     {
-                        int.TryParse(reader.ReadElementContentAsString(), out measurement.WNDDIR);
+                        int.TryParse(reader.ReadElementString(), NumberStyles.None, NumberFormatInfo.InvariantInfo, out measurement.WNDDIR);
                         reader.Skip();
                     }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    throw;
                 }
             }
 
@@ -282,13 +326,14 @@ namespace XMLReader
 
     public class StateObject
     {
+        public static int currentlyActiveTasks = 0;
         public Dictionary<int, WeatherStation> WeatherStations = new Dictionary<int, WeatherStation>(10);
         public Socket workSocket = null;
         public const int BUFFER_SIZE = 1024;
         public byte[] buffer = new byte[BUFFER_SIZE];
         public StringBuilder sb = new StringBuilder();
         public bool Exception;
-        public Task CurrentTask = Task.Run(() => { });
+        public Task CurrentTask = Task.CompletedTask;
     }
 
     public class MeasurementData
@@ -326,7 +371,20 @@ namespace XMLReader
 
     public class WeatherStation
     {
+        public float Temperature;
+        public float Dewpoint;
+        public float STP;
+        public float SLP;
+        public float VISIB;
+        public float WDSP;
+        public float PRCP;
+        public float SNDP;
+        public float FRSHTT;
+        public float CLDC;
+        public int WNDDIR;
         public int StationNumber;
+
+        public static Random Rnd = new Random();
         // Since a little delay of 30 seconds in the database shouldn't really matter choose to split the queues
         // Makes processing easier, just put elements in sqlQueue if count is bigger than 30.
         public Queue<MeasurementData> MeasurementDatas = new Queue<MeasurementData>(30);
@@ -339,16 +397,24 @@ namespace XMLReader
 
         public void Enqueue(MeasurementData measurement)
         {
+
             // Check if count equals 30, and if so move element to the SQL queue
             while (MeasurementDatas.Count >= 30)
             {
                 var toAdd = MeasurementDatas.Dequeue();
-                lock(SqlQueue)
+                SubtractTotals(toAdd);
+                lock (SqlQueue)
                     SqlQueue.Add(toAdd);
                 SqlDequeue();
             }
 
+            AddTotals(measurement);
             MeasurementDatas.Enqueue(measurement);
+
+            // Get a random number and recalculate average if number "hits".
+            // Removes inaccuracy from averages and number can be tweaked to tune performance hit.
+            if (Rnd.Next(17) == 1 && MeasurementDatas.Count > 28)
+                recalculateAverages();
         }
 
         public MeasurementData Dequeue()
@@ -374,5 +440,46 @@ namespace XMLReader
             return sqlDatas;
         }
 
+        private void AddTotals(MeasurementData measurement)
+        {
+            Temperature += measurement.Temperature / 30;
+            Dewpoint += measurement.Dewpoint / 30;
+            STP += measurement.STP / 30;
+            SLP += measurement.SLP / 30;
+            VISIB += measurement.VISIB / 30;
+            WDSP += measurement.WDSP / 30;
+            PRCP += measurement.PRCP / 30;
+            SNDP += measurement.SNDP / 30;
+            CLDC += measurement.CLDC / 30;
+            WNDDIR += measurement.WNDDIR / 30;
+    }
+
+        private void SubtractTotals(MeasurementData measurement)
+        {
+            Temperature -= measurement.Temperature / 30;
+            Dewpoint -= measurement.Dewpoint / 30;
+            STP -= measurement.STP / 30;
+            SLP -= measurement.SLP / 30;
+            VISIB -= measurement.VISIB / 30;
+            WDSP -= measurement.WDSP / 30;
+            PRCP -= measurement.PRCP / 30;
+            SNDP -= measurement.SNDP / 30;
+            CLDC -= measurement.CLDC / 30;
+            WNDDIR -= measurement.WNDDIR / 30;
+        }
+
+        private void recalculateAverages()
+        {
+            Temperature = MeasurementDatas.Average(p => p.Temperature);
+            PRCP = MeasurementDatas.Average(p => p.PRCP);
+            STP = MeasurementDatas.Average(p => p.STP);
+            SLP = MeasurementDatas.Average(p => p.SLP);
+            VISIB = MeasurementDatas.Average(p => p.VISIB);
+            WDSP = MeasurementDatas.Average(p => p.WDSP);
+            PRCP = MeasurementDatas.Average(p => p.PRCP);
+            SNDP = MeasurementDatas.Average(p => p.SNDP);
+            CLDC = MeasurementDatas.Average(p => p.CLDC);
+            WNDDIR = (int) MeasurementDatas.Average(p => p.WNDDIR);
+        }
     }
 }
