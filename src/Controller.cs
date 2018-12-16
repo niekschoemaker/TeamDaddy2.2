@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
@@ -19,7 +20,11 @@ namespace XMLReader
     {
         static void Main(string[] args)
         {
-            //Make instance of self so we can send the Controller to the other objects.
+            //If debug is enabled add a delay before starting, just to give the debugger some time to start up.
+#if DEBUG
+            Thread.Sleep(2500);
+#endif
+            // Make instance of self so we can send the Controller to the other objects.
             Controller controller = new Controller();
         }
 
