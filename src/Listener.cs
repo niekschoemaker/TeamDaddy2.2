@@ -19,11 +19,19 @@ namespace XMLReader
 {
     class Listener
     {
+        public Listener(Controller Instance)
+        {
+            controller = Instance;
+            WeatherStationsDictionary = controller.WeatherStations;
+        }
+
+        private Controller controller;
+
         private Socket _listener;
 
-        public ConcurrentDictionary<int, WeatherStation> WeatherStationsDictionary = new ConcurrentDictionary<int, WeatherStation>();
+        public ConcurrentDictionary<int, WeatherStation> WeatherStationsDictionary;
 
-        public Listener()
+        public void StartListening()
         {
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, 7789);
             _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -215,7 +223,7 @@ namespace XMLReader
 
                     if (reader.Name.Equals("STP"))
                     {
-                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.STP))
+                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.StationPressure))
                         {
                         }
                         reader.Skip();
@@ -224,7 +232,7 @@ namespace XMLReader
 
                     if (reader.Name.Equals("SLP"))
                     {
-                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.SLP))
+                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.SeaLevelPressure))
                         {
                             
                         }
@@ -234,7 +242,7 @@ namespace XMLReader
 
                     if (reader.Name.Equals("VISIB"))
                     {
-                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.VISIB))
+                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.Visibility))
                         {
 
                         }
@@ -244,7 +252,7 @@ namespace XMLReader
 
                     if (reader.Name.Equals("WDSP"))
                     {
-                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.WDSP))
+                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.WindSpeed))
                         {
 
                         }
@@ -253,7 +261,7 @@ namespace XMLReader
 
                     if (reader.Name.Equals("PRCP"))
                     {
-                        if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.PRCP))
+                        if (!double.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.Precipitation))
                         {
 
                         }
@@ -262,7 +270,7 @@ namespace XMLReader
 
                     if (reader.Name.Equals("SNDP"))
                     {
-                        if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.SNDP))
+                        if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.Snowfall))
                         {
 
                         }
@@ -281,20 +289,20 @@ namespace XMLReader
                                 total += frshtt[i] == '0' ? (byte)0 : (byte)Math.Pow(2, 5 - i);
                             }
                         }
-                        measurement.FRSHTT = total;
+                        measurement.Events = total;
 
                         reader.Skip();
                     }
 
                     if (reader.Name.Equals("CLDC"))
                     {
-                        float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.CLDC);
+                        float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.CloudCover);
                         reader.Skip();
                     }
 
                     if (reader.Name.Equals("WNDDIR"))
                     {
-                        int.TryParse(reader.ReadElementString(), NumberStyles.None, NumberFormatInfo.InvariantInfo, out measurement.WNDDIR);
+                        int.TryParse(reader.ReadElementString(), NumberStyles.None, NumberFormatInfo.InvariantInfo, out measurement.WindDirection);
                         reader.Skip();
                     }
                 }
@@ -327,7 +335,6 @@ namespace XMLReader
     public class StateObject
     {
         public static int currentlyActiveTasks = 0;
-        public Dictionary<int, WeatherStation> WeatherStations = new Dictionary<int, WeatherStation>(10);
         public Socket workSocket = null;
         public const int BUFFER_SIZE = 1024;
         public byte[] buffer = new byte[BUFFER_SIZE];
@@ -343,46 +350,92 @@ namespace XMLReader
         /// <summary> Station ID </summary>
         public int StationNumber;
 
-        /// <summary> Temperature </summary>
-        public float Temperature;
-
-        /// <summary> Dewpoint </summary>
-        public float Dewpoint;
-        public float STP;
-        public float SLP;
-        public float VISIB;
-        public float WDSP;
-        public float PRCP;
-        public float SNDP;
-        public byte FRSHTT;
-        public float CLDC;
-        public int WNDDIR;
 
         /// <summary>
-        /// Wether the data has already been added to database.
-        /// to avoid duplicates and still be able to keep history of 30 values.
+        /// Temperature in degrees Celsius. Valid Values range from -9999.9 till 9999.9 with one decimal point precision.
         /// </summary>
-        public bool AddedToDatabase;
+        public float Temperature;
 
-        public void CheckValues()
+        /// <summary>
+        /// Dewpoint in degrees Celsius. Valid values range from -9999.9 till 9999.9 with 1 decimal point precision.
+        /// </summary>
+        public float Dewpoint;
+
+        /// <summary>
+        /// Air pressure at the station's level in mBar. valid values range from 0.0 till 9999.9 with 1 decimal point precision.
+        /// </summary>
+        public float StationPressure;
+
+        /// <summary>
+        /// Air pressure at sea level in mBar. Valid values range from 0.0 till 9999.9 with 1 decimal point precision.
+        /// </summary>
+        public float SeaLevelPressure;
+
+        /// <summary>
+        /// Visibility in KM. Valid values range from 0.0 till 999.9, with 1 decimal point precision.
+        /// </summary>
+        public float Visibility;
+
+        /// <summary>
+        /// Windspeed in KM/h. Valid values range from 0.0 till 999.9, with 1 decimal point precision.
+        /// </summary>
+        public float WindSpeed;
+
+        /// <summary>
+        /// Precipitation in cm. Valid values range from 0.00 till 999.99, with 2 decimal points precision.
+        /// </summary>
+        public double Precipitation;
+
+        /// <summary>
+        /// Snowfall in cm. Valid values range from -9999.9 till 9999.9, with 1 decimal point precision.
+        /// </summary>
+        public float Snowfall;
+
+        /// <summary>
+        /// Flag variable containing events on this day.
+        /// see enum <see cref="EventFlags"/> for possible flags.
+        /// </summary>
+        public byte Events;
+
+        /// <summary>
+        /// Cloud cover in percentage. Valid values range from 0.0 till 99.9 with 1 decimal point precision.
+        /// </summary>
+        public float CloudCover;
+        /// <summary>
+        /// Wind direction in degrees. Valid values range from 0 till 359. Only integers.
+        /// </summary>
+        public int WindDirection;
+
+        public enum EventFlags
         {
+            Tornado = 1,
+            Thunder = 2,
+            Hail = 4,
+            Snow = 8,
+            Rain = 16,
+            Freezing = 32
         }
     }
 
     public class WeatherStation
     {
-        public float Temperature;
-        public float Dewpoint;
-        public float STP;
-        public float SLP;
-        public float VISIB;
-        public float WDSP;
-        public float PRCP;
-        public float SNDP;
-        public float FRSHTT;
-        public float CLDC;
-        public int WNDDIR;
         public int StationNumber;
+        public string Name;
+        public string Country;
+        public double Latitude;
+        public double Longitude;
+        public double Elevation;
+
+        public float TemperatureAvg;
+        public float DewpointAvg;
+        public float StationPressureAvg;
+        public float SeaLevelPressureAvg;
+        public float VisibilityAvg;
+        public float WindSpeedAvg;
+        public double PrecipitationAvg;
+        public float SnowfallAvg;
+        public float CloudCoverAvg;
+        public int WindDirectionAvg;
 
         public static Random Rnd = new Random();
         // Since a little delay of 30 seconds in the database shouldn't really matter choose to split the queues
@@ -393,6 +446,16 @@ namespace XMLReader
         public WeatherStation(int stationNumber)
         {
             StationNumber = stationNumber;
+        }
+
+        public WeatherStation(int stationNumber, string name, string country, double latitude, double longitude, double elevation)
+        {
+            StationNumber = stationNumber;
+            Name = name;
+            Country = country;
+            Latitude = latitude;
+            Longitude = longitude;
+            Elevation = elevation;
         }
 
         public void Enqueue(MeasurementData measurement)
@@ -442,44 +505,44 @@ namespace XMLReader
 
         private void AddTotals(MeasurementData measurement)
         {
-            Temperature += measurement.Temperature / 30;
-            Dewpoint += measurement.Dewpoint / 30;
-            STP += measurement.STP / 30;
-            SLP += measurement.SLP / 30;
-            VISIB += measurement.VISIB / 30;
-            WDSP += measurement.WDSP / 30;
-            PRCP += measurement.PRCP / 30;
-            SNDP += measurement.SNDP / 30;
-            CLDC += measurement.CLDC / 30;
-            WNDDIR += measurement.WNDDIR / 30;
+            TemperatureAvg += measurement.Temperature / 30;
+            DewpointAvg += measurement.Dewpoint / 30;
+            StationPressureAvg += measurement.StationPressure / 30;
+            SeaLevelPressureAvg += measurement.SeaLevelPressure / 30;
+            VisibilityAvg += measurement.Visibility / 30;
+            WindSpeedAvg += measurement.WindSpeed / 30;
+            PrecipitationAvg += measurement.Precipitation / 30;
+            SnowfallAvg += measurement.Snowfall / 30;
+            CloudCoverAvg += measurement.CloudCover / 30;
+            WindDirectionAvg += measurement.WindDirection / 30;
     }
 
         private void SubtractTotals(MeasurementData measurement)
         {
-            Temperature -= measurement.Temperature / 30;
-            Dewpoint -= measurement.Dewpoint / 30;
-            STP -= measurement.STP / 30;
-            SLP -= measurement.SLP / 30;
-            VISIB -= measurement.VISIB / 30;
-            WDSP -= measurement.WDSP / 30;
-            PRCP -= measurement.PRCP / 30;
-            SNDP -= measurement.SNDP / 30;
-            CLDC -= measurement.CLDC / 30;
-            WNDDIR -= measurement.WNDDIR / 30;
+            TemperatureAvg -= measurement.Temperature / 30;
+            DewpointAvg -= measurement.Dewpoint / 30;
+            StationPressureAvg -= measurement.StationPressure / 30;
+            SeaLevelPressureAvg -= measurement.SeaLevelPressure / 30;
+            VisibilityAvg -= measurement.Visibility / 30;
+            WindSpeedAvg -= measurement.WindSpeed / 30;
+            PrecipitationAvg -= measurement.Precipitation / 30;
+            SnowfallAvg -= measurement.Snowfall / 30;
+            CloudCoverAvg -= measurement.CloudCover / 30;
+            WindDirectionAvg -= measurement.WindDirection / 30;
         }
 
         private void recalculateAverages()
         {
-            Temperature = MeasurementDatas.Average(p => p.Temperature);
-            PRCP = MeasurementDatas.Average(p => p.PRCP);
-            STP = MeasurementDatas.Average(p => p.STP);
-            SLP = MeasurementDatas.Average(p => p.SLP);
-            VISIB = MeasurementDatas.Average(p => p.VISIB);
-            WDSP = MeasurementDatas.Average(p => p.WDSP);
-            PRCP = MeasurementDatas.Average(p => p.PRCP);
-            SNDP = MeasurementDatas.Average(p => p.SNDP);
-            CLDC = MeasurementDatas.Average(p => p.CLDC);
-            WNDDIR = (int) MeasurementDatas.Average(p => p.WNDDIR);
+            TemperatureAvg = MeasurementDatas.Average(p => p.Temperature);
+            PrecipitationAvg = MeasurementDatas.Average(p => p.Precipitation);
+            StationPressureAvg = MeasurementDatas.Average(p => p.StationPressure);
+            SeaLevelPressureAvg = MeasurementDatas.Average(p => p.SeaLevelPressure);
+            VisibilityAvg = MeasurementDatas.Average(p => p.Visibility);
+            WindSpeedAvg = MeasurementDatas.Average(p => p.WindSpeed);
+            PrecipitationAvg = MeasurementDatas.Average(p => p.Precipitation);
+            SnowfallAvg = MeasurementDatas.Average(p => p.Snowfall);
+            CloudCoverAvg = MeasurementDatas.Average(p => p.CloudCover);
+            WindDirectionAvg = (int) MeasurementDatas.Average(p => p.WindDirection);
         }
     }
 }
