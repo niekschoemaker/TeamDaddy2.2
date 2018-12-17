@@ -14,7 +14,9 @@ namespace ProjectTeamDaddy2._2
         public SqlHandler(Controller controller)
         {
             this.controller = controller;
+
             CheckConfig();
+            //Load Config variables.
             databaseHost = ConfigurationManager.AppSettings["DatabaseHost"];
             databaseUserId = ConfigurationManager.AppSettings["DatabaseUserId"];
             databasePassword = ConfigurationManager.AppSettings["DatabasePassword"];
@@ -31,7 +33,7 @@ namespace ProjectTeamDaddy2._2
 
         public void AddWeatherStations()
         {
-            using (MySqlConnection connection = new MySqlConnection("server=localhost;PORT=3307;database=unwdmi;user id=root;password=DaddyCool"))
+            using (MySqlConnection connection = new MySqlConnection($"server={databaseHost};PORT={databasePort};database={databaseDb};user id={databaseUserId};password={databasePassword}"))
             {
                 MySqlCommand command = new MySqlCommand("SELECT * FROM unwdmi.stations", connection);
                 command.Connection.Open();
