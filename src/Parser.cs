@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using XMLReader;
 
 namespace ProjectTeamDaddy2._2
 {
@@ -85,13 +84,13 @@ namespace ProjectTeamDaddy2._2
                     // Doesn't validate the XML so is quicker than calling .read multiple times
                     reader.Skip();
 
-                    if (reader.Name.Equals("DATE"))
+                    if (reader.Name == "DATE")
                     {
                         date = reader.ReadElementString();
                         reader.Skip();
                     }
 
-                    if (reader.Name.Equals("TIME"))
+                    if (reader.Name == "TIME")
                     {
                         measurement.dateTime = date + " " + reader.ReadElementString();
                         reader.Skip();
@@ -101,7 +100,7 @@ namespace ProjectTeamDaddy2._2
                     var numberStylePositive = NumberStyles.AllowDecimalPoint;
 
                     var culture = NumberFormatInfo.InvariantInfo;
-                    if (reader.Name.Equals("TEMP"))
+                    if (reader.Name == "TEMP")
                     {
                         if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.Temperature))
                         {
@@ -122,7 +121,7 @@ namespace ProjectTeamDaddy2._2
                         count++;
                     }
 
-                    if (reader.Name.Equals("STP"))
+                    if (reader.Name == "STP")
                     {
                         if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.StationPressure))
                         {
@@ -142,7 +141,7 @@ namespace ProjectTeamDaddy2._2
                         count++;
                     }
 
-                    if (reader.Name.Equals("VISIB"))
+                    if (reader.Name == "VISIB")
                     {
                         if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.Visibility))
                         {
@@ -152,7 +151,7 @@ namespace ProjectTeamDaddy2._2
                         count++;
                     }
 
-                    if (reader.Name.Equals("WDSP"))
+                    if (reader.Name == "WDSP")
                     {
                         if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.WindSpeed))
                         {
@@ -161,7 +160,7 @@ namespace ProjectTeamDaddy2._2
                         reader.Skip();
                     }
 
-                    if (reader.Name.Equals("PRCP"))
+                    if (reader.Name == "PRCP")
                     {
                         if (!double.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.Precipitation))
                         {
@@ -170,7 +169,7 @@ namespace ProjectTeamDaddy2._2
                         reader.Skip();
                     }
 
-                    if (reader.Name.Equals("SNDP"))
+                    if (reader.Name == "SNDP")
                     {
                         if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.Snowfall))
                         {
@@ -179,7 +178,7 @@ namespace ProjectTeamDaddy2._2
                         reader.Skip();
                     }
 
-                    if (reader.Name.Equals("FRSHTT"))
+                    if (reader.Name == "FRSHTT")
                     {
                         var frshtt = reader.ReadElementString().ToCharArray();
 
@@ -192,11 +191,10 @@ namespace ProjectTeamDaddy2._2
                             }
                         }
                         measurement.Events = total;
-
                         reader.Skip();
                     }
 
-                    if (reader.Name.Equals("CLDC"))
+                    if (reader.Name == "CLDC")
                     {
                         if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture,
                             out measurement.CloudCover))
@@ -206,7 +204,7 @@ namespace ProjectTeamDaddy2._2
                         reader.Skip();
                     }
 
-                    if (reader.Name.Equals("WNDDIR"))
+                    if (reader.Name == "WNDDIR")
                     {
                         if (!int.TryParse(reader.ReadElementString(), NumberStyles.None, NumberFormatInfo.InvariantInfo,
                             out measurement.WindDirection))
@@ -288,6 +286,10 @@ namespace ProjectTeamDaddy2._2
         /// Wind direction in degrees. Valid values range from 0 till 359. Only integers.
         /// </summary>
         public int WindDirection;
+
+        public void GetFlags()
+        {
+        }
 
         public enum EventFlags
         {

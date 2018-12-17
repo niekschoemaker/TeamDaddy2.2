@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using MySql.Data.MySqlClient;
-using ProjectTeamDaddy2._2;
 
-namespace XMLReader
+namespace ProjectTeamDaddy2._2
 {
     class Controller
     {

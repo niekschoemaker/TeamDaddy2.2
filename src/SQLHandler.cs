@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
-using XMLReader;
 
 namespace ProjectTeamDaddy2._2
 {
@@ -14,7 +10,6 @@ namespace ProjectTeamDaddy2._2
         public SqlHandler(Controller controller)
         {
             this.controller = controller;
-
             CheckConfig();
             //Load Config variables.
             databaseHost = ConfigurationManager.AppSettings["DatabaseHost"];

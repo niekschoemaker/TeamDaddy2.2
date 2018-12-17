@@ -1,21 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
 using Console = System.Console;
-using Random = System.Random;
 
-namespace XMLReader
+namespace ProjectTeamDaddy2._2
 {
     class Listener
     {
