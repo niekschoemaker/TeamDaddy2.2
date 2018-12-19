@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Google.Protobuf;
 
 namespace unwdmi.Parser
 {
@@ -25,6 +27,7 @@ namespace unwdmi.Parser
         public Controller()
         {
             Instance = this;
+            TimeStarted = DateTime.UtcNow;
             // Make sure you get exceptions in English. Can't quite Google something if it's Dutch.
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
 
@@ -39,9 +42,17 @@ namespace unwdmi.Parser
             //TODO: Add some actual data handling, without ReadLine program just closes since nothing runs on main thread whatsoever.
             while (true)
             {
-                Thread.Sleep(10000);
+                var consoleLine = Console.ReadLine();
+                if (consoleLine == "s")
+                {
+                    Console.WriteLine($"{DataAdded} measurements have been added to the database in {TimeSinceStartup:dd\\.hh\\:mm\\:ss}.");
+                }
             }
         }
+
+        public ulong DataAdded = 0;
+        public DateTime TimeStarted;
+        public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
 
         public ConcurrentBag<MeasurementData> SqlQueue = new ConcurrentBag<MeasurementData>();
         public ConcurrentDictionary<int, WeatherStation> WeatherStations = new ConcurrentDictionary<int, WeatherStation>();
@@ -114,12 +125,15 @@ namespace unwdmi.Parser
 
                 lock (controller.SqlTask)
                 {
-                    if (controller.SqlTask.IsCompleted && controller.SqlQueue.Count > 8000)
+                    if (controller.SqlTask.IsCompleted && controller.SqlQueue.Count >= 8000)
+                    {
+                        List<MeasurementData> measurementDatas = controller.SqlQueue.ToList();
+                        controller.SqlQueue = new ConcurrentBag<MeasurementData>();
                         controller.SqlTask = Task.Run(() =>
                         {
-                            controller.SqlHandler.AddData(controller.SqlQueue.ToList());
-                            controller.SqlQueue = new ConcurrentBag<MeasurementData>();
+                            controller.SqlHandler.AddData(measurementDatas);
                         });
+                    }
                 }
             }
 

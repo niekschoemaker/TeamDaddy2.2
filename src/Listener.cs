@@ -10,9 +10,9 @@ namespace unwdmi.Parser
 {
     class Listener
     {
-        public Listener(Controller Instance)
+        public Listener(Controller instance)
         {
-            controller = Instance;
+            controller = instance;
             WeatherStationsDictionary = controller.WeatherStations;
         }
 
@@ -68,30 +68,10 @@ namespace unwdmi.Parser
                         Task task = so.CurrentTask;
                         so.CurrentTask = Task.Run(() =>
                         {
-                            StateObject.CurrentlyActiveTasks++;
                             Task.WaitAll(task);
                             controller.Parser.ParseXML(strContent);
-                            StateObject.CurrentlyActiveTasks--;
                         });
                         so.sb.Clear();
-                    }
-
-                    // if stringbuilder is longer than a XML file clear it.
-                    if (so.sb.Length > 4000)
-                    {
-                        var strContent = so.sb.ToString();
-                        // Check if the stringbuilder contains a xml definition and if so substring it to start there.
-                        if (strContent.Contains("<?xml"))
-                        {
-                            strContent = strContent.Substring(strContent.LastIndexOf("<?xml",
-                                strContent.Length - 3900, StringComparison.Ordinal));
-                            so.sb.Clear();
-                            so.sb.Append(strContent);
-                        }
-                        else
-                        {
-                            so.sb.Clear();
-                        }
                     }
 
                     s.BeginReceive(so.buffer, 0, StateObject.BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), so);

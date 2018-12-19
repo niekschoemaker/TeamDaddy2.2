@@ -37,17 +37,14 @@ namespace unwdmi.Parser
         {
             try
             {
-                Console.WriteLine("Connecting to MySql...");
                 connection.Open();
                 MySqlCommand command = new MySqlCommand(query, connection);
-                Console.WriteLine("Executing query...");
                 command.ExecuteNonQuery();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-            Console.WriteLine("Done.");
             connection.Close();
         }
 
@@ -81,6 +78,7 @@ namespace unwdmi.Parser
 
                 ExecuteNonQuery(sb.ToString());
                 sb.Clear();
+                controller.DataAdded += (ulong)measurementDatas.Count;
                 CultureInfo.CurrentCulture = CultureInfo.CreateSpecificCulture("en-us");
             }
         }
