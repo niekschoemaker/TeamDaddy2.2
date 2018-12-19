@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
-namespace ProjectTeamDaddy2._2
+namespace unwdmi.Parser
 {
     class Parser
     {
@@ -38,11 +35,8 @@ namespace ProjectTeamDaddy2._2
                         reader.ReadToFollowing("MEASUREMENT");
 
                         // Parse the measurement and add it to the history queue.
-                        var measurement = ParseMeasurement(reader);
-                        if (measurement.StationNumber == 0)
-                        {
-                            Console.WriteLine("Uhoh");
-                        }
+                        ParseMeasurement(reader);
+
                         count++;
 
 
@@ -74,12 +68,14 @@ namespace ProjectTeamDaddy2._2
                         Console.WriteLine("Skipped measurement.");
                         return null;
                     }
+
                     if (!_controller.WeatherStations.TryGetValue(measurement.StationNumber, out var weatherStation))
                     {
                         weatherStation = new WeatherStation(measurement.StationNumber);
                         _controller.WeatherStations.TryAdd(measurement.StationNumber, weatherStation);
                     }
                     weatherStation.Enqueue(measurement);
+
                     // reader.Skip skips one node (Skips to next start element in this XML file)
                     // Doesn't validate the XML so is quicker than calling .read multiple times
                     reader.Skip();
@@ -92,7 +88,12 @@ namespace ProjectTeamDaddy2._2
 
                     if (reader.Name == "TIME")
                     {
-                        measurement.dateTime = date + " " + reader.ReadElementString();
+                        // Pretty expensive to parse DateTime but saves a bit of RAM, if CPU is overloaded change this to string.
+                        if (!DateTime.TryParse(date + " " + reader.ReadElementString(), CultureInfo.InvariantCulture, DateTimeStyles.None,
+                            out measurement.DateTime))
+                        {
+                            Console.WriteLine("Datetime not parsed");
+                        }
                         reader.Skip();
                     }
 
@@ -227,7 +228,7 @@ namespace ProjectTeamDaddy2._2
     public class MeasurementData
     {
         /// <summary> DateTime of recording </summary>
-        public string dateTime;
+        public DateTime DateTime;
         /// <summary> Station ID </summary>
         public int StationNumber;
 

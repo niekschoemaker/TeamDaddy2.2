@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Console = System.Console;
 
-namespace ProjectTeamDaddy2._2
+namespace unwdmi.Parser
 {
     class Listener
     {
@@ -83,7 +83,8 @@ namespace ProjectTeamDaddy2._2
                         // Check if the stringbuilder contains a xml definition and if so substring it to start there.
                         if (strContent.Contains("<?xml"))
                         {
-                            strContent = strContent.Substring(strContent.LastIndexOf("<?xml", strContent.Length - 3900, StringComparison.Ordinal));
+                            strContent = strContent.Substring(strContent.LastIndexOf("<?xml",
+                                strContent.Length - 3900, StringComparison.Ordinal));
                             so.sb.Clear();
                             so.sb.Append(strContent);
                         }

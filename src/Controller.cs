@@ -1,11 +1,14 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace ProjectTeamDaddy2._2
+namespace unwdmi.Parser
 {
     class Controller
     {
@@ -21,6 +24,7 @@ namespace ProjectTeamDaddy2._2
 
         public Controller()
         {
+            Instance = this;
             // Make sure you get exceptions in English. Can't quite Google something if it's Dutch.
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
 
@@ -44,11 +48,15 @@ namespace ProjectTeamDaddy2._2
         public Listener Listener;
         public SqlHandler SqlHandler;
         public Parser Parser;
+        public Task SqlTask = Task.CompletedTask;
+        public static Controller Instance;
     }
 
     public class WeatherStation
     {
         #region Fields
+
+        private static Controller controller = Controller.Instance;
         public int StationNumber;
         public string Name;
         public string Country;
@@ -72,7 +80,6 @@ namespace ProjectTeamDaddy2._2
         // Since a little delay of 30 seconds in the database shouldn't really matter choose to split the queues
         // Makes processing easier, just put elements in sqlQueue if count is bigger than 30.
         public Queue<MeasurementData> MeasurementDatas = new Queue<MeasurementData>(30);
-        public List<MeasurementData> SqlQueue = new List<MeasurementData>();
 
         public WeatherStation(int stationNumber)
         {
@@ -95,15 +102,26 @@ namespace ProjectTeamDaddy2._2
             // Check if count equals 30, and if so move element to the SQL queue
             while (MeasurementDatas.Count >= 30)
             {
-                var toAdd = MeasurementDatas.Dequeue();
-                SubtractTotals(toAdd);
-                lock (SqlQueue)
-                    SqlQueue.Add(toAdd);
-                SqlDequeue();
+                var dequeueMeasurement = MeasurementDatas.Dequeue();
+                SubtractTotals(dequeueMeasurement);
             }
 
             AddTotals(measurement);
             MeasurementDatas.Enqueue(measurement);
+            lock (controller.SqlQueue)
+            {
+                controller.SqlQueue.Add(measurement);
+
+                lock (controller.SqlTask)
+                {
+                    if (controller.SqlTask.IsCompleted && controller.SqlQueue.Count > 8000)
+                        controller.SqlTask = Task.Run(() =>
+                        {
+                            controller.SqlHandler.AddData(controller.SqlQueue.ToList());
+                            controller.SqlQueue = new ConcurrentBag<MeasurementData>();
+                        });
+                }
+            }
 
             // Get a random number and recalculate average if number "hits".
             // Removes inaccuracy from averages and number can be tweaked to tune performance hit.
@@ -124,11 +142,8 @@ namespace ProjectTeamDaddy2._2
         {
             // Use ToList here to copy the List instead of making a reference since it is cleared right after.
             List<MeasurementData> sqlDatas;
-            lock (SqlQueue)
-            {
-                sqlDatas = SqlQueue.ToList();
-                SqlQueue.Clear();
-            }
+            sqlDatas = Controller.Instance.SqlQueue.ToList();
+            Controller.Instance.SqlQueue = new ConcurrentBag<MeasurementData>();
 
             return sqlDatas;
         }
