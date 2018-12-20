@@ -39,6 +39,15 @@ namespace unwdmi.Parser
 
             Listener.StartListening();
 
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    SqlHandler.CheckSqlQueue();
+                    Thread.Sleep(100);
+                }
+            });
+
             //TODO: Add some actual data handling, without ReadLine program just closes since nothing runs on main thread whatsoever.
             while (true)
             {
@@ -47,12 +56,23 @@ namespace unwdmi.Parser
                 {
                     Console.WriteLine($"{DataAdded} measurements have been added to the database in {TimeSinceStartup:dd\\.hh\\:mm\\:ss}.");
                 }
+
+                if (consoleLine == "exit")
+                {
+                    Environment.Exit(1);
+                }
             }
         }
 
         public ulong DataAdded = 0;
         public DateTime TimeStarted;
         public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
+
+        // Trackers to keep track of the current state of the program.
+        /// <summary> Active Threads (either queued or currently processing xml data) </summary>
+        public int ActiveParsers = 0;
+        /// <summary> Sockets currently open (# of established connections with WeatherStations) </summary>
+        public int OpenSockets = 0;
 
         public ConcurrentBag<MeasurementData> SqlQueue = new ConcurrentBag<MeasurementData>();
         public ConcurrentDictionary<int, WeatherStation> WeatherStations = new ConcurrentDictionary<int, WeatherStation>();
@@ -119,22 +139,10 @@ namespace unwdmi.Parser
 
             AddTotals(measurement);
             MeasurementDatas.Enqueue(measurement);
+            
             lock (controller.SqlQueue)
             {
                 controller.SqlQueue.Add(measurement);
-
-                lock (controller.SqlTask)
-                {
-                    if (controller.SqlTask.IsCompleted && controller.SqlQueue.Count >= 8000)
-                    {
-                        List<MeasurementData> measurementDatas = controller.SqlQueue.ToList();
-                        controller.SqlQueue = new ConcurrentBag<MeasurementData>();
-                        controller.SqlTask = Task.Run(() =>
-                        {
-                            controller.SqlHandler.AddData(measurementDatas);
-                        });
-                    }
-                }
             }
 
             // Get a random number and recalculate average if number "hits".

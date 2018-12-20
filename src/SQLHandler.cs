@@ -85,6 +85,20 @@ namespace unwdmi.Parser
             }
         }
 
+        public void CheckSqlQueue()
+        {
+            if (controller.SqlQueue.Count >= 8000 && controller.ActiveParsers == 0)
+            {
+                List<MeasurementData> measurementDatas;
+                lock (controller.SqlQueue)
+                {
+                    measurementDatas = controller.SqlQueue.ToList();
+                    controller.SqlQueue = new ConcurrentBag<MeasurementData>();
+                }
+                controller.SqlHandler.AddData(measurementDatas);
+            }
+        }
+
         public void AddWeatherStations()
         {
             using (MySqlConnection connection = new MySqlConnection($"server={databaseHost};PORT={databasePort};database={databaseDb};user id={databaseUserId};password={databasePassword}"))

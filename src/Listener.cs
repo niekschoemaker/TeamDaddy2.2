@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Console = System.Console;
 
@@ -13,14 +14,11 @@ namespace unwdmi.Parser
         public Listener(Controller instance)
         {
             controller = instance;
-            WeatherStationsDictionary = controller.WeatherStations;
         }
 
         private Controller controller;
 
         private Socket _listener;
-
-        public ConcurrentDictionary<int, WeatherStation> WeatherStationsDictionary;
 
         public void StartListening()
         {
@@ -35,10 +33,11 @@ namespace unwdmi.Parser
 
         void AcceptCallBack(IAsyncResult ar)
         {
-            //Program can act weird if all 800 connections are opened at once.
-            //In real-life applications this shouldn't be a problem.
+            // Program can act weird if all 800 connections are opened at once.
+            // In real-life applications this shouldn't be a problem.
             Socket listener = (Socket) ar.AsyncState;
             Socket handler = listener.EndAccept(ar);
+            Interlocked.Increment(ref controller.OpenSockets);
 
             StateObject stateObject = new StateObject
             {
@@ -51,11 +50,11 @@ namespace unwdmi.Parser
         void ReceiveCallback(IAsyncResult ar)
         {
             StateObject so = (StateObject) ar.AsyncState;
-            Socket s = so.workSocket;
+            Socket workSocket = so.workSocket;
 
             try
             {
-                int read = s.EndReceive(ar);
+                int read = workSocket.EndReceive(ar);
 
                 if (read > 0)
                 {
@@ -66,15 +65,17 @@ namespace unwdmi.Parser
                     {
                         var strContent = so.sb.ToString();
                         Task task = so.CurrentTask;
+                        Interlocked.Increment(ref controller.ActiveParsers);
                         so.CurrentTask = Task.Run(() =>
                         {
                             task.Wait();
                             controller.Parser.ParseXML(strContent);
+                            Interlocked.Decrement(ref controller.ActiveParsers);
                         });
                         so.sb.Clear();
                     }
 
-                    s.BeginReceive(so.buffer, 0, StateObject.BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), so);
+                    workSocket.BeginReceive(so.buffer, 0, StateObject.BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), so);
                 }
                 else
                 {
@@ -83,7 +84,11 @@ namespace unwdmi.Parser
                         so.sb.Clear();
                     }
 
-                    s.Close();
+                    workSocket.Close();
+
+                    Interlocked.Decrement(ref controller.OpenSockets);
+                    Console.WriteLine(controller.OpenSockets);
+
                 }
             }
             catch (Exception e)
