@@ -25,6 +25,7 @@ namespace unwdmi.Parser
             connection = new MySqlConnection($"server={databaseHost};PORT={databasePort};database={databaseDb};user id={databaseUserId};password={databasePassword}");
         }
 
+        private Task<int> sqlTask = Task.Run(() => 1);
         private readonly MySqlConnection connection;
         private readonly Controller controller;
         private readonly string databaseHost;
@@ -39,7 +40,8 @@ namespace unwdmi.Parser
             {
                 connection.Open();
                 MySqlCommand command = new MySqlCommand(query, connection);
-                command.ExecuteNonQuery();
+                sqlTask.Wait();
+                command.ExecuteNonQueryAsync();
             }
             catch (Exception e)
             {

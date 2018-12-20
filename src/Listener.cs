@@ -68,7 +68,7 @@ namespace unwdmi.Parser
                         Task task = so.CurrentTask;
                         so.CurrentTask = Task.Run(() =>
                         {
-                            Task.WaitAll(task);
+                            task.Wait();
                             controller.Parser.ParseXML(strContent);
                         });
                         so.sb.Clear();
