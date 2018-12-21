@@ -30,6 +30,7 @@ namespace unwdmi.Parser
             TimeStarted = DateTime.UtcNow;
             // Make sure you get exceptions in English. Can't quite Google something if it's Dutch.
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
+            CultureInfo.CurrentCulture = new CultureInfo("en-us");
 
             Listener = new Listener(this);
             SqlHandler = new SqlHandler(this);
@@ -144,12 +145,17 @@ namespace unwdmi.Parser
             AddTotals(measurement);
             MeasurementDatas.Enqueue(measurement);
 
-            var str = string.Format(CultureInfo.InvariantCulture,
+            var str = "(" + measurement.StationNumber + ", '" + measurement.DateTime + "', " +
+                      measurement.Temperature + ", " + measurement.Dewpoint + ", " + measurement.StationPressure +
+                      ", " + measurement.SeaLevelPressure + ", " + measurement.Visibility + ", " +
+                      measurement.WindSpeed + ", " + measurement.Precipitation + ", " + measurement.Snowfall + ", " +
+                      measurement.Events + ", " + measurement.CloudCover + ", " + measurement.WindDirection + "),\n";
+            /*var str = string.Format(CultureInfo.InvariantCulture,
                 "({0}, '{1}', {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}),\n", measurement.StationNumber,
                 measurement.DateTime, measurement.Temperature, measurement.Dewpoint, measurement.StationPressure,
                 measurement.SeaLevelPressure, measurement.Visibility,
                 measurement.WindSpeed, measurement.Precipitation, measurement.Snowfall, measurement.Events,
-                measurement.CloudCover, measurement.WindDirection);
+                measurement.CloudCover, measurement.WindDirection);*/
             lock (Controller.SqlStringBuilder)
             {
                 Controller.SqlStringBuilder.Append(str);
