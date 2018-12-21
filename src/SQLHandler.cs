@@ -47,7 +47,7 @@ namespace unwdmi.Parser
                     {
                         connection.Open();
                         MySqlCommand command = new MySqlCommand(sb.ToString(), connection);
-                        command.ExecuteNonQuery();
+                        await command.ExecuteNonQueryAsync();
                     }
                     catch (Exception e)
                     {
