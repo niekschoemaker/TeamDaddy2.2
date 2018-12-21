@@ -78,7 +78,7 @@ namespace unwdmi.Parser
 
         public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, StationPressure, SeaLevelPressure, Visibility, WindSpeed, Precipitation, Snowfall, Events, CloudCover, WindDirection)\nVALUES");
         public int SqlQueueCount = 0;
-        public List<MeasurementData> SqlQueue = new List<MeasurementData>();
+
         public ConcurrentDictionary<uint, WeatherStation> WeatherStations = new ConcurrentDictionary<uint, WeatherStation>();
         public Listener Listener;
         public SqlHandler SqlHandler;
@@ -143,11 +143,6 @@ namespace unwdmi.Parser
 
             AddTotals(measurement);
             MeasurementDatas.Enqueue(measurement);
-            
-            lock (Controller.SqlQueue)
-            {
-                Controller.SqlQueue.Add(measurement);
-            }
 
             var str = string.Format(CultureInfo.InvariantCulture,
                 "({0}, '{1}', {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}),\n", measurement.StationNumber,

@@ -241,7 +241,7 @@ namespace unwdmi.Parser
         }
     }
 
-    public struct MeasurementData
+    public class MeasurementData
     {
         /// <summary> Station ID </summary>
         public uint StationNumber;

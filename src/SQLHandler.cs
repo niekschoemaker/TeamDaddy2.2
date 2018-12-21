@@ -142,7 +142,7 @@ namespace unwdmi.Parser
 
             if (!allKeys.Contains("DatabaseUserId"))
             {
-                confCollection.Add("DatabaseUserId", "root");
+                confCollection.Add("DatabaseUserId", "unwdmi");
                 changed = true;
             }
 
