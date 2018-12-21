@@ -44,7 +44,7 @@ namespace unwdmi.Parser
                 while (true)
                 {
                     SqlHandler.CheckSqlQueue();
-                    Thread.Sleep(100);
+                    Thread.Sleep(900);
                 }
             });
 

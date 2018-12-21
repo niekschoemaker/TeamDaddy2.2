@@ -69,8 +69,18 @@ namespace unwdmi.Parser
                         so.CurrentTask = Task.Run(() =>
                         {
                             task.Wait();
-                            controller.Parser.ParseXML(strContent);
-                            Interlocked.Decrement(ref controller.ActiveParsers);
+                            try
+                            {
+                                controller.Parser.ParseXML(strContent);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
+                            finally
+                            {
+                                Interlocked.Decrement(ref controller.ActiveParsers);
+                            }
                         });
                         so.sb.Clear();
                     }
@@ -100,7 +110,6 @@ namespace unwdmi.Parser
 
     public class StateObject
     {
-        public static int CurrentlyActiveTasks = 0;
         public Socket workSocket = null;
         public const int BUFFER_SIZE = 1024;
         public byte[] buffer = new byte[BUFFER_SIZE];

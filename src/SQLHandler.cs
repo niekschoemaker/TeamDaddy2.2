@@ -25,7 +25,6 @@ namespace unwdmi.Parser
             connection = new MySqlConnection($"server={databaseHost};PORT={databasePort};database={databaseDb};user id={databaseUserId};password={databasePassword}");
         }
 
-        private Task<int> sqlTask = Task.Run(() => 1);
         private readonly MySqlConnection connection;
         private readonly Controller controller;
         private readonly string databaseHost;
@@ -34,14 +33,13 @@ namespace unwdmi.Parser
         private readonly string databaseDb;
         private readonly string databasePort;
 
-        public void ExecuteNonQuery(string query)
+        public void ExecuteNonQuery(StringBuilder sb)
         {
             try
             {
                 connection.Open();
-                MySqlCommand command = new MySqlCommand(query, connection);
-                sqlTask.Wait();
-                command.ExecuteNonQueryAsync();
+                MySqlCommand command = new MySqlCommand(sb.ToString(), connection);
+                command.BeginExecuteNonQuery();
             }
             catch (Exception e)
             {
@@ -73,12 +71,12 @@ namespace unwdmi.Parser
                         count++;
                         continue;
                     }
-                    sb.Append($"({m.StationNumber}, '{m.DateTime:yyyy-MM-dd HH:mm:ss}', {m.Temperature}, {m.Events}, {m.SeaLevelPressure}, {m.Snowfall}, {m.StationPressure}, {m.Visibility}, {m.WindDirection}, {m.CloudCover}, {m.Dewpoint}, {m.Precipitation}, {m.WindSpeed}),\n");
+                    sb.Append("(" + m.StationNumber + ", '" + m.DateTime.ToString("yyyy-MM-dd HH:mm:ss") + "', " + m.Temperature + ", " + m.Events + ", " + m.SeaLevelPressure+ ", " + m.Snowfall + ", " + m.StationPressure + ", " + m.Visibility + ", " + m.WindDirection + ", " + m.CloudCover + ", "+ m.Dewpoint + ", " + m.Precipitation + ", " + m.WindSpeed + "),\n");
                     count++;
                 }
                 //sb.Append("END;\n");
 
-                ExecuteNonQuery(sb.ToString());
+                ExecuteNonQuery(sb);
                 sb.Clear();
                 controller.DataAdded += (ulong)measurementDatas.Count;
                 CultureInfo.CurrentCulture = CultureInfo.CreateSpecificCulture("en-us");
