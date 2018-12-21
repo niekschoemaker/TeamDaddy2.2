@@ -79,7 +79,7 @@ namespace unwdmi.Parser
         public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, StationPressure, SeaLevelPressure, Visibility, WindSpeed, Precipitation, Snowfall, Events, CloudCover, WindDirection)\nVALUES");
         public int SqlQueueCount = 0;
         public List<MeasurementData> SqlQueue = new List<MeasurementData>();
-        public ConcurrentDictionary<string, WeatherStation> WeatherStations = new ConcurrentDictionary<string, WeatherStation>();
+        public ConcurrentDictionary<uint, WeatherStation> WeatherStations = new ConcurrentDictionary<uint, WeatherStation>();
         public Listener Listener;
         public SqlHandler SqlHandler;
         public Parser Parser;
@@ -92,7 +92,7 @@ namespace unwdmi.Parser
         #region Fields
 
         private static readonly Controller Controller = Controller.Instance;
-        public string StationNumber;
+        public uint StationNumber;
         public string Name;
         public string Country;
         public double Latitude;
@@ -116,12 +116,12 @@ namespace unwdmi.Parser
         // Makes processing easier, just put elements in sqlQueue if count is bigger than 30.
         public Queue<MeasurementData> MeasurementDatas = new Queue<MeasurementData>(30);
 
-        public WeatherStation(string stationNumber)
+        public WeatherStation(uint stationNumber)
         {
             StationNumber = stationNumber;
         }
 
-        public WeatherStation(string stationNumber, string name, string country, double latitude, double longitude, double elevation)
+        public WeatherStation(uint stationNumber, string name, string country, double latitude, double longitude, double elevation)
         {
             StationNumber = stationNumber;
             Name = name;

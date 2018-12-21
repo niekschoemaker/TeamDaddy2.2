@@ -58,7 +58,7 @@ namespace unwdmi.Parser
             // The code now following. Plis ignore, lot of repetitive code, since using objects for performance.
             try
             {
-                measurement.StationNumber = reader.ReadElementString();
+                uint.TryParse(reader.ReadElementString(), out measurement.StationNumber);
 
                 var weatherStation = _controller.WeatherStations[measurement.StationNumber];
 
@@ -244,7 +244,7 @@ namespace unwdmi.Parser
     public struct MeasurementData
     {
         /// <summary> Station ID </summary>
-        public string StationNumber;
+        public uint StationNumber;
 
         /// <summary> DateTime of recording </summary>
         public string DateTime;

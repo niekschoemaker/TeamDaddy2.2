@@ -114,7 +114,7 @@ namespace unwdmi.Parser
                 MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    var STN = reader.GetString("stn");
+                    var STN = reader.GetUInt32("stn");
                     var name = reader.GetString("name");
                     var country = reader.GetString("country");
                     var latitude = reader.GetDouble("latitude");
