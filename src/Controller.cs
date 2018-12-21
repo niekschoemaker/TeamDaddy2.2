@@ -38,14 +38,11 @@ namespace unwdmi.Parser
             SqlHandler.AddWeatherStations();
 
             Listener.StartListening();
-
+            
+            // Loop to keep checking the Sql Data.
             Task.Run(() =>
             {
-                while (true)
-                {
-                    SqlHandler.CheckSqlQueue();
-                    Thread.Sleep(900);
-                }
+                SqlHandler.CheckSqlQueue();
             });
 
             //TODO: Add some actual data handling, without ReadLine program just closes since nothing runs on main thread whatsoever.
@@ -57,6 +54,11 @@ namespace unwdmi.Parser
                     Console.WriteLine($"{DataAdded} measurements have been added to the database in {TimeSinceStartup:dd\\.hh\\:mm\\:ss}.");
                 }
 
+                if (consoleLine == "r")
+                {
+                    DataAdded = 0;
+                }
+
                 if (consoleLine == "exit")
                 {
                     Environment.Exit(1);
@@ -64,7 +66,7 @@ namespace unwdmi.Parser
             }
         }
 
-        public ulong DataAdded = 0;
+        public int DataAdded = 0;
         public DateTime TimeStarted;
         public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
 
@@ -74,8 +76,10 @@ namespace unwdmi.Parser
         /// <summary> Sockets currently open (# of established connections with WeatherStations) </summary>
         public int OpenSockets = 0;
 
-        public ConcurrentBag<MeasurementData> SqlQueue = new ConcurrentBag<MeasurementData>();
-        public ConcurrentDictionary<int, WeatherStation> WeatherStations = new ConcurrentDictionary<int, WeatherStation>();
+        public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, StationPressure, SeaLevelPressure, Visibility, WindSpeed, Precipitation, Snowfall, Events, CloudCover, WindDirection)\nVALUES");
+        public int SqlQueueCount = 0;
+        public List<MeasurementData> SqlQueue = new List<MeasurementData>();
+        public ConcurrentDictionary<string, WeatherStation> WeatherStations = new ConcurrentDictionary<string, WeatherStation>();
         public Listener Listener;
         public SqlHandler SqlHandler;
         public Parser Parser;
@@ -87,8 +91,8 @@ namespace unwdmi.Parser
     {
         #region Fields
 
-        private static Controller controller = Controller.Instance;
-        public int StationNumber;
+        private static readonly Controller Controller = Controller.Instance;
+        public string StationNumber;
         public string Name;
         public string Country;
         public double Latitude;
@@ -112,12 +116,12 @@ namespace unwdmi.Parser
         // Makes processing easier, just put elements in sqlQueue if count is bigger than 30.
         public Queue<MeasurementData> MeasurementDatas = new Queue<MeasurementData>(30);
 
-        public WeatherStation(int stationNumber)
+        public WeatherStation(string stationNumber)
         {
             StationNumber = stationNumber;
         }
 
-        public WeatherStation(int stationNumber, string name, string country, double latitude, double longitude, double elevation)
+        public WeatherStation(string stationNumber, string name, string country, double latitude, double longitude, double elevation)
         {
             StationNumber = stationNumber;
             Name = name;
@@ -140,34 +144,31 @@ namespace unwdmi.Parser
             AddTotals(measurement);
             MeasurementDatas.Enqueue(measurement);
             
-            lock (controller.SqlQueue)
+            lock (Controller.SqlQueue)
             {
-                controller.SqlQueue.Add(measurement);
+                Controller.SqlQueue.Add(measurement);
             }
+
+            lock (Controller.SqlStringBuilder)
+            {
+                Controller.SqlStringBuilder.AppendFormat(
+                    "({0}, '{1}', {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}),\n", measurement.StationNumber,
+                    measurement.DateTime, measurement.Temperature, measurement.Dewpoint, measurement.StationPressure, measurement.SeaLevelPressure, measurement.Visibility,
+                    measurement.WindSpeed, measurement.Precipitation, measurement.Snowfall, measurement.Events, measurement.CloudCover, measurement.WindDirection);
+            }
+
+            Interlocked.Increment(ref Controller.SqlQueueCount);
+
 
             // Get a random number and recalculate average if number "hits".
             // Removes inaccuracy from averages and number can be tweaked to tune performance hit.
-            if (Rnd.Next(17) == 1 && MeasurementDatas.Count > 28)
+            if (Rnd.Next(240) == 1 && MeasurementDatas.Count > 28)
                 recalculateAverages();
         }
 
         public MeasurementData Dequeue()
         {
             return MeasurementDatas.Dequeue();
-        }
-
-        /// <summary>
-        /// Sends back the values which are queued to be added to the database.
-        /// </summary>
-        /// <returns></returns>
-        public List<MeasurementData> SqlDequeue()
-        {
-            // Use ToList here to copy the List instead of making a reference since it is cleared right after.
-            List<MeasurementData> sqlDatas;
-            sqlDatas = Controller.Instance.SqlQueue.ToList();
-            Controller.Instance.SqlQueue = new ConcurrentBag<MeasurementData>();
-
-            return sqlDatas;
         }
 
         private void AddTotals(MeasurementData measurement)

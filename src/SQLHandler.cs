@@ -2,9 +2,11 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
@@ -32,14 +34,46 @@ namespace unwdmi.Parser
         private readonly string databasePassword;
         private readonly string databaseDb;
         private readonly string databasePort;
+        
+        private Task _sqlTask = Task.CompletedTask;
 
         public void ExecuteNonQuery(StringBuilder sb)
         {
+                var task = _sqlTask;
+                _sqlTask = Task.Run(async () =>
+                {
+                    await task;
+                    try
+                    {
+                        connection.Open();
+                        MySqlCommand command = new MySqlCommand(sb.ToString(), connection);
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    connection.Close();
+                });
+        }
+
+        public void AddData()
+        {
+            string query;
+            lock (controller.SqlStringBuilder)
+            {
+                controller.SqlStringBuilder[controller.SqlStringBuilder.Length - 2] = ';';
+                query = controller.SqlStringBuilder.ToString();
+                controller.SqlStringBuilder.Clear();
+                controller.SqlStringBuilder.AppendFormat(
+                    "INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, StationPressure, SeaLevelPressure, Visibility, WindSpeed, Precipitation, Snowfall, Events, CloudCover, WindDirection)\nVALUES");
+                controller.SqlQueueCount = 0;
+            }
             try
             {
                 connection.Open();
-                MySqlCommand command = new MySqlCommand(sb.ToString(), connection);
-                command.BeginExecuteNonQuery();
+                MySqlCommand command = new MySqlCommand(query, connection);
+                command.ExecuteNonQuery();
             }
             catch (Exception e)
             {
@@ -48,52 +82,26 @@ namespace unwdmi.Parser
             connection.Close();
         }
 
-        public void AddData(List<MeasurementData> measurementDatas)
-        {
-            if (measurementDatas.Count >= controller.WeatherStations.Count)
-            {
-
-                StringBuilder sb = new StringBuilder();
-
-                CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-                int count = 0;
-                foreach (var m in measurementDatas)
-                {
-                    if (count == 0)
-                    {
-                        sb.Append($"INSERT INTO measurements ({nameof(m.StationNumber)}, {nameof(m.DateTime)}, {nameof(m.Temperature)}, {nameof(m.Events)}, {nameof(m.SeaLevelPressure)}, {nameof(m.Snowfall)}, {nameof(m.StationPressure)}, {nameof(m.Visibility)}, {nameof(m.WindDirection)}, {nameof(m.CloudCover)}, {nameof(m.Dewpoint)}, {nameof(m.Precipitation)}, {nameof(m.WindSpeed)})\n" +
-                            $"VALUES");
-                    }
-
-                    if (count == measurementDatas.Count - 1)
-                    {
-                        sb.Append($"({m.StationNumber}, '{m.DateTime:yyyy-MM-dd HH:mm:ss}', {m.Temperature}, {m.Events}, {m.SeaLevelPressure}, {m.Snowfall}, {m.StationPressure}, {m.Visibility}, {m.WindDirection}, {m.CloudCover}, {m.Dewpoint}, {m.Precipitation}, {m.WindSpeed});");
-                        count++;
-                        continue;
-                    }
-                    sb.Append("(" + m.StationNumber + ", '" + m.DateTime.ToString("yyyy-MM-dd HH:mm:ss") + "', " + m.Temperature + ", " + m.Events + ", " + m.SeaLevelPressure+ ", " + m.Snowfall + ", " + m.StationPressure + ", " + m.Visibility + ", " + m.WindDirection + ", " + m.CloudCover + ", "+ m.Dewpoint + ", " + m.Precipitation + ", " + m.WindSpeed + "),\n");
-                    count++;
-                }
-                //sb.Append("END;\n");
-
-                ExecuteNonQuery(sb);
-                sb.Clear();
-                controller.DataAdded += (ulong)measurementDatas.Count;
-                CultureInfo.CurrentCulture = CultureInfo.CreateSpecificCulture("en-us");
-            }
-        }
-
         public void CheckSqlQueue()
         {
-            if (controller.SqlQueue.Count >= 8000 && controller.ActiveParsers == 0)
+            while (true)
             {
-                List<MeasurementData> measurementDatas;
-                lock (controller.SqlQueue)
+                if(controller.ActiveParsers > 0)
                 {
-                    measurementDatas = controller.SqlQueue.ToList();
-                    controller.SqlQueue = new ConcurrentBag<MeasurementData>();
+                    Thread.Sleep(100);
+                    continue;
                 }
-                controller.SqlHandler.AddData(measurementDatas);
+
+                if (controller.OpenSockets == 0 || controller.SqlQueueCount == 0)
+                {
+                    Thread.Sleep(1000);
+                    continue;
+                }
+
+                // Check if every parser has added their data for that second and if so add the data to the Database
+                Console.WriteLine(controller.SqlQueueCount);
+                AddData();
+
             }
         }
 
@@ -106,7 +114,7 @@ namespace unwdmi.Parser
                 MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    var STN = reader.GetInt32("stn");
+                    var STN = reader.GetString("stn");
                     var name = reader.GetString("name");
                     var country = reader.GetString("country");
                     var latitude = reader.GetDouble("latitude");

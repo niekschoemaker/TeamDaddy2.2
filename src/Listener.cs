@@ -97,7 +97,6 @@ namespace unwdmi.Parser
                     workSocket.Close();
 
                     Interlocked.Decrement(ref controller.OpenSockets);
-                    Console.WriteLine(controller.OpenSockets);
 
                 }
             }
