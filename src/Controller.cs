@@ -149,12 +149,15 @@ namespace unwdmi.Parser
                 Controller.SqlQueue.Add(measurement);
             }
 
+            var str = string.Format(CultureInfo.InvariantCulture,
+                "({0}, '{1}', {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}),\n", measurement.StationNumber,
+                measurement.DateTime, measurement.Temperature, measurement.Dewpoint, measurement.StationPressure,
+                measurement.SeaLevelPressure, measurement.Visibility,
+                measurement.WindSpeed, measurement.Precipitation, measurement.Snowfall, measurement.Events,
+                measurement.CloudCover, measurement.WindDirection);
             lock (Controller.SqlStringBuilder)
             {
-                Controller.SqlStringBuilder.AppendFormat(
-                    "({0}, '{1}', {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}),\n", measurement.StationNumber,
-                    measurement.DateTime, measurement.Temperature, measurement.Dewpoint, measurement.StationPressure, measurement.SeaLevelPressure, measurement.Visibility,
-                    measurement.WindSpeed, measurement.Precipitation, measurement.Snowfall, measurement.Events, measurement.CloudCover, measurement.WindDirection);
+                Controller.SqlStringBuilder.Append(str);
             }
 
             Interlocked.Increment(ref Controller.SqlQueueCount);
