@@ -30,16 +30,13 @@ namespace unwdmi.Parser
                 try
                 {
                     var count = 0;
+                    reader.ReadToFollowing("MEASUREMENT");
                     while (count != 10)
                     {
-                        reader.ReadToFollowing("MEASUREMENT");
-
                         // Parse the measurement
                         ParseMeasurement(reader);
 
                         count++;
-
-
                     }
                 }
                 catch (Exception e)
@@ -49,6 +46,10 @@ namespace unwdmi.Parser
             }
         }
 
+        /// <summary>
+        /// Main parser, parses all measurement variables to correct types and adds them to the WeatherStation <see cref="WeatherStation"/>
+        /// </summary>
+        /// <param name="reader"> XMLReader positioned at WeatherData starting tag. </param>
         void ParseMeasurement(XmlReader reader)
         {
             MeasurementData measurement = new MeasurementData();
@@ -58,6 +59,8 @@ namespace unwdmi.Parser
             // The code now following. Plis ignore, lot of repetitive code, since using objects for performance.
             try
             {
+                #region Identification (StationNumber and DateTime)
+
                 uint.TryParse(reader.ReadElementString(), out measurement.StationNumber);
 
                 var weatherStation = _controller.WeatherStations[measurement.StationNumber];
@@ -68,22 +71,27 @@ namespace unwdmi.Parser
 
                 var date = reader.ReadElementString();
                 reader.Skip();
+
                 measurement.DateTime = date + " " + reader.ReadElementString();
                 reader.Skip();
+#endregion
 
+                // Set up a few custom NumberStyles (defines the amount of things float.TryParse tries on a number, minor performance increase)
                 const NumberStyles numberStyleNegative = NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint;
                 const NumberStyles numberStylePositive = NumberStyles.AllowDecimalPoint;
 
                 var culture = NumberFormatInfo.InvariantInfo;
+                #region Temperature
 
-                if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.Temperature))
+                // Cache value containing latest value read from XMLReader.
+                var currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out measurement.Temperature))
                 {
                     // If value fails to parse set the value to the average of last 30 seconds.
                     measurement.Temperature = weatherStation.TemperatureAvg;
                 }
-
                 // Check if the data is not a peak. The not equals check is to avoid buggy behaviour when the value and average is 0.
-                if (measurement.Temperature != weatherStation.TemperatureAvg &&
+                else if (measurement.Temperature != weatherStation.TemperatureAvg &&
                     measurement.Temperature <= weatherStation.TemperatureAvg * 1.2 &&
                     measurement.Temperature >= weatherStation.TemperatureAvg * 0.8)
                 {
@@ -91,13 +99,17 @@ namespace unwdmi.Parser
                 }
 
                 reader.Skip();
+#endregion
 
-                if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.Dewpoint))
+                #region DewPoint
+
+                currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out measurement.Dewpoint))
                 {
                     measurement.Dewpoint = weatherStation.DewpointAvg;
                 }
 
-                if (measurement.Dewpoint != weatherStation.DewpointAvg &&
+                else if (measurement.Dewpoint != weatherStation.DewpointAvg &&
                     measurement.Dewpoint <= weatherStation.DewpointAvg * 1.2 &&
                     measurement.Dewpoint >= weatherStation.DewpointAvg * 0.8)
                 {
@@ -105,13 +117,17 @@ namespace unwdmi.Parser
                 }
 
                 reader.Skip();
+#endregion
 
-                if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.StationPressure))
+                #region StationPressure
+
+                currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.StationPressure))
                 {
                     measurement.StationPressure = weatherStation.StationPressureAvg;
                 }
 
-                if (measurement.StationPressure != weatherStation.StationPressureAvg &&
+                else if (measurement.StationPressure != weatherStation.StationPressureAvg &&
                     measurement.StationPressure <= weatherStation.StationPressureAvg * 1.2 &&
                     measurement.StationPressure >= weatherStation.StationPressureAvg * 0.8)
                 {
@@ -119,13 +135,17 @@ namespace unwdmi.Parser
                 }
 
                 reader.Skip();
+#endregion
 
-                if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.SeaLevelPressure))
+                #region SeaLevelPressure
+
+                currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.SeaLevelPressure))
                 {
                     measurement.SeaLevelPressure = weatherStation.SeaLevelPressureAvg;
                 }
 
-                if (measurement.SeaLevelPressure != weatherStation.SeaLevelPressureAvg &&
+                else if (measurement.SeaLevelPressure != weatherStation.SeaLevelPressureAvg &&
                     measurement.SeaLevelPressure <= weatherStation.SeaLevelPressureAvg * 1.2 &&
                     measurement.SeaLevelPressure >= weatherStation.SeaLevelPressureAvg * 0.8)
                 {
@@ -133,13 +153,17 @@ namespace unwdmi.Parser
                 }
 
                 reader.Skip();
+#endregion
+                
+                #region Visibility
 
-                if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.Visibility))
+                currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.Visibility))
                 {
                     measurement.Visibility = weatherStation.VisibilityAvg;
                 }
 
-                if (measurement.Visibility != weatherStation.VisibilityAvg &&
+                else if (measurement.Visibility != weatherStation.VisibilityAvg &&
                     measurement.Visibility <= weatherStation.VisibilityAvg * 1.2 &&
                     measurement.Visibility >= weatherStation.VisibilityAvg * 0.8)
                 {
@@ -147,13 +171,17 @@ namespace unwdmi.Parser
                 }
 
                 reader.Skip();
+#endregion
 
-                if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.WindSpeed))
+                #region WindSpeed
+
+                currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.WindSpeed))
                 {
                     measurement.WindSpeed = weatherStation.WindSpeedAvg;
                 }
 
-                if (measurement.WindSpeed != weatherStation.WindSpeedAvg &&
+                else if (measurement.WindSpeed != weatherStation.WindSpeedAvg &&
                     measurement.WindSpeed <= weatherStation.WindSpeedAvg * 1.2 &&
                     measurement.WindSpeed >= weatherStation.WindSpeedAvg * 0.8)
                 {
@@ -161,13 +189,17 @@ namespace unwdmi.Parser
                 }
 
                 reader.Skip();
+#endregion
 
-                if (!double.TryParse(reader.ReadElementString(), numberStylePositive, culture, out measurement.Precipitation))
+                #region Precipitation
+
+                currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !double.TryParse(currentValue, numberStylePositive, culture, out measurement.Precipitation))
                 {
                     measurement.Precipitation = weatherStation.PrecipitationAvg;
                 }
 
-                if (measurement.Precipitation != weatherStation.PrecipitationAvg &&
+                else if (measurement.Precipitation != weatherStation.PrecipitationAvg &&
                     measurement.Precipitation <= weatherStation.PrecipitationAvg * 1.2 &&
                     measurement.Precipitation >= weatherStation.PrecipitationAvg * 0.8)
                 {
@@ -175,13 +207,17 @@ namespace unwdmi.Parser
                 }
 
                 reader.Skip();
+#endregion
 
-                if (!float.TryParse(reader.ReadElementString(), numberStyleNegative, culture, out measurement.Snowfall))
+                #region Snowfall
+
+                currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out measurement.Snowfall))
                 {
                     measurement.Snowfall = weatherStation.SnowfallAvg;
                 }
 
-                if (weatherStation.SnowfallAvg != measurement.Snowfall &&
+                else if (weatherStation.SnowfallAvg != measurement.Snowfall &&
                     measurement.Snowfall <= weatherStation.SnowfallAvg * 1.2 &&
                     measurement.Snowfall >= weatherStation.SnowfallAvg * 0.8)
                 {
@@ -189,8 +225,15 @@ namespace unwdmi.Parser
                 }
 
                 reader.Skip();
+#endregion
+                #region Events
 
-                var frshtt = reader.ReadElementString().ToCharArray();
+                currentValue = reader.ReadElementString();
+                // If string IsNull skip frshtt calculation, used goto to reduce nesting.
+                if (string.IsNullOrEmpty(currentValue))
+                    goto CloudCover;
+
+                var frshtt = currentValue.ToCharArray();
 
                 byte total = 0;
                 if (frshtt.Length != 0)
@@ -202,28 +245,37 @@ namespace unwdmi.Parser
                 }
                 measurement.Events = total;
                 reader.Skip();
+#endregion
 
-                if (!float.TryParse(reader.ReadElementString(), numberStylePositive, culture,
+                #region CloudCover
+
+                CloudCover:
+                currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture,
                     out measurement.CloudCover))
                 {
                     measurement.CloudCover = weatherStation.CloudCoverAvg;
                 }
 
-                if (measurement.CloudCover != weatherStation.CloudCoverAvg &&
+                else if (measurement.CloudCover != weatherStation.CloudCoverAvg &&
                     measurement.CloudCover <= weatherStation.CloudCoverAvg * 1.2 &&
                     measurement.CloudCover >= weatherStation.CloudCoverAvg * 0.8)
                 {
                     measurement.CloudCover = weatherStation.CloudCoverAvg;
                 }
                 reader.Skip();
+#endregion
 
-                if (!int.TryParse(reader.ReadElementString(), NumberStyles.None, NumberFormatInfo.InvariantInfo,
+                #region WindDirection
+
+                currentValue = reader.ReadElementString();
+                if (string.IsNullOrEmpty(currentValue) || !int.TryParse(currentValue, NumberStyles.None, NumberFormatInfo.InvariantInfo,
                     out measurement.WindDirection))
                 {
                     measurement.WindDirection = weatherStation.WindDirectionAvg;
                 }
 
-                if (measurement.WindDirection != weatherStation.WindDirectionAvg &&
+                else if (measurement.WindDirection != weatherStation.WindDirectionAvg &&
                     measurement.WindDirection <= weatherStation.WindDirectionAvg * 1.2 &&
                     measurement.WindDirection >= weatherStation.WindDirectionAvg * 0.8)
                 {
@@ -231,6 +283,9 @@ namespace unwdmi.Parser
                 }
 
                 reader.Skip();
+                reader.Read();
+                reader.Read();
+#endregion
 
                 weatherStation.Enqueue(measurement);
             }

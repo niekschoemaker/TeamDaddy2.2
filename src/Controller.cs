@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,16 +100,27 @@ namespace unwdmi.Parser
         public double Longitude;
         public double Elevation;
 
-        public float TemperatureAvg;
-        public float DewpointAvg;
-        public float StationPressureAvg;
-        public float SeaLevelPressureAvg;
-        public float VisibilityAvg;
-        public float WindSpeedAvg;
-        public double PrecipitationAvg;
-        public float SnowfallAvg;
-        public float CloudCoverAvg;
-        public int WindDirectionAvg;
+        public float TemperatureAvg => TemperatureTotal / 30;
+        public float DewpointAvg => DewpointTotal / 30;
+        public float StationPressureAvg => StationPressureTotal / 30;
+        public float SeaLevelPressureAvg => SeaLevelPressureTotal / 30;
+        public float VisibilityAvg => VisibilityTotal / 30;
+        public float WindSpeedAvg => WindSpeedTotal / 30;
+        public double PrecipitationAvg => PrecipitationTotal / 30;
+        public float SnowfallAvg => SnowfallTotal / 30;
+        public float CloudCoverAvg => CloudCoverTotal / 30;
+        public int WindDirectionAvg => WindDirectionTotal / 30;
+
+        public float TemperatureTotal;
+        public float DewpointTotal;
+        public float StationPressureTotal;
+        public float SeaLevelPressureTotal;
+        public float VisibilityTotal;
+        public float WindSpeedTotal;
+        public double PrecipitationTotal;
+        public float SnowfallTotal;
+        public float CloudCoverTotal;
+        public int WindDirectionTotal;
         #endregion Fields
 
         public static Random Rnd = new Random();
@@ -144,6 +156,8 @@ namespace unwdmi.Parser
             AddTotals(measurement);
             MeasurementDatas.Enqueue(measurement);
 
+            // Tested both string.Format and concat, string.Format seems quickest, no difference on PC (CPU) but difference is massive on PI, probably due to memory usage.
+            // There's also sb.AppendFormat but this way you can create the string, then wait for the lock, instead of waiting for the lock and make the string while in the lock.
             var str = string.Format(CultureInfo.InvariantCulture,
                 "({0}, '{1}', {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}),\n", measurement.StationNumber,
                 measurement.DateTime, measurement.Temperature, measurement.Dewpoint, measurement.StationPressure,
@@ -160,8 +174,8 @@ namespace unwdmi.Parser
 
             // Get a random number and recalculate average if number "hits".
             // Removes inaccuracy from averages and number can be tweaked to tune performance hit.
-            if (Rnd.Next(240) == 1 && MeasurementDatas.Count > 28)
-                recalculateAverages();
+            //if (Rnd.Next(240) == 1 && MeasurementDatas.Count > 28)
+                //recalculateAverages();
         }
 
         public MeasurementData Dequeue()
@@ -171,44 +185,44 @@ namespace unwdmi.Parser
 
         private void AddTotals(MeasurementData measurement)
         {
-            TemperatureAvg += measurement.Temperature / 30;
-            DewpointAvg += measurement.Dewpoint / 30;
-            StationPressureAvg += measurement.StationPressure / 30;
-            SeaLevelPressureAvg += measurement.SeaLevelPressure / 30;
-            VisibilityAvg += measurement.Visibility / 30;
-            WindSpeedAvg += measurement.WindSpeed / 30;
-            PrecipitationAvg += measurement.Precipitation / 30;
-            SnowfallAvg += measurement.Snowfall / 30;
-            CloudCoverAvg += measurement.CloudCover / 30;
-            WindDirectionAvg += measurement.WindDirection / 30;
+            TemperatureTotal += measurement.Temperature;
+            DewpointTotal += measurement.Dewpoint;
+            StationPressureTotal += measurement.StationPressure;
+            SeaLevelPressureTotal += measurement.SeaLevelPressure;
+            VisibilityTotal += measurement.Visibility;
+            WindSpeedTotal += measurement.WindSpeed;
+            PrecipitationTotal += measurement.Precipitation;
+            SnowfallTotal += measurement.Snowfall;
+            CloudCoverTotal += measurement.CloudCover;
+            WindDirectionTotal += measurement.WindDirection;
         }
 
         private void SubtractTotals(MeasurementData measurement)
         {
-            TemperatureAvg -= measurement.Temperature / 30;
-            DewpointAvg -= measurement.Dewpoint / 30;
-            StationPressureAvg -= measurement.StationPressure / 30;
-            SeaLevelPressureAvg -= measurement.SeaLevelPressure / 30;
-            VisibilityAvg -= measurement.Visibility / 30;
-            WindSpeedAvg -= measurement.WindSpeed / 30;
-            PrecipitationAvg -= measurement.Precipitation / 30;
-            SnowfallAvg -= measurement.Snowfall / 30;
-            CloudCoverAvg -= measurement.CloudCover / 30;
-            WindDirectionAvg -= measurement.WindDirection / 30;
+            TemperatureTotal -= measurement.Temperature;
+            DewpointTotal -= measurement.Dewpoint;
+            StationPressureTotal -= measurement.StationPressure;
+            SeaLevelPressureTotal -= measurement.SeaLevelPressure;
+            VisibilityTotal -= measurement.Visibility;
+            WindSpeedTotal -= measurement.WindSpeed;
+            PrecipitationTotal -= measurement.Precipitation;
+            SnowfallTotal -= measurement.Snowfall;
+            CloudCoverTotal -= measurement.CloudCover;
+            WindDirectionTotal -= measurement.WindDirection;
         }
 
         public void recalculateAverages()
         {
-            TemperatureAvg = MeasurementDatas.Average(p => p.Temperature);
-            PrecipitationAvg = MeasurementDatas.Average(p => p.Precipitation);
-            StationPressureAvg = MeasurementDatas.Average(p => p.StationPressure);
-            SeaLevelPressureAvg = MeasurementDatas.Average(p => p.SeaLevelPressure);
-            VisibilityAvg = MeasurementDatas.Average(p => p.Visibility);
-            WindSpeedAvg = MeasurementDatas.Average(p => p.WindSpeed);
-            PrecipitationAvg = MeasurementDatas.Average(p => p.Precipitation);
-            SnowfallAvg = MeasurementDatas.Average(p => p.Snowfall);
-            CloudCoverAvg = MeasurementDatas.Average(p => p.CloudCover);
-            WindDirectionAvg = (int)MeasurementDatas.Average(p => p.WindDirection);
+            TemperatureTotal = MeasurementDatas.Sum(p => p.Temperature);
+            PrecipitationTotal = MeasurementDatas.Sum(p => p.Precipitation);
+            StationPressureTotal = MeasurementDatas.Sum(p => p.StationPressure);
+            SeaLevelPressureTotal = MeasurementDatas.Sum(p => p.SeaLevelPressure);
+            VisibilityTotal = MeasurementDatas.Sum(p => p.Visibility);
+            WindSpeedTotal = MeasurementDatas.Sum(p => p.WindSpeed);
+            PrecipitationTotal = MeasurementDatas.Sum(p => p.Precipitation);
+            SnowfallTotal = MeasurementDatas.Sum(p => p.Snowfall);
+            CloudCoverTotal = MeasurementDatas.Sum(p => p.CloudCover);
+            WindDirectionTotal = (int)MeasurementDatas.Sum(p => p.WindDirection);
         }
     }
 }

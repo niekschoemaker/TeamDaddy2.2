@@ -136,7 +136,7 @@ namespace unwdmi.Parser
             //Check if any of the keys are missing and if they are substitute them with the default value.
             if (!allKeys.Contains("DatabaseHost"))
             {
-                confCollection.Add("DatabaseHost", "localhost");
+                confCollection.Add("DatabaseHost", "192.168.178.123");
                 changed = true;
             }
 
