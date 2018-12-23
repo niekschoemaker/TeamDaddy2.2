@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Xml;
 
 namespace unwdmi.Parser
@@ -20,7 +19,7 @@ namespace unwdmi.Parser
             if (!XML.StartsWith("<?x") || !XML.EndsWith("TA>\n"))
             {
                 XML = XML.Substring(XML.IndexOf("<?xml", StringComparison.Ordinal),
-                    XML.IndexOf("</WEATHERDATA>", StringComparison.Ordinal) + 15);
+                    XML.IndexOf("TA>", StringComparison.Ordinal) + 4);
             }
 
             // Is inside a using Statement because XmlReader and StringReader are ignored by GC
@@ -88,14 +87,19 @@ namespace unwdmi.Parser
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out measurement.Temperature))
                 {
                     // If value fails to parse set the value to the average of last 30 seconds.
-                    measurement.Temperature = weatherStation.TemperatureAvg;
+                    measurement.Temperature = weatherStation.TemperatureTotal / 30;
                 }
                 // Check if the data is not a peak. The not equals check is to avoid buggy behaviour when the value and average is 0.
-                else if (measurement.Temperature != weatherStation.TemperatureAvg &&
-                    measurement.Temperature <= weatherStation.TemperatureAvg * 1.2 &&
-                    measurement.Temperature >= weatherStation.TemperatureAvg * 0.8)
+                else
                 {
-                    measurement.Temperature = weatherStation.TemperatureAvg;
+                    var temperatureAvg = weatherStation.TemperatureTotal / 30;
+                    if (measurement.Temperature != temperatureAvg &&
+                        measurement.Temperature <= temperatureAvg * 1.2 &&
+                        measurement.Temperature >= temperatureAvg * 0.8)
+                    {
+                        measurement.Temperature = temperatureAvg;
+                    }
+
                 }
 
                 reader.Skip();
@@ -106,14 +110,17 @@ namespace unwdmi.Parser
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out measurement.Dewpoint))
                 {
-                    measurement.Dewpoint = weatherStation.DewpointAvg;
+                    measurement.Dewpoint = weatherStation.DewpointTotal / 30;
                 }
-
-                else if (measurement.Dewpoint != weatherStation.DewpointAvg &&
-                    measurement.Dewpoint <= weatherStation.DewpointAvg * 1.2 &&
-                    measurement.Dewpoint >= weatherStation.DewpointAvg * 0.8)
+                else
                 {
-                    measurement.Dewpoint = weatherStation.DewpointAvg;
+                    var dewPointAvg = weatherStation.DewpointTotal / 30;
+                    if (measurement.Dewpoint != dewPointAvg &&
+                        measurement.Dewpoint <= dewPointAvg * 1.2 &&
+                        measurement.Dewpoint >= dewPointAvg * 0.8)
+                    {
+                        measurement.Dewpoint = dewPointAvg;
+                    }
                 }
 
                 reader.Skip();
@@ -124,14 +131,17 @@ namespace unwdmi.Parser
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.StationPressure))
                 {
-                    measurement.StationPressure = weatherStation.StationPressureAvg;
+                    measurement.StationPressure = weatherStation.StationPressureTotal / 30;
                 }
-
-                else if (measurement.StationPressure != weatherStation.StationPressureAvg &&
-                    measurement.StationPressure <= weatherStation.StationPressureAvg * 1.2 &&
-                    measurement.StationPressure >= weatherStation.StationPressureAvg * 0.8)
+                else
                 {
-                    measurement.StationPressure = weatherStation.StationPressureAvg;
+                    var stationPressureAvg = weatherStation.StationPressureTotal / 30;
+                    if (measurement.StationPressure != stationPressureAvg &&
+                        measurement.StationPressure <= stationPressureAvg * 1.2 &&
+                        measurement.StationPressure >= stationPressureAvg * 0.8)
+                    {
+                        measurement.StationPressure = stationPressureAvg;
+                    }
                 }
 
                 reader.Skip();
@@ -142,14 +152,18 @@ namespace unwdmi.Parser
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.SeaLevelPressure))
                 {
-                    measurement.SeaLevelPressure = weatherStation.SeaLevelPressureAvg;
+                    measurement.SeaLevelPressure = weatherStation.SeaLevelPressureTotal / 30;
                 }
 
-                else if (measurement.SeaLevelPressure != weatherStation.SeaLevelPressureAvg &&
-                    measurement.SeaLevelPressure <= weatherStation.SeaLevelPressureAvg * 1.2 &&
-                    measurement.SeaLevelPressure >= weatherStation.SeaLevelPressureAvg * 0.8)
+                else
                 {
-                    measurement.SeaLevelPressure = weatherStation.SeaLevelPressureAvg;
+                    var seaLevelPressureAvg = weatherStation.SeaLevelPressureTotal / 30;
+                    if (measurement.SeaLevelPressure != seaLevelPressureAvg &&
+                        measurement.SeaLevelPressure <= seaLevelPressureAvg * 1.2 &&
+                        measurement.SeaLevelPressure >= seaLevelPressureAvg * 0.8)
+                    {
+                        measurement.SeaLevelPressure = seaLevelPressureAvg;
+                    }
                 }
 
                 reader.Skip();
@@ -160,14 +174,18 @@ namespace unwdmi.Parser
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.Visibility))
                 {
-                    measurement.Visibility = weatherStation.VisibilityAvg;
+                    measurement.Visibility = weatherStation.VisibilityTotal / 30;
                 }
 
-                else if (measurement.Visibility != weatherStation.VisibilityAvg &&
-                    measurement.Visibility <= weatherStation.VisibilityAvg * 1.2 &&
-                    measurement.Visibility >= weatherStation.VisibilityAvg * 0.8)
+                else
                 {
-                    measurement.Visibility = weatherStation.VisibilityAvg;
+                    var visibilityAverage = weatherStation.VisibilityTotal / 30;
+                    if (measurement.Visibility != visibilityAverage &&
+                    measurement.Visibility <= visibilityAverage * 1.2 &&
+                    measurement.Visibility >= visibilityAverage * 0.8)
+                    {
+                        measurement.Visibility = visibilityAverage;
+                    }
                 }
 
                 reader.Skip();
@@ -178,14 +196,18 @@ namespace unwdmi.Parser
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.WindSpeed))
                 {
-                    measurement.WindSpeed = weatherStation.WindSpeedAvg;
+                    measurement.WindSpeed = weatherStation.WindSpeedTotal / 30;
                 }
 
-                else if (measurement.WindSpeed != weatherStation.WindSpeedAvg &&
-                    measurement.WindSpeed <= weatherStation.WindSpeedAvg * 1.2 &&
-                    measurement.WindSpeed >= weatherStation.WindSpeedAvg * 0.8)
+                else
                 {
-                    measurement.WindSpeed = weatherStation.WindSpeedAvg;
+                    var windSpeedAvg = weatherStation.WindSpeedTotal / 30;
+                    if (measurement.WindSpeed != windSpeedAvg &&
+                  measurement.WindSpeed <= windSpeedAvg * 1.2 &&
+                  measurement.WindSpeed >= windSpeedAvg * 0.8)
+                    {
+                        measurement.WindSpeed = windSpeedAvg;
+                    }
                 }
 
                 reader.Skip();
@@ -196,14 +218,17 @@ namespace unwdmi.Parser
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !double.TryParse(currentValue, numberStylePositive, culture, out measurement.Precipitation))
                 {
-                    measurement.Precipitation = weatherStation.PrecipitationAvg;
+                    measurement.Precipitation = weatherStation.PrecipitationTotal / 30;
                 }
-
-                else if (measurement.Precipitation != weatherStation.PrecipitationAvg &&
-                    measurement.Precipitation <= weatherStation.PrecipitationAvg * 1.2 &&
-                    measurement.Precipitation >= weatherStation.PrecipitationAvg * 0.8)
+                else
                 {
-                    measurement.Precipitation = weatherStation.PrecipitationAvg;
+                    var precipitationAvg = weatherStation.PrecipitationTotal / 30;
+                    if (measurement.Precipitation != precipitationAvg &&
+                    measurement.Precipitation <= precipitationAvg * 1.2 &&
+                    measurement.Precipitation >= precipitationAvg * 0.8)
+                    {
+                        measurement.Precipitation = precipitationAvg;
+                    }
                 }
 
                 reader.Skip();
@@ -214,14 +239,17 @@ namespace unwdmi.Parser
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out measurement.Snowfall))
                 {
-                    measurement.Snowfall = weatherStation.SnowfallAvg;
+                    measurement.Snowfall = weatherStation.SnowfallTotal / 30;
                 }
-
-                else if (weatherStation.SnowfallAvg != measurement.Snowfall &&
-                    measurement.Snowfall <= weatherStation.SnowfallAvg * 1.2 &&
-                    measurement.Snowfall >= weatherStation.SnowfallAvg * 0.8)
+                else
                 {
-                    measurement.Snowfall = weatherStation.SnowfallAvg;
+                    var snowFallAvg = weatherStation.SnowfallTotal / 30;
+                    if (measurement.Snowfall != snowFallAvg &&
+                    measurement.Snowfall <= snowFallAvg * 1.2 &&
+                    measurement.Snowfall >= snowFallAvg * 0.8)
+                    {
+                        measurement.Snowfall = snowFallAvg;
+                    }
                 }
 
                 reader.Skip();
@@ -243,6 +271,7 @@ namespace unwdmi.Parser
                         total += frshtt[i] == '0' ? (byte)0 : (byte)Math.Pow(2, 5 - i);
                     }
                 }
+
                 measurement.Events = total;
                 reader.Skip();
 #endregion
@@ -254,37 +283,40 @@ namespace unwdmi.Parser
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture,
                     out measurement.CloudCover))
                 {
-                    measurement.CloudCover = weatherStation.CloudCoverAvg;
+                    measurement.CloudCover = weatherStation.CloudCoverTotal / 30;
+                }
+                else
+                {
+                    var cloudCoverAvg = weatherStation.CloudCoverTotal / 30;
+                    if (measurement.CloudCover != cloudCoverAvg &&
+                    measurement.CloudCover <= cloudCoverAvg * 1.2 &&
+                    measurement.CloudCover >= cloudCoverAvg * 0.8)
+                    {
+                        measurement.CloudCover = cloudCoverAvg;
+                    }
                 }
 
-                else if (measurement.CloudCover != weatherStation.CloudCoverAvg &&
-                    measurement.CloudCover <= weatherStation.CloudCoverAvg * 1.2 &&
-                    measurement.CloudCover >= weatherStation.CloudCoverAvg * 0.8)
-                {
-                    measurement.CloudCover = weatherStation.CloudCoverAvg;
-                }
                 reader.Skip();
 #endregion
 
                 #region WindDirection
 
                 currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !int.TryParse(currentValue, NumberStyles.None, NumberFormatInfo.InvariantInfo,
+                if (string.IsNullOrEmpty(currentValue) || !ushort.TryParse(currentValue, NumberStyles.None, NumberFormatInfo.InvariantInfo,
                     out measurement.WindDirection))
                 {
-                    measurement.WindDirection = weatherStation.WindDirectionAvg;
+                    measurement.WindDirection = (ushort)(weatherStation.WindDirectionTotal / 30);
                 }
-
-                else if (measurement.WindDirection != weatherStation.WindDirectionAvg &&
-                    measurement.WindDirection <= weatherStation.WindDirectionAvg * 1.2 &&
-                    measurement.WindDirection >= weatherStation.WindDirectionAvg * 0.8)
+                else
                 {
-                    measurement.WindDirection = weatherStation.WindDirectionAvg;
+                    var windDirectionAvg = weatherStation.WindDirectionTotal / 30;
+                    if (measurement.WindDirection != windDirectionAvg &&
+                  measurement.WindDirection <= windDirectionAvg * 1.2 &&
+                  measurement.WindDirection >= windDirectionAvg * 0.8)
+                    {
+                        measurement.WindDirection = (ushort)windDirectionAvg;
+                    }
                 }
-
-                reader.Skip();
-                reader.Read();
-                reader.Read();
 #endregion
 
                 weatherStation.Enqueue(measurement);
@@ -334,7 +366,7 @@ namespace unwdmi.Parser
         /// <summary> Cloud cover in percentage. Valid values range from 0.0 till 99.9 with 1 decimal point precision.</summary>
         public float CloudCover;
         /// <summary> Wind direction in degrees. Valid values range from 0 till 359. Only integers.</summary>
-        public int WindDirection;
+        public ushort WindDirection;
 
         public enum EventFlags
         {

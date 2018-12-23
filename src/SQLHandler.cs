@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -120,7 +116,7 @@ namespace unwdmi.Parser
                     var latitude = reader.GetDouble("latitude");
                     var longitude = reader.GetDouble("longitude");
                     var elevation = reader.GetDouble("elevation");
-                    controller.WeatherStations.TryAdd(STN,
+                    controller.WeatherStations.Add(STN,
                         new WeatherStation(STN, name, country, latitude, longitude, elevation));
                 }
             }
@@ -136,7 +132,7 @@ namespace unwdmi.Parser
             //Check if any of the keys are missing and if they are substitute them with the default value.
             if (!allKeys.Contains("DatabaseHost"))
             {
-                confCollection.Add("DatabaseHost", "192.168.178.123");
+                confCollection.Add("DatabaseHost", "169.254.134.127");
                 changed = true;
             }
 

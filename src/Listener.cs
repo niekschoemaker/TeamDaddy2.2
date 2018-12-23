@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -13,10 +12,10 @@ namespace unwdmi.Parser
     {
         public Listener(Controller instance)
         {
-            controller = instance;
+            _controller = instance;
         }
 
-        private Controller controller;
+        private readonly Controller _controller;
 
         private Socket _listener;
 
@@ -26,7 +25,7 @@ namespace unwdmi.Parser
             _listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             _listener.Blocking = false;
             _listener.Bind(ip);
-            _listener.Listen(100);
+            _listener.Listen(200);
             _listener.BeginAccept(new AsyncCallback(AcceptCallBack), _listener);
         }
 
@@ -35,43 +34,42 @@ namespace unwdmi.Parser
         {
             // Program can act weird if all 800 connections are opened at once.
             // In real-life applications this shouldn't be a problem.
-            Socket listener = (Socket) ar.AsyncState;
+            _listener.BeginAccept(new AsyncCallback(AcceptCallBack), _listener);
+
+            Socket listener = (Socket)ar.AsyncState;
             Socket handler = listener.EndAccept(ar);
-            Interlocked.Increment(ref controller.OpenSockets);
 
             StateObject stateObject = new StateObject
             {
                 workSocket = handler
             };
-            handler.BeginReceive(stateObject.buffer, 0, StateObject.BUFFER_SIZE, 0, new AsyncCallback(ReceiveCallback), stateObject);
-            _listener.BeginAccept(new AsyncCallback(AcceptCallBack), _listener);
+            handler.BeginReceive(stateObject.buffer, 0, StateObject.BUFFER_SIZE, 0, ReceiveCallback, stateObject);
+            Interlocked.Increment(ref _controller.OpenSockets);
         }
 
         void ReceiveCallback(IAsyncResult ar)
         {
-            StateObject so = (StateObject) ar.AsyncState;
-            Socket workSocket = so.workSocket;
-
+            var so = (StateObject) ar.AsyncState;
+            var workSocket = so.workSocket;
             try
             {
-                int read = workSocket.EndReceive(ar);
+                var read = workSocket.EndReceive(ar);
 
                 if (read > 0)
                 {
-                    string str = Encoding.ASCII.GetString(so.buffer, 0, read);
+                    
+                    var str = Encoding.ASCII.GetString(so.buffer, 0, read);
                     so.sb.Append(str);
-                    if (str.IndexOf("</WEATHERDATA>", str.Length - 20 >= 0 ? str.Length - 20 : 0,
+                    if (read < StateObject.BUFFER_SIZE && str.IndexOf("ATA>", str.Length - 6 >= 0 ? str.Length - 6 : 0,
                             StringComparison.Ordinal) > -1)
                     {
                         var strContent = so.sb.ToString();
-                        Task task = so.CurrentTask;
-                        Interlocked.Increment(ref controller.ActiveParsers);
-                        so.CurrentTask = Task.Run(() =>
+                        Interlocked.Increment(ref _controller.ActiveParsers);
+                        Task.Run(() =>
                         {
-                            task.Wait();
                             try
                             {
-                                controller.Parser.ParseXML(strContent);
+                                _controller.Parser.ParseXML(strContent);
                             }
                             catch (Exception e)
                             {
@@ -79,7 +77,7 @@ namespace unwdmi.Parser
                             }
                             finally
                             {
-                                Interlocked.Decrement(ref controller.ActiveParsers);
+                                Interlocked.Decrement(ref _controller.ActiveParsers);
                             }
                         });
                         so.sb.Clear();
@@ -96,7 +94,7 @@ namespace unwdmi.Parser
 
                     workSocket.Close();
 
-                    Interlocked.Decrement(ref controller.OpenSockets);
+                    Interlocked.Decrement(ref _controller.OpenSockets);
 
                 }
             }
@@ -109,11 +107,10 @@ namespace unwdmi.Parser
 
     public class StateObject
     {
-        public Socket workSocket = null;
-        public const int BUFFER_SIZE = 1024;
+        public Socket workSocket;
+        // 4096 fits all the XML files, so the checks don't have to be done as often, saves a bit of CPU, costs a bit more ram.
+        public const int BUFFER_SIZE = 4096;
         public byte[] buffer = new byte[BUFFER_SIZE];
         public StringBuilder sb = new StringBuilder();
-        public bool Exception;
-        public Task CurrentTask = Task.CompletedTask;
     }
 }
