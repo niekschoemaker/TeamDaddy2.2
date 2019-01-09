@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Weather station</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+}
+
+/* Style the header */
+.header {
+	background-color: #f1f1f1;
+	padding: 20px;
+	text-align: center;
+}
+/* Style text h1 */
+.header h1 {
+	background-color: #f1f1f1;
+	color: #ff0000
+}
+/* Style text h2 */
+.header h2 {
+	background-color: #f1f1f1;
+	color: #6c933f
+}
+
+/* Style the top navigation bar */
+.topnav {
+	overflow: hidden;
+	background-color: #333;
+}
+
+/* Style the topnav links */
+.topnav a {
+	float: left;
+	display: block;
+	color: #f2f2f2;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+}
+
+/* Change color on hover */
+.topnav a:hover {
+	background-color: #ddd;
+	color: black;
+}
+
+/* Create three unequal columns that floats next to each other */
+.column {
+	float: left;
+	padding: 10px;
+}
+
+/* Left and right column */
+.column.side {
+	width: 25%;
+	background-color: #0000ff
+}
+
+/* Middle column */
+.column.middle {
+	width: 50%;
+	background-color: #ffffff
+}
+
+/* Clear floats after the columns */
+.row:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+/* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+	.column.side, .column.middle {
+		width: 100%;
+		height: 100%
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>TeamDaddy</h1>
+  <h2>Header die mooi meegaat :)</h2>
+</div>
+
+<div class="topnav">
+  <a href="#">opmaakLink</a>
+</div>
+
+<div class="row">
+	<div class="column side">
+		<h2>leftSide</h2>
+		<p>Text</p>
+	</div>
+  
+	<div class="column middle">
+		<h2>Main Content</h2>
+		<p>Jo hier is ruimte</p>
+</div>
+  
+	<div class="column side">
+		<h2>RightSide</h2>
+		<p>Text</p>
+	</div>
+</div>
+  
+</body>
+</html>
