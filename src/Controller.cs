@@ -1,4 +1,4 @@
-﻿#define CONCAT
+﻿//#define CONCAT
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -67,7 +67,7 @@ namespace unwdmi.Parser
         /// <summary> Sockets currently open (# of established connections with WeatherStations) </summary>
         public int OpenSockets = 0;
 
-        public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, StationPressure, SeaLevelPressure, Visibility, WindSpeed, Precipitation, Snowfall, Events, CloudCover, WindDirection)\nVALUES");
+        public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, WindSpeed, CloudCover)\nVALUES");
         public int SqlQueueCount = 0;
 
         public Dictionary<uint, WeatherStation> WeatherStations = new Dictionary<uint, WeatherStation>();
@@ -134,12 +134,17 @@ namespace unwdmi.Parser
 #if CONCAT
             var str = "(" + measurement.StationNumber + ", '" + measurement.DateTime + "', " + measurement.Temperature + ", " + measurement.Dewpoint + ", " + measurement.StationPressure + ", " + measurement.SeaLevelPressure + ", " + measurement.Visibility + ", " + measurement.WindSpeed + ", " + measurement.Precipitation + ", " + measurement.Snowfall + ", " + measurement.Events + ", " + measurement.CloudCover + ", " + measurement.WindDirection + "),\n";
 #else
-            var str = string.Format(CultureInfo.InvariantCulture,
+            /*var str = string.Format(CultureInfo.InvariantCulture,
                 "({0}, '{1}', {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}),\n", measurement.StationNumber,
                 measurement.DateTime, measurement.Temperature, measurement.Dewpoint, measurement.StationPressure,
                 measurement.SeaLevelPressure, measurement.Visibility,
                 measurement.WindSpeed, measurement.Precipitation, measurement.Snowfall, measurement.Events,
-                measurement.CloudCover, measurement.WindDirection);
+                measurement.CloudCover, measurement.WindDirection);*/
+
+            var str = string.Format(CultureInfo.InvariantCulture,
+                "({0}, '{1}', {2}, {3}, {4}, {5}),\n", measurement.StationNumber,
+                measurement.DateTime, measurement.Temperature, measurement.Dewpoint,
+                measurement.WindSpeed, measurement.CloudCover);
 #endif
 
             lock (Controller.SqlStringBuilder)

@@ -62,7 +62,7 @@ namespace unwdmi.Parser
                 query = controller.SqlStringBuilder.ToString();
                 controller.SqlStringBuilder.Clear();
                 controller.SqlStringBuilder.AppendFormat(
-                    "INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, StationPressure, SeaLevelPressure, Visibility, WindSpeed, Precipitation, Snowfall, Events, CloudCover, WindDirection)\nVALUES");
+                    "INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, WindSpeed, CloudCover)\nVALUES");
                 controller.SqlQueueCount = 0;
             }
             try
