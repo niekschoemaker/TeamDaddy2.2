@@ -1,0 +1,22 @@
+syntax = "proto3";
+package WeatherData;
+
+option csharp_namespace = "unwdmi.Protobuf";
+
+message Measurement {
+	uint32 StationID = 1;
+	uint64 DateTime = 2;
+	float Temperature = 3;
+	float Dewpoint = 4;
+	float WindSpeed = 5;
+	float CloudCover = 6;
+}
+
+message WeatherStation {
+	uint32 StationNumber = 1;
+	string Name = 2;
+	string Country = 3;
+	double Latitude = 4;
+	double Longitude = 5;
+	double Elevation = 6;
+}
