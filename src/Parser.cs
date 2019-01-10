@@ -71,7 +71,7 @@ namespace unwdmi.Parser
                 var date = reader.ReadElementString();
                 reader.Skip();
 
-                measurement.DateTime = date + " " + reader.ReadElementString();
+                DateTime.TryParse(date + " " + reader.ReadElementString(), out measurement.DateTime);
                 reader.Skip();
 #endregion
 
@@ -334,7 +334,7 @@ namespace unwdmi.Parser
         public uint StationNumber;
 
         /// <summary> DateTime of recording </summary>
-        public string DateTime;
+        public DateTime DateTime;
 
         /// <summary> Temperature in degrees Celsius. Valid Values range from -9999.9 till 9999.9 with one decimal point precision. </summary>
         public float Temperature;

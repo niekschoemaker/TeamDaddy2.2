@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
+using unwdmi.Protobuf;
 
 namespace unwdmi.Parser
 {
@@ -142,16 +144,30 @@ namespace unwdmi.Parser
                 measurement.WindSpeed, measurement.Precipitation, measurement.Snowfall, measurement.Events,
                 measurement.CloudCover, measurement.WindDirection);*/
 
-            var str = string.Format(CultureInfo.InvariantCulture,
+            /*var str = string.Format(CultureInfo.InvariantCulture,
                 "({0}, '{1}', {2}, {3}, {4}, {5}),\n", measurement.StationNumber,
                 measurement.DateTime, measurement.Temperature, measurement.Dewpoint,
-                measurement.WindSpeed, measurement.CloudCover);
+                measurement.WindSpeed, measurement.CloudCover);*/
 #endif
+            var measurementProtobuf = new Measurement()
+            {
+                CloudCover = measurement.CloudCover,
+                DateTime = ((DateTimeOffset) measurement.DateTime).ToUnixTimeSeconds(),
+                StationID = measurement.StationNumber,
+                Dewpoint = measurement.Dewpoint,
+                WindSpeed = measurement.WindSpeed,
+                Temperature = measurement.Temperature
+            };
 
-            lock (Controller.SqlStringBuilder)
+            using (var output = File.Open("measurement.dat", FileMode.Append))
+            {
+                measurementProtobuf.WriteTo(output);
+            }
+
+            /*lock (Controller.SqlStringBuilder)
             {
                 Controller.SqlStringBuilder.Append(str);
-            }
+            }*/
 
             Interlocked.Increment(ref Controller.SqlQueueCount);
 

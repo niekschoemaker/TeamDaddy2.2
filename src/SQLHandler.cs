@@ -96,7 +96,7 @@ namespace unwdmi.Parser
 
                 // Check if every parser has added their data for that second and if so add the data to the Database
                 Console.WriteLine(controller.SqlQueueCount);
-                AddData();
+                //AddData();
 
             }
         }

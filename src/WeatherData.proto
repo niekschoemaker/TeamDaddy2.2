@@ -5,7 +5,7 @@ option csharp_namespace = "unwdmi.Protobuf";
 
 message Measurement {
 	uint32 StationID = 1;
-	uint64 DateTime = 2;
+	int64 DateTime = 2;
 	float Temperature = 3;
 	float Dewpoint = 4;
 	float WindSpeed = 5;

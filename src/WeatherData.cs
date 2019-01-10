@@ -25,7 +25,7 @@ namespace unwdmi.Protobuf {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChFXZWF0aGVyRGF0YS5wcm90bxILV2VhdGhlckRhdGEigAEKC01lYXN1cmVt",
-            "ZW50EhEKCVN0YXRpb25JRBgBIAEoDRIQCghEYXRlVGltZRgCIAEoBBITCgtU",
+            "ZW50EhEKCVN0YXRpb25JRBgBIAEoDRIQCghEYXRlVGltZRgCIAEoAxITCgtU",
             "ZW1wZXJhdHVyZRgDIAEoAhIQCghEZXdwb2ludBgEIAEoAhIRCglXaW5kU3Bl",
             "ZWQYBSABKAISEgoKQ2xvdWRDb3ZlchgGIAEoAiJ+Cg5XZWF0aGVyU3RhdGlv",
             "bhIVCg1TdGF0aW9uTnVtYmVyGAEgASgNEgwKBE5hbWUYAiABKAkSDwoHQ291",
@@ -95,9 +95,9 @@ namespace unwdmi.Protobuf {
 
     /// <summary>Field number for the "DateTime" field.</summary>
     public const int DateTimeFieldNumber = 2;
-    private ulong dateTime_;
+    private long dateTime_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong DateTime {
+    public long DateTime {
       get { return dateTime_; }
       set {
         dateTime_ = value;
@@ -174,7 +174,7 @@ namespace unwdmi.Protobuf {
     public override int GetHashCode() {
       int hash = 1;
       if (StationID != 0) hash ^= StationID.GetHashCode();
-      if (DateTime != 0UL) hash ^= DateTime.GetHashCode();
+      if (DateTime != 0L) hash ^= DateTime.GetHashCode();
       if (Temperature != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Temperature);
       if (Dewpoint != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Dewpoint);
       if (WindSpeed != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(WindSpeed);
@@ -196,9 +196,9 @@ namespace unwdmi.Protobuf {
         output.WriteRawTag(8);
         output.WriteUInt32(StationID);
       }
-      if (DateTime != 0UL) {
+      if (DateTime != 0L) {
         output.WriteRawTag(16);
-        output.WriteUInt64(DateTime);
+        output.WriteInt64(DateTime);
       }
       if (Temperature != 0F) {
         output.WriteRawTag(29);
@@ -227,8 +227,8 @@ namespace unwdmi.Protobuf {
       if (StationID != 0) {
         size += 1 + pb::CodedOutputStream.ComputeUInt32Size(StationID);
       }
-      if (DateTime != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(DateTime);
+      if (DateTime != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(DateTime);
       }
       if (Temperature != 0F) {
         size += 1 + 4;
@@ -256,7 +256,7 @@ namespace unwdmi.Protobuf {
       if (other.StationID != 0) {
         StationID = other.StationID;
       }
-      if (other.DateTime != 0UL) {
+      if (other.DateTime != 0L) {
         DateTime = other.DateTime;
       }
       if (other.Temperature != 0F) {
@@ -287,7 +287,7 @@ namespace unwdmi.Protobuf {
             break;
           }
           case 16: {
-            DateTime = input.ReadUInt64();
+            DateTime = input.ReadInt64();
             break;
           }
           case 29: {
