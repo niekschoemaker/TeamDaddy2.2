@@ -20,6 +20,11 @@ namespace unwdmi.Parser
 #if DEBUG
             Thread.Sleep(2500);
 #endif
+            if (!Directory.Exists("Data"))
+            {
+                Directory.CreateDirectory("Data");
+            }
+
             // Make instance of self so we can send the Controller to the other objects.
             Controller controller = new Controller();
         }
@@ -40,10 +45,10 @@ namespace unwdmi.Parser
             Listener.StartListening();
             
             // Loop to keep checking the Sql Data.
-            Task.Run(() =>
+            /*Task.Run(() =>
             {
                 SqlHandler.CheckSqlQueue();
-            });
+            });*/
 
             //TODO: Add some actual data handling, without ReadLine program just closes since nothing runs on main thread whatsoever.
             while (true)
@@ -94,20 +99,20 @@ namespace unwdmi.Parser
 
         public float TemperatureTotal;
         public float DewpointTotal;
-        public float StationPressureTotal;
-        public float SeaLevelPressureTotal;
-        public float VisibilityTotal;
+        //public float StationPressureTotal;
+        //public float SeaLevelPressureTotal;
+        //public float VisibilityTotal;
         public float WindSpeedTotal;
-        public double PrecipitationTotal;
-        public float SnowfallTotal;
+        //public double PrecipitationTotal;
+        //public float SnowfallTotal;
         public float CloudCoverTotal;
-        public ushort WindDirectionTotal;
+        //public ushort WindDirectionTotal;
         #endregion Fields
 
         public static Random Rnd = new Random();
         // Since a little delay of 30 seconds in the database shouldn't really matter choose to split the queues
         // Makes processing easier, just put elements in sqlQueue if count is bigger than 30.
-        public Queue<MeasurementData> MeasurementDatas = new Queue<MeasurementData>(30);
+        public Queue<Measurement> MeasurementDatas = new Queue<Measurement>(30);
 
         public WeatherStation(uint stationNumber, string name, string country, double latitude, double longitude, double elevation)
         {
@@ -119,7 +124,7 @@ namespace unwdmi.Parser
             Elevation = elevation;
         }
 
-        public void Enqueue(MeasurementData measurement)
+        public void Enqueue(Measurement measurement)
         {
 
             // Check if count equals 30, and if so move element to the SQL queue
@@ -149,19 +154,10 @@ namespace unwdmi.Parser
                 measurement.DateTime, measurement.Temperature, measurement.Dewpoint,
                 measurement.WindSpeed, measurement.CloudCover);*/
 #endif
-            var measurementProtobuf = new Measurement()
+            var path = $"./Data/{StationNumber}{DateTime.FromBinary(measurement.DateTime):yyyy-M-d-HH-mm-ss}.dat";
+            using (var output = File.Exists(path)? File.Open(path, FileMode.Append) : File.Create(path))
             {
-                CloudCover = measurement.CloudCover,
-                DateTime = ((DateTimeOffset) measurement.DateTime).ToUnixTimeSeconds(),
-                StationID = measurement.StationNumber,
-                Dewpoint = measurement.Dewpoint,
-                WindSpeed = measurement.WindSpeed,
-                Temperature = measurement.Temperature
-            };
-
-            using (var output = File.Open("measurement.dat", FileMode.Append))
-            {
-                measurementProtobuf.WriteTo(output);
+                measurement.WriteTo(output);
             }
 
             /*lock (Controller.SqlStringBuilder)
@@ -178,51 +174,52 @@ namespace unwdmi.Parser
                 //recalculateAverages();
         }
 
-        public MeasurementData Dequeue()
+        public Measurement Dequeue()
         {
             return MeasurementDatas.Dequeue();
         }
 
-        private void AddTotals(MeasurementData measurement)
+        private void AddTotals(Measurement measurement)
         {
             TemperatureTotal += measurement.Temperature;
             DewpointTotal += measurement.Dewpoint;
-            StationPressureTotal += measurement.StationPressure;
-            SeaLevelPressureTotal += measurement.SeaLevelPressure;
-            VisibilityTotal += measurement.Visibility;
+            //StationPressureTotal += measurement.StationPressure;
+            //SeaLevelPressureTotal += measurement.SeaLevelPressure;
+           // VisibilityTotal += measurement.Visibility;
             WindSpeedTotal += measurement.WindSpeed;
-            PrecipitationTotal += measurement.Precipitation;
-            SnowfallTotal += measurement.Snowfall;
+            //PrecipitationTotal += measurement.Precipitation;
+            //SnowfallTotal += measurement.Snowfall;
             CloudCoverTotal += measurement.CloudCover;
-            WindDirectionTotal += measurement.WindDirection;
+            //WindDirectionTotal += measurement.WindDirection;
         }
 
-        private void SubtractTotals(MeasurementData measurement)
+        private void SubtractTotals(Measurement measurement)
         {
             TemperatureTotal -= measurement.Temperature;
             DewpointTotal -= measurement.Dewpoint;
-            StationPressureTotal -= measurement.StationPressure;
-            SeaLevelPressureTotal -= measurement.SeaLevelPressure;
-            VisibilityTotal -= measurement.Visibility;
+            //StationPressureTotal -= measurement.StationPressure;
+            //SeaLevelPressureTotal -= measurement.SeaLevelPressure;
+            //VisibilityTotal -= measurement.Visibility;
             WindSpeedTotal -= measurement.WindSpeed;
-            PrecipitationTotal -= measurement.Precipitation;
-            SnowfallTotal -= measurement.Snowfall;
+            //PrecipitationTotal -= measurement.Precipitation;
+            //SnowfallTotal -= measurement.Snowfall;
             CloudCoverTotal -= measurement.CloudCover;
-            WindDirectionTotal -= measurement.WindDirection;
+            //WindDirectionTotal -= measurement.WindDirection;
         }
 
         public void recalculateSums()
         {
             TemperatureTotal = MeasurementDatas.Sum(p => p.Temperature);
-            PrecipitationTotal = MeasurementDatas.Sum(p => p.Precipitation);
-            StationPressureTotal = MeasurementDatas.Sum(p => p.StationPressure);
-            SeaLevelPressureTotal = MeasurementDatas.Sum(p => p.SeaLevelPressure);
-            VisibilityTotal = MeasurementDatas.Sum(p => p.Visibility);
+            DewpointTotal = MeasurementDatas.Sum(p => p.Dewpoint);
+            //PrecipitationTotal = MeasurementDatas.Sum(p => p.Precipitation);
+            //StationPressureTotal = MeasurementDatas.Sum(p => p.StationPressure);
+            //SeaLevelPressureTotal = MeasurementDatas.Sum(p => p.SeaLevelPressure);
+            //VisibilityTotal = MeasurementDatas.Sum(p => p.Visibility);
             WindSpeedTotal = MeasurementDatas.Sum(p => p.WindSpeed);
-            PrecipitationTotal = MeasurementDatas.Sum(p => p.Precipitation);
-            SnowfallTotal = MeasurementDatas.Sum(p => p.Snowfall);
+            //PrecipitationTotal = MeasurementDatas.Sum(p => p.Precipitation);
+            //SnowfallTotal = MeasurementDatas.Sum(p => p.Snowfall);
             CloudCoverTotal = MeasurementDatas.Sum(p => p.CloudCover);
-            WindDirectionTotal = (ushort)MeasurementDatas.Sum(p => p.WindDirection);
+            //WindDirectionTotal = (ushort)MeasurementDatas.Sum(p => p.WindDirection);
         }
     }
 }

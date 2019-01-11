@@ -2,6 +2,8 @@
 using System.Globalization;
 using System.IO;
 using System.Xml;
+using Google.Protobuf;
+using unwdmi.Protobuf;
 
 namespace unwdmi.Parser
 {
@@ -51,8 +53,6 @@ namespace unwdmi.Parser
         /// <param name="reader"> XMLReader positioned at WeatherData starting tag. </param>
         void ParseMeasurement(XmlReader reader)
         {
-            MeasurementData measurement = new MeasurementData();
-
             if (!reader.ReadToFollowing("STN")) return;
 
             // The code now following. Plis ignore, lot of repetitive code, since using objects for performance.
@@ -60,9 +60,10 @@ namespace unwdmi.Parser
             {
                 #region Identification (StationNumber and DateTime)
 
-                uint.TryParse(reader.ReadElementString(), out measurement.StationNumber);
+                uint stationNumber;
+                uint.TryParse(reader.ReadElementString(), out stationNumber);
 
-                var weatherStation = _controller.WeatherStations[measurement.StationNumber];
+                var weatherStation = _controller.WeatherStations[stationNumber];
 
                 // reader.Skip skips one node (Skips to next start element in this XML file)
                 // Doesn't validate the XML so is quicker than calling .read multiple times
@@ -70,8 +71,8 @@ namespace unwdmi.Parser
 
                 var date = reader.ReadElementString();
                 reader.Skip();
-
-                DateTime.TryParse(date + " " + reader.ReadElementString(), out measurement.DateTime);
+                DateTime dateTime;
+                DateTime.TryParse(date + " " + reader.ReadElementString(), out dateTime);
                 reader.Skip();
 #endregion
 
@@ -83,21 +84,22 @@ namespace unwdmi.Parser
                 #region Temperature
 
                 // Cache value containing latest value read from XMLReader.
+                float temperature;
                 var currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out measurement.Temperature))
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out temperature))
                 {
                     // If value fails to parse set the value to the average of last 30 seconds.
-                    measurement.Temperature = weatherStation.TemperatureTotal / 30;
+                    temperature = weatherStation.TemperatureTotal / 30;
                 }
                 // Check if the data is not a peak. The not equals check is to avoid buggy behaviour when the value and average is 0.
                 else
                 {
                     var temperatureAvg = weatherStation.TemperatureTotal / 30;
-                    if (measurement.Temperature != temperatureAvg &&
-                        measurement.Temperature <= temperatureAvg * 1.2 &&
-                        measurement.Temperature >= temperatureAvg * 0.8)
+                    if (temperature != temperatureAvg &&
+                        temperature <= temperatureAvg * 1.2 &&
+                        temperature >= temperatureAvg * 0.8)
                     {
-                        measurement.Temperature = temperatureAvg;
+                        temperature = temperatureAvg;
                     }
 
                 }
@@ -107,19 +109,20 @@ namespace unwdmi.Parser
 
                 #region DewPoint
 
+                float dewpoint;
                 currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out measurement.Dewpoint))
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out dewpoint))
                 {
-                    measurement.Dewpoint = weatherStation.DewpointTotal / 30;
+                    dewpoint = weatherStation.DewpointTotal / 30;
                 }
                 else
                 {
                     var dewPointAvg = weatherStation.DewpointTotal / 30;
-                    if (measurement.Dewpoint != dewPointAvg &&
-                        measurement.Dewpoint <= dewPointAvg * 1.2 &&
-                        measurement.Dewpoint >= dewPointAvg * 0.8)
+                    if (dewpoint != dewPointAvg &&
+                        dewpoint <= dewPointAvg * 1.2 &&
+                        dewpoint >= dewPointAvg * 0.8)
                     {
-                        measurement.Dewpoint = dewPointAvg;
+                        dewpoint = dewPointAvg;
                     }
                 }
 
@@ -193,20 +196,22 @@ namespace unwdmi.Parser
 
                 #region WindSpeed
 
+                float windSpeed;
+
                 currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.WindSpeed))
+                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out windSpeed))
                 {
-                    measurement.WindSpeed = weatherStation.WindSpeedTotal / 30;
+                    windSpeed = weatherStation.WindSpeedTotal / 30;
                 }
 
                 else
                 {
                     var windSpeedAvg = weatherStation.WindSpeedTotal / 30;
-                    if (measurement.WindSpeed != windSpeedAvg &&
-                  measurement.WindSpeed <= windSpeedAvg * 1.2 &&
-                  measurement.WindSpeed >= windSpeedAvg * 0.8)
+                    if (windSpeed != windSpeedAvg &&
+                  windSpeed <= windSpeedAvg * 1.2 &&
+                  windSpeed >= windSpeedAvg * 0.8)
                     {
-                        measurement.WindSpeed = windSpeedAvg;
+                        windSpeed = windSpeedAvg;
                     }
                 }
 
@@ -278,21 +283,21 @@ namespace unwdmi.Parser
 
                 #region CloudCover
 
-                CloudCover:
+                float cloudCover;
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture,
-                    out measurement.CloudCover))
+                    out cloudCover))
                 {
-                    measurement.CloudCover = weatherStation.CloudCoverTotal / 30;
+                    cloudCover = weatherStation.CloudCoverTotal / 30;
                 }
                 else
                 {
                     var cloudCoverAvg = weatherStation.CloudCoverTotal / 30;
-                    if (measurement.CloudCover != cloudCoverAvg &&
-                        measurement.CloudCover <= cloudCoverAvg * 1.2 &&
-                        measurement.CloudCover >= cloudCoverAvg * 0.8)
+                    if (cloudCover != cloudCoverAvg &&
+                        cloudCover <= cloudCoverAvg * 1.2 &&
+                        cloudCover >= cloudCoverAvg * 0.8)
                     {
-                        measurement.CloudCover = cloudCoverAvg;
+                        cloudCover = cloudCoverAvg;
                     }
                 }
 
@@ -318,6 +323,18 @@ namespace unwdmi.Parser
                     }
                 }*/
 #endregion
+
+                Measurement measurement = new Measurement()
+                {
+                    CloudCover = cloudCover,
+                    DateTime = dateTime.ToBinary(),
+                    Dewpoint = dewpoint,
+                    StationID = stationNumber,
+                    Temperature = temperature,
+                    WindSpeed = windSpeed
+                };
+
+                Console.WriteLine($"{stationNumber} {dateTime.ToBinary()} {temperature} + {dewpoint} + {windSpeed} + {cloudCover.ToString()}");
 
                 weatherStation.Enqueue(measurement);
             }
