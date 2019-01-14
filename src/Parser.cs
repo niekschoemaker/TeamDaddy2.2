@@ -336,6 +336,7 @@ namespace unwdmi.Parser
 
                 Request request = new Request()
                 {
+                    Command = Request.Types.Command.WeatherData
                 };
 
                 weatherStation.Enqueue(measurement);
