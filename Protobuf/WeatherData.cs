@@ -30,15 +30,18 @@ namespace unwdmi.Protobuf {
             "ZWQYBSABKAISEgoKQ2xvdWRDb3ZlchgGIAEoAiJ+Cg5XZWF0aGVyU3RhdGlv",
             "bhIVCg1TdGF0aW9uTnVtYmVyGAEgASgNEgwKBE5hbWUYAiABKAkSDwoHQ291",
             "bnRyeRgDIAEoCRIQCghMYXRpdHVkZRgEIAEoARIRCglMb25naXR1ZGUYBSAB",
-            "KAESEQoJRWxldmF0aW9uGAYgASgBIlQKB1JlcXVlc3QSLQoHY29tbWFuZBgB",
-            "IAEoDjIcLldlYXRoZXJEYXRhLlJlcXVlc3QuQ29tbWFuZCIaCgdDb21tYW5k",
-            "Eg8KC1dlYXRoZXJEYXRhEABCEqoCD3Vud2RtaS5Qcm90b2J1ZmIGcHJvdG8z"));
+            "KAESEQoJRWxldmF0aW9uGAYgASgBImQKB1JlcXVlc3QSLQoHY29tbWFuZBgB",
+            "IAEoDjIcLldlYXRoZXJEYXRhLlJlcXVlc3QuQ29tbWFuZCIqCgdDb21tYW5k",
+            "Eg8KC1dlYXRoZXJEYXRhEAASDgoKQ2xvdWRDb3ZlchABIg0KC1dlYXRoZXJE",
+            "YXRhIgwKCkNsb3VkQ292ZXJCEqoCD3Vud2RtaS5Qcm90b2J1ZmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Measurement), global::unwdmi.Protobuf.Measurement.Parser, new[]{ "StationID", "DateTime", "Temperature", "Dewpoint", "WindSpeed", "CloudCover" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherStation), global::unwdmi.Protobuf.WeatherStation.Parser, new[]{ "StationNumber", "Name", "Country", "Latitude", "Longitude", "Elevation" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Request), global::unwdmi.Protobuf.Request.Parser, new[]{ "Command" }, null, new[]{ typeof(global::unwdmi.Protobuf.Request.Types.Command) }, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Request), global::unwdmi.Protobuf.Request.Parser, new[]{ "Command" }, null, new[]{ typeof(global::unwdmi.Protobuf.Request.Types.Command) }, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherData), global::unwdmi.Protobuf.WeatherData.Parser, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.CloudCover), global::unwdmi.Protobuf.CloudCover.Parser, null, null, null, null)
           }));
     }
     #endregion
@@ -716,10 +719,213 @@ namespace unwdmi.Protobuf {
     public static partial class Types {
       public enum Command {
         [pbr::OriginalName("WeatherData")] WeatherData = 0,
+        [pbr::OriginalName("CloudCover")] CloudCover = 1,
       }
 
     }
     #endregion
+
+  }
+
+  public sealed partial class WeatherData : pb::IMessage<WeatherData> {
+    private static readonly pb::MessageParser<WeatherData> _parser = new pb::MessageParser<WeatherData>(() => new WeatherData());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<WeatherData> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::unwdmi.Protobuf.WeatherDataReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public WeatherData() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public WeatherData(WeatherData other) : this() {
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public WeatherData Clone() {
+      return new WeatherData(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as WeatherData);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(WeatherData other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(WeatherData other) {
+      if (other == null) {
+        return;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+        }
+      }
+    }
+
+  }
+
+  public sealed partial class CloudCover : pb::IMessage<CloudCover> {
+    private static readonly pb::MessageParser<CloudCover> _parser = new pb::MessageParser<CloudCover>(() => new CloudCover());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<CloudCover> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::unwdmi.Protobuf.WeatherDataReflection.Descriptor.MessageTypes[4]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CloudCover() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CloudCover(CloudCover other) : this() {
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CloudCover Clone() {
+      return new CloudCover(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as CloudCover);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(CloudCover other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(CloudCover other) {
+      if (other == null) {
+        return;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+        }
+      }
+    }
 
   }
 

@@ -24,6 +24,15 @@ message WeatherStation {
 message Request {
 	enum Command {
 		WeatherData = 0;
+		CloudCover = 1;
 	}
 	Command command = 1;
+}
+
+message WeatherData {
+	
+}
+
+message CloudCover {
+	
 }
