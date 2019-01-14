@@ -334,8 +334,6 @@ namespace unwdmi.Parser
                     WindSpeed = windSpeed
                 };
 
-                Console.WriteLine($"{stationNumber} {dateTime.ToBinary()} {temperature} + {dewpoint} + {windSpeed} + {cloudCover.ToString()}");
-
                 weatherStation.Enqueue(measurement);
             }
             catch (Exception e)

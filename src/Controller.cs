@@ -154,11 +154,7 @@ namespace unwdmi.Parser
                 measurement.DateTime, measurement.Temperature, measurement.Dewpoint,
                 measurement.WindSpeed, measurement.CloudCover);*/
 #endif
-            var path = $"./Data/{StationNumber}{DateTime.FromBinary(measurement.DateTime):yyyy-M-d-HH-mm-ss}.dat";
-            using (var output = File.Exists(path)? File.Open(path, FileMode.Append) : File.Create(path))
-            {
-                measurement.WriteTo(output);
-            }
+            var path = $"./Data/{StationNumber}{DateTime.FromBinary(measurement.DateTime):yyyy-M-d-HH}.dat";
 
             /*lock (Controller.SqlStringBuilder)
             {
