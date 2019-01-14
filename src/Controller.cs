@@ -33,6 +33,8 @@ namespace unwdmi.Parser
         {
             Instance = this;
             TimeStarted = DateTime.UtcNow;
+            ThreadPool.SetMinThreads(1, 0);
+            ThreadPool.SetMaxThreads(20, 10);
             // Make sure you get exceptions in English. Can't quite Google something if it's Dutch.
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
 

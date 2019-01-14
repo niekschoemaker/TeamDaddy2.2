@@ -20,3 +20,10 @@ message WeatherStation {
 	double Longitude = 5;
 	double Elevation = 6;
 }
+
+message Request {
+	enum Command {
+		WeatherData = 0;
+	}
+	Command command = 1;
+}

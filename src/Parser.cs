@@ -334,6 +334,10 @@ namespace unwdmi.Parser
                     WindSpeed = windSpeed
                 };
 
+                Request request = new Request()
+                {
+                };
+
                 weatherStation.Enqueue(measurement);
             }
             catch (Exception e)
