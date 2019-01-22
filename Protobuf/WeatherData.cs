@@ -26,7 +26,7 @@ namespace unwdmi.Protobuf {
           string.Concat(
             "ChFXZWF0aGVyRGF0YS5wcm90bxILV2VhdGhlckRhdGEiawoLTWVhc3VyZW1l",
             "bnQSEQoJU3RhdGlvbklEGAEgASgNEhAKCERhdGVUaW1lGAIgASgDEhAKCEh1",
-            "bWlkaXR5GAMgASgCEhEKCVdpbmRTcGVlZBgEIAEoAhISCgpDbG91ZENvdmVy",
+            "bWlkaXR5GAMgASgBEhEKCVdpbmRTcGVlZBgEIAEoAhISCgpDbG91ZENvdmVy",
             "GAUgASgCIn4KDldlYXRoZXJTdGF0aW9uEhUKDVN0YXRpb25OdW1iZXIYASAB",
             "KA0SDAoETmFtZRgCIAEoCRIPCgdDb3VudHJ5GAMgASgJEhAKCExhdGl0dWRl",
             "GAQgASgBEhEKCUxvbmdpdHVkZRgFIAEoARIRCglFbGV2YXRpb24YBiABKAEi",
@@ -110,9 +110,9 @@ namespace unwdmi.Protobuf {
 
     /// <summary>Field number for the "Humidity" field.</summary>
     public const int HumidityFieldNumber = 3;
-    private float humidity_;
+    private double humidity_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public float Humidity {
+    public double Humidity {
       get { return humidity_; }
       set {
         humidity_ = value;
@@ -156,7 +156,7 @@ namespace unwdmi.Protobuf {
       }
       if (StationID != other.StationID) return false;
       if (DateTime != other.DateTime) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity, other.Humidity)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Humidity, other.Humidity)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(WindSpeed, other.WindSpeed)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(CloudCover, other.CloudCover)) return false;
       return Equals(_unknownFields, other._unknownFields);
@@ -167,7 +167,7 @@ namespace unwdmi.Protobuf {
       int hash = 1;
       if (StationID != 0) hash ^= StationID.GetHashCode();
       if (DateTime != 0L) hash ^= DateTime.GetHashCode();
-      if (Humidity != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity);
+      if (Humidity != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Humidity);
       if (WindSpeed != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(WindSpeed);
       if (CloudCover != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(CloudCover);
       if (_unknownFields != null) {
@@ -191,9 +191,9 @@ namespace unwdmi.Protobuf {
         output.WriteRawTag(16);
         output.WriteInt64(DateTime);
       }
-      if (Humidity != 0F) {
-        output.WriteRawTag(29);
-        output.WriteFloat(Humidity);
+      if (Humidity != 0D) {
+        output.WriteRawTag(25);
+        output.WriteDouble(Humidity);
       }
       if (WindSpeed != 0F) {
         output.WriteRawTag(37);
@@ -217,8 +217,8 @@ namespace unwdmi.Protobuf {
       if (DateTime != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(DateTime);
       }
-      if (Humidity != 0F) {
-        size += 1 + 4;
+      if (Humidity != 0D) {
+        size += 1 + 8;
       }
       if (WindSpeed != 0F) {
         size += 1 + 4;
@@ -243,7 +243,7 @@ namespace unwdmi.Protobuf {
       if (other.DateTime != 0L) {
         DateTime = other.DateTime;
       }
-      if (other.Humidity != 0F) {
+      if (other.Humidity != 0D) {
         Humidity = other.Humidity;
       }
       if (other.WindSpeed != 0F) {
@@ -271,8 +271,8 @@ namespace unwdmi.Protobuf {
             DateTime = input.ReadInt64();
             break;
           }
-          case 29: {
-            Humidity = input.ReadFloat();
+          case 25: {
+            Humidity = input.ReadDouble();
             break;
           }
           case 37: {
