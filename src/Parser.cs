@@ -324,13 +324,13 @@ namespace unwdmi.Parser
                 }*/
 #endregion
 
+
                 Measurement measurement = new Measurement()
                 {
                     CloudCover = cloudCover,
                     DateTime = dateTime.ToBinary(),
-                    Dewpoint = dewpoint,
+                    Humidity = (double)(Math.Exp(17.625*dewpoint/(243.03 + dewpoint))/Math.Exp(17.625*temperature/(243.04+temperature))),
                     StationID = stationNumber,
-                    Temperature = temperature,
                     WindSpeed = windSpeed
                 };
 

@@ -57,6 +57,9 @@
     <Reference Include="MySqlConnector, Version=0.48.2.0, Culture=neutral, PublicKeyToken=d33d3e53aa5f8c92, processorArchitecture=MSIL">
       <HintPath>..\packages\MySqlConnector.0.48.2\lib\net471\MySqlConnector.dll</HintPath>
     </Reference>
+    <Reference Include="Protobuf">
+      <HintPath>..\lib\Protobuf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>

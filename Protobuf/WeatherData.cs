@@ -24,20 +24,20 @@ namespace unwdmi.Protobuf {
     static WeatherDataReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChFXZWF0aGVyRGF0YS5wcm90bxILV2VhdGhlckRhdGEigAEKC01lYXN1cmVt",
-            "ZW50EhEKCVN0YXRpb25JRBgBIAEoDRIQCghEYXRlVGltZRgCIAEoAxITCgtU",
-            "ZW1wZXJhdHVyZRgDIAEoAhIQCghEZXdwb2ludBgEIAEoAhIRCglXaW5kU3Bl",
-            "ZWQYBSABKAISEgoKQ2xvdWRDb3ZlchgGIAEoAiJ+Cg5XZWF0aGVyU3RhdGlv",
-            "bhIVCg1TdGF0aW9uTnVtYmVyGAEgASgNEgwKBE5hbWUYAiABKAkSDwoHQ291",
-            "bnRyeRgDIAEoCRIQCghMYXRpdHVkZRgEIAEoARIRCglMb25naXR1ZGUYBSAB",
-            "KAESEQoJRWxldmF0aW9uGAYgASgBImQKB1JlcXVlc3QSLQoHY29tbWFuZBgB",
-            "IAEoDjIcLldlYXRoZXJEYXRhLlJlcXVlc3QuQ29tbWFuZCIqCgdDb21tYW5k",
-            "Eg8KC1dlYXRoZXJEYXRhEAASDgoKQ2xvdWRDb3ZlchABIg0KC1dlYXRoZXJE",
-            "YXRhIgwKCkNsb3VkQ292ZXJCEqoCD3Vud2RtaS5Qcm90b2J1ZmIGcHJvdG8z"));
+            "ChFXZWF0aGVyRGF0YS5wcm90bxILV2VhdGhlckRhdGEiawoLTWVhc3VyZW1l",
+            "bnQSEQoJU3RhdGlvbklEGAEgASgNEhAKCERhdGVUaW1lGAIgASgDEhAKCEh1",
+            "bWlkaXR5GAMgASgCEhEKCVdpbmRTcGVlZBgEIAEoAhISCgpDbG91ZENvdmVy",
+            "GAUgASgCIn4KDldlYXRoZXJTdGF0aW9uEhUKDVN0YXRpb25OdW1iZXIYASAB",
+            "KA0SDAoETmFtZRgCIAEoCRIPCgdDb3VudHJ5GAMgASgJEhAKCExhdGl0dWRl",
+            "GAQgASgBEhEKCUxvbmdpdHVkZRgFIAEoARIRCglFbGV2YXRpb24YBiABKAEi",
+            "ZAoHUmVxdWVzdBItCgdjb21tYW5kGAEgASgOMhwuV2VhdGhlckRhdGEuUmVx",
+            "dWVzdC5Db21tYW5kIioKB0NvbW1hbmQSDwoLV2VhdGhlckRhdGEQABIOCgpD",
+            "bG91ZENvdmVyEAEiDQoLV2VhdGhlckRhdGEiDAoKQ2xvdWRDb3ZlckISqgIP",
+            "dW53ZG1pLlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Measurement), global::unwdmi.Protobuf.Measurement.Parser, new[]{ "StationID", "DateTime", "Temperature", "Dewpoint", "WindSpeed", "CloudCover" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Measurement), global::unwdmi.Protobuf.Measurement.Parser, new[]{ "StationID", "DateTime", "Humidity", "WindSpeed", "CloudCover" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherStation), global::unwdmi.Protobuf.WeatherStation.Parser, new[]{ "StationNumber", "Name", "Country", "Latitude", "Longitude", "Elevation" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Request), global::unwdmi.Protobuf.Request.Parser, new[]{ "Command" }, null, new[]{ typeof(global::unwdmi.Protobuf.Request.Types.Command) }, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherData), global::unwdmi.Protobuf.WeatherData.Parser, null, null, null, null),
@@ -75,8 +75,7 @@ namespace unwdmi.Protobuf {
     public Measurement(Measurement other) : this() {
       stationID_ = other.stationID_;
       dateTime_ = other.dateTime_;
-      temperature_ = other.temperature_;
-      dewpoint_ = other.dewpoint_;
+      humidity_ = other.humidity_;
       windSpeed_ = other.windSpeed_;
       cloudCover_ = other.cloudCover_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -109,30 +108,19 @@ namespace unwdmi.Protobuf {
       }
     }
 
-    /// <summary>Field number for the "Temperature" field.</summary>
-    public const int TemperatureFieldNumber = 3;
-    private float temperature_;
+    /// <summary>Field number for the "Humidity" field.</summary>
+    public const int HumidityFieldNumber = 3;
+    private float humidity_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public float Temperature {
-      get { return temperature_; }
+    public float Humidity {
+      get { return humidity_; }
       set {
-        temperature_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "Dewpoint" field.</summary>
-    public const int DewpointFieldNumber = 4;
-    private float dewpoint_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public float Dewpoint {
-      get { return dewpoint_; }
-      set {
-        dewpoint_ = value;
+        humidity_ = value;
       }
     }
 
     /// <summary>Field number for the "WindSpeed" field.</summary>
-    public const int WindSpeedFieldNumber = 5;
+    public const int WindSpeedFieldNumber = 4;
     private float windSpeed_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public float WindSpeed {
@@ -143,7 +131,7 @@ namespace unwdmi.Protobuf {
     }
 
     /// <summary>Field number for the "CloudCover" field.</summary>
-    public const int CloudCoverFieldNumber = 6;
+    public const int CloudCoverFieldNumber = 5;
     private float cloudCover_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public float CloudCover {
@@ -168,8 +156,7 @@ namespace unwdmi.Protobuf {
       }
       if (StationID != other.StationID) return false;
       if (DateTime != other.DateTime) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Temperature, other.Temperature)) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Dewpoint, other.Dewpoint)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity, other.Humidity)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(WindSpeed, other.WindSpeed)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(CloudCover, other.CloudCover)) return false;
       return Equals(_unknownFields, other._unknownFields);
@@ -180,8 +167,7 @@ namespace unwdmi.Protobuf {
       int hash = 1;
       if (StationID != 0) hash ^= StationID.GetHashCode();
       if (DateTime != 0L) hash ^= DateTime.GetHashCode();
-      if (Temperature != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Temperature);
-      if (Dewpoint != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Dewpoint);
+      if (Humidity != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity);
       if (WindSpeed != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(WindSpeed);
       if (CloudCover != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(CloudCover);
       if (_unknownFields != null) {
@@ -205,20 +191,16 @@ namespace unwdmi.Protobuf {
         output.WriteRawTag(16);
         output.WriteInt64(DateTime);
       }
-      if (Temperature != 0F) {
+      if (Humidity != 0F) {
         output.WriteRawTag(29);
-        output.WriteFloat(Temperature);
-      }
-      if (Dewpoint != 0F) {
-        output.WriteRawTag(37);
-        output.WriteFloat(Dewpoint);
+        output.WriteFloat(Humidity);
       }
       if (WindSpeed != 0F) {
-        output.WriteRawTag(45);
+        output.WriteRawTag(37);
         output.WriteFloat(WindSpeed);
       }
       if (CloudCover != 0F) {
-        output.WriteRawTag(53);
+        output.WriteRawTag(45);
         output.WriteFloat(CloudCover);
       }
       if (_unknownFields != null) {
@@ -235,10 +217,7 @@ namespace unwdmi.Protobuf {
       if (DateTime != 0L) {
         size += 1 + pb::CodedOutputStream.ComputeInt64Size(DateTime);
       }
-      if (Temperature != 0F) {
-        size += 1 + 4;
-      }
-      if (Dewpoint != 0F) {
+      if (Humidity != 0F) {
         size += 1 + 4;
       }
       if (WindSpeed != 0F) {
@@ -264,11 +243,8 @@ namespace unwdmi.Protobuf {
       if (other.DateTime != 0L) {
         DateTime = other.DateTime;
       }
-      if (other.Temperature != 0F) {
-        Temperature = other.Temperature;
-      }
-      if (other.Dewpoint != 0F) {
-        Dewpoint = other.Dewpoint;
+      if (other.Humidity != 0F) {
+        Humidity = other.Humidity;
       }
       if (other.WindSpeed != 0F) {
         WindSpeed = other.WindSpeed;
@@ -296,18 +272,14 @@ namespace unwdmi.Protobuf {
             break;
           }
           case 29: {
-            Temperature = input.ReadFloat();
+            Humidity = input.ReadFloat();
             break;
           }
           case 37: {
-            Dewpoint = input.ReadFloat();
-            break;
-          }
-          case 45: {
             WindSpeed = input.ReadFloat();
             break;
           }
-          case 53: {
+          case 45: {
             CloudCover = input.ReadFloat();
             break;
           }
