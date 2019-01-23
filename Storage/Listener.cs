@@ -54,26 +54,20 @@ namespace unwdmi.Storage
         void ReceiveCallback(IAsyncResult ar)
         {
             var so = (StateObject)ar.AsyncState;
-            var workSocket = so.workSocket;
+            TcpListener server = (TcpListener)ar.AsyncState;
 
-            /*
-             *  TODO: Functie die de ProtoBuf-stream van web ontvangt en opslaat
-             */
-
-            try {
-                var read = workSocket.EndReceive(ar);
-
-                if(read > 0)
+            using (TcpClient client = server.EndAcceptTcpClient(ar))
+            using (NetworkStream stream = client.GetStream())
+            {
+                try
                 {
-                    var _str = Encoding.ASCII.GetString(so.buffer, 0, read);
-
+                    //TODO
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
                 }
             }
-            catch(Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
 
         }
     }
