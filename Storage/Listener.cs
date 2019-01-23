@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Console = System.Console;
+using Google.Protobuf;
 
 namespace unwdmi.Storage
 {
+
     class ListenerParser
     {
+
         public ListenerParser(Controller instance)
         {
             _controller = instance;
@@ -51,7 +54,27 @@ namespace unwdmi.Storage
         void ReceiveCallback(IAsyncResult ar)
         {
             var so = (StateObject)ar.AsyncState;
-            
+            var workSocket = so.workSocket;
+
+            /*
+             *  TODO: Functie die de ProtoBuf-stream van web ontvangt en opslaat
+             */
+
+            try {
+                var read = workSocket.EndReceive(ar);
+
+                if(read > 0)
+                {
+                    var _str = Encoding.ASCII.GetString(so.buffer, 0, read);
+
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+
         }
     }
 
@@ -98,8 +121,31 @@ namespace unwdmi.Storage
         void ReceiveCallback(IAsyncResult ar)
         {
             var so = (StateObject)ar.AsyncState;
+            var workSocket = so.workSocket;
+
+            /*
+             *  TODO: Functie die de ProtoBuf-stream van web ontvangt en opslaat
+             */
+
+            try
+            {
+                var read = workSocket.EndReceive(ar);
+
+                if (read > 0)
+                {
+                    var _str = Encoding.ASCII.GetString(so.buffer, 0, read);
+
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
 
         }
+
+
     }
 
     public class StateObject
