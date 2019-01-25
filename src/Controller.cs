@@ -1,5 +1,6 @@
 ﻿//#define CONCAT
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -43,11 +44,13 @@ namespace unwdmi.Parser
         public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, WindSpeed, CloudCover)\nVALUES");
         public int SqlQueueCount = 0;
 
+        public ConcurrentBag<Measurement> MeasurementQueue = new ConcurrentBag<Measurement>();
         public Dictionary<uint, WeatherStation> WeatherStations = new Dictionary<uint, WeatherStation>();
         public Listener Listener;
         public SqlHandler SqlHandler;
         public Parser Parser;
         public static Controller Instance;
+        public DataSender DataSender;
 
         public Controller()
         {
@@ -61,16 +64,30 @@ namespace unwdmi.Parser
             Listener = new Listener(this);
             SqlHandler = new SqlHandler(this);
             Parser = new Parser(this);
+            DataSender = new DataSender(this);
+            
 
             LoadWeatherStations();
 
             Listener.StartListening();
             
             // Loop to keep checking the Sql Data.
-            /*Task.Run(() =>
+            Task.Run(async () =>
             {
-                SqlHandler.CheckSqlQueue();
-            });*/
+                while (true)
+                {
+                    if (MeasurementQueue.Count > 1)
+                    {
+                        lock (MeasurementQueue)
+                        {
+                            DataSender.StartSend("localhost", 25565, MeasurementQueue.ToList());
+                            MeasurementQueue = new ConcurrentBag<Measurement>();
+                        }
+                    }
+
+                    await Task.Delay(500);
+                }
+            });
 
             //TODO: Add some actual data handling, without ReadLine program just closes since nothing runs on main thread whatsoever.
             while (true)
@@ -223,6 +240,7 @@ namespace unwdmi.Parser
             {
                 Controller.SqlStringBuilder.Append(str);
             }*/
+            Controller.MeasurementQueue.Add(measurement);
 
             Interlocked.Increment(ref Controller.SqlQueueCount);
 

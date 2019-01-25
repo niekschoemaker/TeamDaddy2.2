@@ -34,7 +34,7 @@ namespace unwdmi.Storage
 
 
         }
-
+        
         public ListenerParser ListenerParser;
         public ListenerWeb ListenerWeb;
         public static Controller Instance;
@@ -46,7 +46,7 @@ namespace unwdmi.Storage
         {
             Instance = this;
             ListenerParser = new ListenerParser(this);
-            ListenerWeb = new ListenerWeb(this);
+            //ListenerWeb = new ListenerWeb(this);
 
             // Multi-threading
             TimeStarted = DateTime.UtcNow;
@@ -54,11 +54,41 @@ namespace unwdmi.Storage
             ThreadPool.SetMaxThreads(20, 10);
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
 
-            ListenerParser.StartListening();
+            Task.Run(() => ListenerParser.StartListening());
 
-            ListenerWeb.StartListening();
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    Save();
+                }
+            });
+
+            //ListenerWeb.StartListening();
 
 
+        }
+
+        private async void Save()
+        {
+            if (ListenerParser.CacheMeasurements.Count > 8000)
+            {
+                List<Measurement> measurements;
+                lock (ListenerParser.CacheMeasurements)
+                {
+                    measurements = ListenerParser.CacheMeasurements.ToList();
+                    ListenerParser.CacheMeasurements.Clear();
+                }
+
+                using (var output = File.OpenWrite("Daddy.dat"))
+                {
+                    Console.WriteLine(measurements.Count);
+                    foreach (var measurement in measurements)
+                    {
+                        measurement.WriteDelimitedTo(output);
+                    }
+                }
+            }
         }
     }
 }

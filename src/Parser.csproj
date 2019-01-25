@@ -95,6 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataSender.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="SQLHandler.cs" />
