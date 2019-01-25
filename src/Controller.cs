@@ -29,6 +29,26 @@ namespace unwdmi.Parser
             Controller controller = new Controller();
         }
 
+        private const string path = "WeatherStations.dat";
+
+        public DateTime TimeStarted;
+        public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
+
+        // Trackers to keep track of the current state of the program.
+        /// <summary> Active Threads (either queued or currently processing xml data) </summary>
+        public int ActiveParsers = 0;
+        /// <summary> Sockets currently open (# of established connections with WeatherStations) </summary>
+        public int OpenSockets = 0;
+
+        public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, WindSpeed, CloudCover)\nVALUES");
+        public int SqlQueueCount = 0;
+
+        public Dictionary<uint, WeatherStation> WeatherStations = new Dictionary<uint, WeatherStation>();
+        public Listener Listener;
+        public SqlHandler SqlHandler;
+        public Parser Parser;
+        public static Controller Instance;
+
         public Controller()
         {
             Instance = this;
@@ -42,7 +62,7 @@ namespace unwdmi.Parser
             SqlHandler = new SqlHandler(this);
             Parser = new Parser(this);
 
-            SqlHandler.AddWeatherStations();
+            LoadWeatherStations();
 
             Listener.StartListening();
             
@@ -68,23 +88,64 @@ namespace unwdmi.Parser
             }
         }
 
-        public DateTime TimeStarted;
-        public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
+        public void LoadWeatherStations()
+        {
+            if (!File.Exists(path))
+            {
+                Console.WriteLine($"{path} file is missing, trying to update it from sql database.");
+                UpdateWeatherStations();
+            }
 
-        // Trackers to keep track of the current state of the program.
-        /// <summary> Active Threads (either queued or currently processing xml data) </summary>
-        public int ActiveParsers = 0;
-        /// <summary> Sockets currently open (# of established connections with WeatherStations) </summary>
-        public int OpenSockets = 0;
+            using (FileStream fs = File.OpenRead(path))
+            {
+                while (true)
+                {
+                    try
+                    {
+                        var measurement = Protobuf.WeatherStation.Parser.ParseDelimitedFrom(fs);
+                        if (measurement == null)
+                        {
+                            break;
+                        }
 
-        public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, WindSpeed, CloudCover)\nVALUES");
-        public int SqlQueueCount = 0;
+                        WeatherStations.Add(measurement.StationNumber,
+                            new WeatherStation(measurement.StationNumber, measurement.Name, measurement.Country,
+                                measurement.Latitude, measurement.Longitude, measurement.Elevation));
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                }
 
-        public Dictionary<uint, WeatherStation> WeatherStations = new Dictionary<uint, WeatherStation>();
-        public Listener Listener;
-        public SqlHandler SqlHandler;
-        public Parser Parser;
-        public static Controller Instance;
+
+            }
+        }
+
+        public void UpdateWeatherStations()
+        {
+            SqlHandler.AddWeatherStations();
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+            using (FileStream fs = File.OpenWrite(path))
+            {
+                foreach (var weatherStation in WeatherStations.Values)
+                {
+                    new Protobuf.WeatherStation()
+                    {
+                        StationNumber = weatherStation.StationNumber,
+                        Name = weatherStation.Name,
+                        Country = weatherStation.Country,
+                        Latitude = weatherStation.Latitude,
+                        Longitude = weatherStation.Longitude,
+                        Elevation = weatherStation.Elevation
+                    }.WriteDelimitedTo(fs);
+                }
+            }
+        }
     }
 
     public class WeatherStation
@@ -179,8 +240,8 @@ namespace unwdmi.Parser
 
         private void AddTotals(Measurement measurement)
         {
-            TemperatureTotal += measurement.Temperature;
-            DewpointTotal += measurement.Dewpoint;
+            //TemperatureTotal += measurement.Temperature;
+            //DewpointTotal += measurement.Dewpoint;
             //StationPressureTotal += measurement.StationPressure;
             //SeaLevelPressureTotal += measurement.SeaLevelPressure;
            // VisibilityTotal += measurement.Visibility;
@@ -193,8 +254,8 @@ namespace unwdmi.Parser
 
         private void SubtractTotals(Measurement measurement)
         {
-            TemperatureTotal -= measurement.Temperature;
-            DewpointTotal -= measurement.Dewpoint;
+            //TemperatureTotal -= measurement.Temperature;
+            //DewpointTotal -= measurement.Dewpoint;
             //StationPressureTotal -= measurement.StationPressure;
             //SeaLevelPressureTotal -= measurement.SeaLevelPressure;
             //VisibilityTotal -= measurement.Visibility;
@@ -207,8 +268,8 @@ namespace unwdmi.Parser
 
         public void recalculateSums()
         {
-            TemperatureTotal = MeasurementDatas.Sum(p => p.Temperature);
-            DewpointTotal = MeasurementDatas.Sum(p => p.Dewpoint);
+            //TemperatureTotal = MeasurementDatas.Sum(p => p.Temperature);
+            //DewpointTotal = MeasurementDatas.Sum(p => p.Dewpoint);
             //PrecipitationTotal = MeasurementDatas.Sum(p => p.Precipitation);
             //StationPressureTotal = MeasurementDatas.Sum(p => p.StationPressure);
             //SeaLevelPressureTotal = MeasurementDatas.Sum(p => p.SeaLevelPressure);
