@@ -75,7 +75,7 @@ namespace unwdmi.Parser
             {
                 while (true)
                 {
-                    if (MeasurementQueue.Count > 1)
+                    if (MeasurementQueue.Count >= OpenSockets * 10)
                     {
                         lock (MeasurementQueue)
                         {
@@ -253,7 +253,7 @@ namespace unwdmi.Parser
                 measurement.DateTime, measurement.Temperature, measurement.Dewpoint,
                 measurement.WindSpeed, measurement.CloudCover);*/
 #endif
-            var path = $"./Data/{StationNumber}{DateTime.FromBinary(measurement.DateTime):yyyy-M-d-HH}.dat";
+            var path = $"./Data/{StationNumber}{DateTime.FromBinary(measurement.DateTime):yyyy-M-d-HH-mm-ss}.dat";
 
             /*lock (Controller.SqlStringBuilder)
             {
