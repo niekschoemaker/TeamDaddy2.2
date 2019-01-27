@@ -109,41 +109,52 @@ namespace unwdmi.Parser
             if (!File.Exists(path))
             {
                 Console.WriteLine($"{path} file is missing, trying to update it from sql database.");
-                UpdateWeatherStations();
+
+                if (!UpdateWeatherStations())
+                {
+                    File.Create(path).Dispose();
+                }
             }
 
-            using (FileStream fs = File.OpenRead(path))
+            try
             {
-                while (true)
+                using (FileStream fs = File.OpenRead(path))
                 {
-                    try
+                    while (true)
                     {
-                        var measurement = Protobuf.WeatherStation.Parser.ParseDelimitedFrom(fs);
-                        if (measurement == null)
+                        try
+                        {
+                            var measurement = Protobuf.WeatherStation.Parser.ParseDelimitedFrom(fs);
+                            if (measurement == null)
+                            {
+                                break;
+                            }
+
+                            WeatherStations.Add(measurement.StationNumber,
+                                new WeatherStation(measurement.StationNumber, measurement.Name, measurement.Country,
+                                    measurement.Latitude, measurement.Longitude, measurement.Elevation));
+                        }
+                        catch
                         {
                             break;
                         }
+                    }
 
-                        WeatherStations.Add(measurement.StationNumber,
-                            new WeatherStation(measurement.StationNumber, measurement.Name, measurement.Country,
-                                measurement.Latitude, measurement.Longitude, measurement.Elevation));
-                    }
-                    catch
-                    {
-                        break;
-                    }
+
                 }
-
-
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 
-        public void UpdateWeatherStations()
+        public bool UpdateWeatherStations()
         {
             if (SqlHandler == null)
             {
                 Console.WriteLine("SQL not available. Program wasn't able to gather WeatherStation data.");
-                return;
+                return false;
             }
 
             SqlHandler.AddWeatherStations();
@@ -168,6 +179,8 @@ namespace unwdmi.Parser
                     }.WriteDelimitedTo(fs);
                 }
             }
+
+            return true;
         }
     }
 
