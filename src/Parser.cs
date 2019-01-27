@@ -63,7 +63,7 @@ namespace unwdmi.Parser
                 uint stationNumber;
                 uint.TryParse(reader.ReadElementString(), out stationNumber);
 
-                if (_controller.WeatherStations.ContainsKey(stationNumber))
+                if (!_controller.WeatherStations.ContainsKey(stationNumber))
                 {
                     _controller.WeatherStations.Add(stationNumber, new WeatherStation(stationNumber, string.Empty, string.Empty, 0.0, 0.0, 0.0));
                 }
