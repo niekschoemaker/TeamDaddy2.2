@@ -56,11 +56,12 @@ namespace unwdmi.Storage
 
             Task.Run(() => ListenerParser.StartListening());
 
-            Task.Run(() =>
+            Task.Run( async () =>
             {
                 while (true)
                 {
                     Save();
+                    await Task.Delay(1000);
                 }
             });
         }
