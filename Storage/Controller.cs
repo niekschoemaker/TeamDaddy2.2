@@ -61,7 +61,7 @@ namespace unwdmi.Storage
                 while (true)
                 {
                     Save();
-                    await Task.Delay(1000);
+                    await Task.Delay(10);
                 }
             });
         }
@@ -70,13 +70,15 @@ namespace unwdmi.Storage
         {
             if (ListenerParser.CacheMeasurements.Count > 8000)
             {
+
+                var count = DateTime.UtcNow;
                 List<Measurement> measurements;
                 lock (ListenerParser.CacheMeasurements)
                 {
                     measurements = ListenerParser.CacheMeasurements.ToList();
                     ListenerParser.CacheMeasurements.Clear();
                 }
-                using (var output = File.OpenWrite("Daddy.pb"))
+                using (var output = File.OpenWrite($"/data/Daddy.pb-{count:yyyy-M-d-HH-mm-ss}"))
                 {
                     Console.WriteLine(measurements.Count);
                     foreach (var measurement in measurements)
