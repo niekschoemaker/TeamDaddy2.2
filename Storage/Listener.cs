@@ -11,6 +11,12 @@ using Console = System.Console;
 using Google.Protobuf;
 using unwdmi.Protobuf;
 
+/*
+ *  Автор: Sean Visser
+ *  Версия: 1.0.0
+ *  Определение: Контроллер для МВС-Модел память
+ */
+
 namespace unwdmi.Storage
 {
 

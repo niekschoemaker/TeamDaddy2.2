@@ -62,7 +62,6 @@ namespace unwdmi.Parser
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
 
             Listener = new Listener(this);
-            SqlHandler = new SqlHandler(this);
             Parser = new Parser(this);
             DataSender = new DataSender(this);
             

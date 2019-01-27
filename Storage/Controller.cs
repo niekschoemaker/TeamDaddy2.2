@@ -63,13 +63,9 @@ namespace unwdmi.Storage
                     Save();
                 }
             });
-
-            //ListenerWeb.StartListening();
-
-
         }
 
-        private async void Save()
+        private void Save()
         {
             if (ListenerParser.CacheMeasurements.Count > 8000)
             {
@@ -79,8 +75,7 @@ namespace unwdmi.Storage
                     measurements = ListenerParser.CacheMeasurements.ToList();
                     ListenerParser.CacheMeasurements.Clear();
                 }
-
-                using (var output = File.OpenWrite("Daddy.dat"))
+                using (var output = File.OpenWrite("Daddy.pb"))
                 {
                     Console.WriteLine(measurements.Count);
                     foreach (var measurement in measurements)
