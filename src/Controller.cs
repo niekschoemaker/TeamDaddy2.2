@@ -27,7 +27,7 @@ namespace unwdmi.Parser
             }
 
             // Make instance of self so we can send the Controller to the other objects.
-            Controller controller = new Controller();
+            Controller controller = new Controller(args);
         }
 
         private const string path = "WeatherStations.dat";
@@ -52,7 +52,7 @@ namespace unwdmi.Parser
         public static Controller Instance;
         public DataSender DataSender;
 
-        public Controller()
+        public Controller(string[] args)
         {
             Instance = this;
             TimeStarted = DateTime.UtcNow;
@@ -140,7 +140,14 @@ namespace unwdmi.Parser
 
         public void UpdateWeatherStations()
         {
+            if (SqlHandler == null)
+            {
+                Console.WriteLine("SQL not available. Program wasn't able to gather WeatherStation data.");
+                return;
+            }
+
             SqlHandler.AddWeatherStations();
+
             if (File.Exists(path))
             {
                 File.Delete(path);
