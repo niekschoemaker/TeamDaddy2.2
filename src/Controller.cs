@@ -31,7 +31,8 @@ namespace unwdmi.Parser
             Controller controller = new Controller(args);
         }
 
-        private const string path = "WeatherStations.dat";
+        private const string PathWeatherstations = "WeatherStations.dat";
+        private const string PathCountries = "Countries.dat";
 
         public DateTime TimeStarted;
         public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
@@ -48,6 +49,7 @@ namespace unwdmi.Parser
         public const string hostname = "127.0.0.1";
         public const int port = 25565;
 
+        public Dictionary<string, Country> Countries = new Dictionary<string, Country>();
         public ConcurrentBag<Measurement> MeasurementQueue = new ConcurrentBag<Measurement>();
         public Dictionary<uint, WeatherStation> WeatherStations = new Dictionary<uint, WeatherStation>();
         public Listener Listener;
@@ -68,8 +70,8 @@ namespace unwdmi.Parser
             Listener = new Listener(this);
             Parser = new Parser(this);
             DataSender = new DataSender(this);
-            
 
+            LoadCountries();
             LoadWeatherStations();
 
             Listener.StartListening();
@@ -77,15 +79,136 @@ namespace unwdmi.Parser
             //TODO: Add some actual data handling, without ReadLine program just closes since nothing runs on main thread whatsoever.
             while (true)
             {
-                var consoleLine = Console.ReadLine();
-                if (consoleLine == "s")
+                var consoleLine = Console.ReadLine()?.Split(' ');
+                if (consoleLine != null && consoleLine.Length > 0)
                 {
-                    Console.WriteLine($"Program has been running for: {TimeSinceStartup:dd\\.hh\\:mm\\:ss}.");
+                    switch (consoleLine[0])
+                    {
+                        case "s":
+                        case "stats":
+                            Console.WriteLine($"Program has been running for: {TimeSinceStartup:dd\\.hh\\:mm\\:ss}.");
+                            break;
+
+                        case "ignore":
+                            Console.WriteLine("Please provide a country name...");
+                            var countryString = Console.ReadLine()?.ToUpper() ?? "";
+                            Country country;
+                            if (!Countries.TryGetValue(countryString, out country))
+                            {
+                                var countryArray = Countries.Where(p => p.Key.Contains(countryString)).Select(p => p.Value).ToArray();
+                                if (countryArray == null || countryArray.Length == 0)
+                                {
+                                    Console.WriteLine("Country not found please specify an existing country.");
+                                    break;
+                                }
+
+                                if (countryArray.Length > 1)
+                                {
+                                    Console.WriteLine("Found multiple countries with given string please enter the number of the one you want to select:");
+                                    var count = 0;
+                                    foreach (var a in countryArray)
+                                    {
+                                        Console.WriteLine(count.ToString() + ": " + a.Country_);
+                                        count++;
+                                    }
+                                    Console.WriteLine("Please specifiy a number to select the country you want to change...");
+
+                                    int index = 0;
+                                    if (!int.TryParse(Console.ReadLine(), out index) || index > countryArray.Length - 1)
+                                    {
+                                        Console.WriteLine("Invalid format. Please provide a valid number.");
+                                        break;
+                                    }
+
+                                    country = countryArray[index];
+                                }
+                            }
+                            Console.WriteLine("Please provide if you want to ignore the specified country with true/false");
+
+                            bool ignore;
+                            if (bool.TryParse(Console.ReadLine(), out ignore))
+                            {
+                                country.Ignore = ignore;
+                                SaveCountryData();
+                                Console.WriteLine("Datahandling will " + (country.Ignore ? "now" : "no longer") + " ignore " + country.Country_);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid syntax, please only input true or false.");
+                            }
+                            
+                            break;
+
+                        case "exit":
+                            Environment.Exit(1);
+                            break;
+
+                        default:
+                            Console.WriteLine("Available commands are:\n\n" +
+                                              "exit - exit the program.\n" +
+                                              "ignore- add or remove a country from the ignored countries list.\n" +
+                                              "stats - display the stats of the program.");
+                            break;
+                    }
+                }
+            }
+        }
+
+        public void LoadCountries()
+        {
+            if (!File.Exists(PathCountries))
+            {
+                File.Create(PathCountries).Dispose();
+            }
+
+            try
+            {
+                using (FileStream fs = File.OpenRead(PathCountries))
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            var country = Country.Parser.ParseDelimitedFrom(fs);
+                            Countries.Add(country.Country_, country);
+                        }
+                        catch
+                        {
+                            break;
+                        }
+                    }
                 }
 
-                if (consoleLine == "exit")
+                SaveCountryData();
+                Console.WriteLine("Succesfully loaded Country data.");
+            }
+            catch
+#if DEBUG
+                (Exception e)
+#endif
+            {
+#if DEBUG
+                Console.WriteLine(e);
+#else
+                Console.WriteLine("Something went wrong while loading Country data.");
+#endif
+
+            }
+        }
+
+        public void SaveCountryData()
+        {
+
+            if (File.Exists(PathCountries))
+            {
+                File.Delete(PathCountries);
+            }
+
+            using (FileStream fs = File.OpenWrite(PathCountries))
+            {
+                foreach (var country in Countries.Values)
                 {
-                    Environment.Exit(1);
+                    country.WriteTo(fs);
                 }
             }
         }
@@ -93,13 +216,13 @@ namespace unwdmi.Parser
         public void LoadWeatherStations()
         {
             Console.WriteLine("Loading WeatherStation Data...\n");
-            if (!File.Exists(path))
+            if (!File.Exists(PathWeatherstations))
             {
-                Console.WriteLine($"{path} file is missing, trying to update it from sql database...\n");
+                Console.WriteLine($"{PathWeatherstations} file is missing, trying to update it from sql database...\n");
 
                 if (!UpdateWeatherStations())
                 {
-                    File.Create(path).Dispose();
+                    File.Create(PathWeatherstations).Dispose();
                     Console.WriteLine("Failed to get data from Database, generated empty (default) WeatherStation data.\n");
                 }
                 else
@@ -110,7 +233,7 @@ namespace unwdmi.Parser
 
             try
             {
-                using (FileStream fs = File.OpenRead(path))
+                using (FileStream fs = File.OpenRead(PathWeatherstations))
                 {
                     while (true)
                     {
@@ -121,10 +244,27 @@ namespace unwdmi.Parser
                             {
                                 break;
                             }
+                            WeatherStation weatherStation = new WeatherStation(measurement.StationNumber, measurement.Name, measurement.Country,
+                                measurement.Latitude, measurement.Longitude, measurement.Elevation, measurement.IgnoreStation);
+                            weatherStation.IgnoreStation =
+                                (weatherStation.Latitude < 36 || weatherStation.Latitude > 72) ||
+                                (weatherStation.Longitude < -13 || weatherStation.Longitude > 41);
 
-                            WeatherStations.Add(measurement.StationNumber,
-                                new WeatherStation(measurement.StationNumber, measurement.Name, measurement.Country,
-                                    measurement.Latitude, measurement.Longitude, measurement.Elevation));
+                            Country country;
+                            if (!Countries.TryGetValue(measurement.Country, out country))
+                            {
+                                country = new Country()
+                                {
+                                    Country_ = measurement.Country,
+                                    Ignore = measurement.IgnoreStation
+                                };
+                                Countries.Add(measurement.Country, country);
+                            }
+
+                            weatherStation.IgnoreStation = country.Ignore;
+
+                            WeatherStations.Add(measurement.StationNumber, weatherStation);
+
                         }
                         catch
                         {
@@ -132,6 +272,7 @@ namespace unwdmi.Parser
                         }
                     }
                 }
+                SaveCountryData();
                 Console.WriteLine("Succesfully loaded WeatherStation data.");
             }
             catch
@@ -150,19 +291,12 @@ namespace unwdmi.Parser
 
         public bool UpdateWeatherStations()
         {
-            if (SqlHandler == null)
+            if (File.Exists(PathWeatherstations))
             {
-                return false;
+                File.Delete(PathWeatherstations);
             }
 
-            SqlHandler.AddWeatherStations();
-
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-
-            using (FileStream fs = File.OpenWrite(path))
+            using (FileStream fs = File.OpenWrite(PathWeatherstations))
             {
                 foreach (var weatherStation in WeatherStations.Values)
                 {
@@ -173,7 +307,8 @@ namespace unwdmi.Parser
                         Country = weatherStation.Country,
                         Latitude = weatherStation.Latitude,
                         Longitude = weatherStation.Longitude,
-                        Elevation = weatherStation.Elevation
+                        Elevation = weatherStation.Elevation,
+                        IgnoreStation = weatherStation.IgnoreStation
                     }.WriteDelimitedTo(fs);
                 }
             }
@@ -208,6 +343,7 @@ namespace unwdmi.Parser
         public double Latitude;
         public double Longitude;
         public double Elevation;
+        public bool IgnoreStation;
 
         public float TemperatureTotal;
         public float DewpointTotal;
@@ -219,7 +355,7 @@ namespace unwdmi.Parser
         public static Random Rnd = new Random();
         public Queue<Measurement> MeasurementDatas = new Queue<Measurement>(30);
 
-        public WeatherStation(uint stationNumber, string name, string country, double latitude, double longitude, double elevation)
+        public WeatherStation(uint stationNumber, string name, string country, double latitude, double longitude, double elevation, bool ignoreStation)
         {
             StationNumber = stationNumber;
             Name = name;
@@ -227,6 +363,7 @@ namespace unwdmi.Parser
             Latitude = latitude;
             Longitude = longitude;
             Elevation = elevation;
+            IgnoreStation = ignoreStation;
         }
 
         public void Enqueue(Measurement measurement)

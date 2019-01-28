@@ -65,11 +65,15 @@ namespace unwdmi.Parser
 
                 if (!_controller.WeatherStations.ContainsKey(stationNumber))
                 {
-                    _controller.WeatherStations.Add(stationNumber, new WeatherStation(stationNumber, string.Empty, string.Empty, 0.0, 0.0, 0.0));
+                    _controller.WeatherStations.Add(stationNumber, new WeatherStation(stationNumber, string.Empty, string.Empty, 0.0, 0.0, 0.0, false));
                 }
 
                 var weatherStation = _controller.WeatherStations[stationNumber];
 
+                if (weatherStation.IgnoreStation)
+                {
+                    return;
+                }
                 // reader.Skip skips one node (Skips to next start element in this XML file)
                 // Doesn't validate the XML so is quicker than calling .read multiple times
                 reader.Skip();
@@ -197,11 +201,6 @@ namespace unwdmi.Parser
                     Humidity = humidity,
                     StationID = stationNumber,
                     WindSpeed = windSpeed
-                };
-
-                Request request = new Request()
-                {
-                    Command = Request.Types.Command.WeatherData
                 };
 
                 weatherStation.Enqueue(measurement);

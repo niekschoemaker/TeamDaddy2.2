@@ -27,21 +27,18 @@ namespace unwdmi.Protobuf {
             "ChFXZWF0aGVyRGF0YS5wcm90bxILV2VhdGhlckRhdGEiawoLTWVhc3VyZW1l",
             "bnQSEQoJU3RhdGlvbklEGAEgASgNEhAKCERhdGVUaW1lGAIgASgDEhAKCEh1",
             "bWlkaXR5GAMgASgBEhEKCVdpbmRTcGVlZBgEIAEoAhISCgpDbG91ZENvdmVy",
-            "GAUgASgCIn4KDldlYXRoZXJTdGF0aW9uEhUKDVN0YXRpb25OdW1iZXIYASAB",
-            "KA0SDAoETmFtZRgCIAEoCRIPCgdDb3VudHJ5GAMgASgJEhAKCExhdGl0dWRl",
-            "GAQgASgBEhEKCUxvbmdpdHVkZRgFIAEoARIRCglFbGV2YXRpb24YBiABKAEi",
-            "ZAoHUmVxdWVzdBItCgdjb21tYW5kGAEgASgOMhwuV2VhdGhlckRhdGEuUmVx",
-            "dWVzdC5Db21tYW5kIioKB0NvbW1hbmQSDwoLV2VhdGhlckRhdGEQABIOCgpD",
-            "bG91ZENvdmVyEAEiDQoLV2VhdGhlckRhdGEiDAoKQ2xvdWRDb3ZlckISqgIP",
-            "dW53ZG1pLlByb3RvYnVmYgZwcm90bzM="));
+            "GAUgASgCIpUBCg5XZWF0aGVyU3RhdGlvbhIVCg1TdGF0aW9uTnVtYmVyGAEg",
+            "ASgNEgwKBE5hbWUYAiABKAkSDwoHQ291bnRyeRgDIAEoCRIQCghMYXRpdHVk",
+            "ZRgEIAEoARIRCglMb25naXR1ZGUYBSABKAESEQoJRWxldmF0aW9uGAYgASgB",
+            "EhUKDUlnbm9yZVN0YXRpb24YByABKAgiKgoHQ291bnRyeRIPCgdDb3VudHJ5",
+            "GAEgASgJEg4KBklnbm9yZRgCIAEoCEISqgIPdW53ZG1pLlByb3RvYnVmYgZw",
+            "cm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Measurement), global::unwdmi.Protobuf.Measurement.Parser, new[]{ "StationID", "DateTime", "Humidity", "WindSpeed", "CloudCover" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherStation), global::unwdmi.Protobuf.WeatherStation.Parser, new[]{ "StationNumber", "Name", "Country", "Latitude", "Longitude", "Elevation" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Request), global::unwdmi.Protobuf.Request.Parser, new[]{ "Command" }, null, new[]{ typeof(global::unwdmi.Protobuf.Request.Types.Command) }, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherData), global::unwdmi.Protobuf.WeatherData.Parser, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.CloudCover), global::unwdmi.Protobuf.CloudCover.Parser, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherStation), global::unwdmi.Protobuf.WeatherStation.Parser, new[]{ "StationNumber", "Name", "Country", "Latitude", "Longitude", "Elevation", "IgnoreStation" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Country), global::unwdmi.Protobuf.Country.Parser, new[]{ "Country_", "Ignore" }, null, null, null)
           }));
     }
     #endregion
@@ -320,6 +317,7 @@ namespace unwdmi.Protobuf {
       latitude_ = other.latitude_;
       longitude_ = other.longitude_;
       elevation_ = other.elevation_;
+      ignoreStation_ = other.ignoreStation_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -394,6 +392,17 @@ namespace unwdmi.Protobuf {
       }
     }
 
+    /// <summary>Field number for the "IgnoreStation" field.</summary>
+    public const int IgnoreStationFieldNumber = 7;
+    private bool ignoreStation_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool IgnoreStation {
+      get { return ignoreStation_; }
+      set {
+        ignoreStation_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as WeatherStation);
@@ -413,6 +422,7 @@ namespace unwdmi.Protobuf {
       if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Latitude, other.Latitude)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Longitude, other.Longitude)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Elevation, other.Elevation)) return false;
+      if (IgnoreStation != other.IgnoreStation) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -425,6 +435,7 @@ namespace unwdmi.Protobuf {
       if (Latitude != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Latitude);
       if (Longitude != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Longitude);
       if (Elevation != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Elevation);
+      if (IgnoreStation != false) hash ^= IgnoreStation.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -462,6 +473,10 @@ namespace unwdmi.Protobuf {
         output.WriteRawTag(49);
         output.WriteDouble(Elevation);
       }
+      if (IgnoreStation != false) {
+        output.WriteRawTag(56);
+        output.WriteBool(IgnoreStation);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -487,6 +502,9 @@ namespace unwdmi.Protobuf {
       }
       if (Elevation != 0D) {
         size += 1 + 8;
+      }
+      if (IgnoreStation != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -516,6 +534,9 @@ namespace unwdmi.Protobuf {
       }
       if (other.Elevation != 0D) {
         Elevation = other.Elevation;
+      }
+      if (other.IgnoreStation != false) {
+        IgnoreStation = other.IgnoreStation;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -552,17 +573,21 @@ namespace unwdmi.Protobuf {
             Elevation = input.ReadDouble();
             break;
           }
+          case 56: {
+            IgnoreStation = input.ReadBool();
+            break;
+          }
         }
       }
     }
 
   }
 
-  public sealed partial class Request : pb::IMessage<Request> {
-    private static readonly pb::MessageParser<Request> _parser = new pb::MessageParser<Request>(() => new Request());
+  public sealed partial class Country : pb::IMessage<Country> {
+    private static readonly pb::MessageParser<Country> _parser = new pb::MessageParser<Country>(() => new Country());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<Request> Parser { get { return _parser; } }
+    public static pb::MessageParser<Country> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -575,55 +600,69 @@ namespace unwdmi.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public Request() {
+    public Country() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public Request(Request other) : this() {
-      command_ = other.command_;
+    public Country(Country other) : this() {
+      country_ = other.country_;
+      ignore_ = other.ignore_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public Request Clone() {
-      return new Request(this);
+    public Country Clone() {
+      return new Country(this);
     }
 
-    /// <summary>Field number for the "command" field.</summary>
-    public const int CommandFieldNumber = 1;
-    private global::unwdmi.Protobuf.Request.Types.Command command_ = 0;
+    /// <summary>Field number for the "Country" field.</summary>
+    public const int Country_FieldNumber = 1;
+    private string country_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public global::unwdmi.Protobuf.Request.Types.Command Command {
-      get { return command_; }
+    public string Country_ {
+      get { return country_; }
       set {
-        command_ = value;
+        country_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "Ignore" field.</summary>
+    public const int IgnoreFieldNumber = 2;
+    private bool ignore_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Ignore {
+      get { return ignore_; }
+      set {
+        ignore_ = value;
       }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as Request);
+      return Equals(other as Country);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(Request other) {
+    public bool Equals(Country other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Command != other.Command) return false;
+      if (Country_ != other.Country_) return false;
+      if (Ignore != other.Ignore) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
-      if (Command != 0) hash ^= Command.GetHashCode();
+      if (Country_.Length != 0) hash ^= Country_.GetHashCode();
+      if (Ignore != false) hash ^= Ignore.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -637,9 +676,13 @@ namespace unwdmi.Protobuf {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public void WriteTo(pb::CodedOutputStream output) {
-      if (Command != 0) {
-        output.WriteRawTag(8);
-        output.WriteEnum((int) Command);
+      if (Country_.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Country_);
+      }
+      if (Ignore != false) {
+        output.WriteRawTag(16);
+        output.WriteBool(Ignore);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -649,8 +692,11 @@ namespace unwdmi.Protobuf {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
-      if (Command != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Command);
+      if (Country_.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Country_);
+      }
+      if (Ignore != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -659,12 +705,15 @@ namespace unwdmi.Protobuf {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(Request other) {
+    public void MergeFrom(Country other) {
       if (other == null) {
         return;
       }
-      if (other.Command != 0) {
-        Command = other.Command;
+      if (other.Country_.Length != 0) {
+        Country_ = other.Country_;
+      }
+      if (other.Ignore != false) {
+        Ignore = other.Ignore;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -677,224 +726,14 @@ namespace unwdmi.Protobuf {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            command_ = (global::unwdmi.Protobuf.Request.Types.Command) input.ReadEnum();
+          case 10: {
+            Country_ = input.ReadString();
             break;
           }
-        }
-      }
-    }
-
-    #region Nested types
-    /// <summary>Container for nested types declared in the Request message type.</summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static partial class Types {
-      public enum Command {
-        [pbr::OriginalName("WeatherData")] WeatherData = 0,
-        [pbr::OriginalName("CloudCover")] CloudCover = 1,
-      }
-
-    }
-    #endregion
-
-  }
-
-  public sealed partial class WeatherData : pb::IMessage<WeatherData> {
-    private static readonly pb::MessageParser<WeatherData> _parser = new pb::MessageParser<WeatherData>(() => new WeatherData());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<WeatherData> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::unwdmi.Protobuf.WeatherDataReflection.Descriptor.MessageTypes[3]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public WeatherData() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public WeatherData(WeatherData other) : this() {
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public WeatherData Clone() {
-      return new WeatherData(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override bool Equals(object other) {
-      return Equals(other as WeatherData);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(WeatherData other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int CalculateSize() {
-      int size = 0;
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(WeatherData other) {
-      if (other == null) {
-        return;
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          case 16: {
+            Ignore = input.ReadBool();
             break;
-        }
-      }
-    }
-
-  }
-
-  public sealed partial class CloudCover : pb::IMessage<CloudCover> {
-    private static readonly pb::MessageParser<CloudCover> _parser = new pb::MessageParser<CloudCover>(() => new CloudCover());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<CloudCover> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::unwdmi.Protobuf.WeatherDataReflection.Descriptor.MessageTypes[4]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CloudCover() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CloudCover(CloudCover other) : this() {
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public CloudCover Clone() {
-      return new CloudCover(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override bool Equals(object other) {
-      return Equals(other as CloudCover);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(CloudCover other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void WriteTo(pb::CodedOutputStream output) {
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public int CalculateSize() {
-      int size = 0;
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(CloudCover other) {
-      if (other == null) {
-        return;
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(pb::CodedInputStream input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
+          }
         }
       }
     }
