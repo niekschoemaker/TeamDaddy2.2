@@ -94,20 +94,7 @@ namespace unwdmi.Parser
                 var currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out temperature))
                 {
-                    // If value fails to parse set the value to the average of last 30 seconds.
                     humidityMissing = true;
-                }
-                // Check if the data is not a peak. The not equals check is to avoid buggy behaviour when the value and average is 0.
-                else
-                {
-                    var temperatureAvg = weatherStation.TemperatureTotal / 30;
-                    if (temperature != temperatureAvg &&
-                        temperature <= temperatureAvg * 1.2 &&
-                        temperature >= temperatureAvg * 0.8)
-                    {
-                        humidityMissing = true;
-                    }
-
                 }
 
                 reader.Skip();
@@ -115,21 +102,11 @@ namespace unwdmi.Parser
 
                 #region DewPoint
 
-                float dewpoint = 0.0f;
+                float dewpoint = 0f;
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out dewpoint))
                 {
                     humidityMissing = true;
-                }
-                else
-                {
-                    var dewPointAvg = weatherStation.DewpointTotal / 30;
-                    if (dewpoint != dewPointAvg &&
-                        dewpoint <= dewPointAvg * 1.2 &&
-                        dewpoint >= dewPointAvg * 0.8)
-                    {
-                        humidityMissing = true;
-                    }
                 }
 
                 reader.Skip();
@@ -199,6 +176,14 @@ namespace unwdmi.Parser
                 if (!humidityMissing)
                 {
                     humidity = Math.Exp(17.625 * dewpoint / (243.03 + dewpoint)) / Math.Exp(17.625 * temperature / (243.04 + temperature));
+
+                    double humidityAvg = weatherStation.HumidityTotal / 30;
+                    if (humidity != humidityAvg &&
+                        humidity <= humidityAvg * 1.2 &&
+                        humidity >= humidityAvg * 0.8)
+                    {
+                        humidity = humidityAvg;
+                    }
                 }
                 else
                 {
