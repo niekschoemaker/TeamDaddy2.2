@@ -64,7 +64,7 @@ namespace unwdmi.Storage
             }
 
             //Console.WriteLine(CacheMeasurements.Count() + "HACKER MAN <3");
-            _controller.Save();
+            Task.Run(() => _controller.Save());
 
         }
 
