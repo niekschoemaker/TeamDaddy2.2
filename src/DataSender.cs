@@ -20,11 +20,11 @@ namespace unwdmi.Parser
             _controller = controller;
         }
 
-        public async void SendData(IPAddress ip, int port, ICollection<Measurement> measurements)
+        public void SendData(IPAddress ip, int port, ICollection<Measurement> measurements)
         {
             using (var client = new TcpClient())
             {
-                await client.ConnectAsync(ip, 25565);
+                client.Connect(ip, 25565);
                 Console.WriteLine(client.Connected);
                 using (var stream = client.GetStream())
                 {
