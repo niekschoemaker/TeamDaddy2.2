@@ -70,9 +70,6 @@ namespace unwdmi.Storage
 
         public void Save()
         {
-            if (ListenerParser.CacheMeasurements.Count > 8000)
-            {
-
                 var count = DateTime.UtcNow;
                 List<Measurement> measurements;
                 lock (ListenerParser.CacheMeasurements)
@@ -94,7 +91,6 @@ namespace unwdmi.Storage
                         measurement.WriteDelimitedTo(output);
                     }
                 }
-            }
         }
     }
 }
