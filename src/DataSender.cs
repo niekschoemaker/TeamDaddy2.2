@@ -33,7 +33,6 @@ namespace unwdmi.Parser
                         measurement.WriteDelimitedTo(stream);
                     }
                 }
-                client.Close();
             }
         }
     }

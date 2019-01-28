@@ -42,6 +42,8 @@ namespace unwdmi.Parser
         /// <summary> Sockets currently open (# of established connections with WeatherStations) </summary>
         public int OpenSockets = 0;
 
+        public int ActiveReceivers = 0;
+
         public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, WindSpeed, CloudCover)\nVALUES");
         public const string hostname = "127.0.0.1";
         public const int port = 25565;
@@ -185,11 +187,13 @@ namespace unwdmi.Parser
         // Add things which have to be executed right after all parsers are finished here.
         public void OnParsersFinished()
         {
+            List<Measurement> measurements;
             lock (MeasurementQueue)
             {
-                DataSender.SendData(IPAddress.Loopback, port, MeasurementQueue.ToList());
+                measurements = MeasurementQueue.ToList();
                 MeasurementQueue = new ConcurrentBag<Measurement>();
-            }  
+            }
+            DataSender.SendData(IPAddress.Loopback, port, measurements);
         }
     }
 
