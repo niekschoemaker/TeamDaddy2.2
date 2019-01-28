@@ -61,6 +61,11 @@ namespace unwdmi.Storage
                 Directory.CreateDirectory("Data");
             }
 
+            if(!File.Exists("./Data/Daddy.pb"))
+            {
+                File.Create("./Data/Daddy.pb");
+            }
+
         }
 
         public void Save()
@@ -76,9 +81,7 @@ namespace unwdmi.Storage
                     ListenerParser.CacheMeasurements.Clear();
                 }
 
-
-
-                using (var output = File.OpenWrite($"./Data/Daddy.pb-{count:yyyy-M-d-HH-mm-ss}"))
+                using (FileStream output = File.Open($"./Data/Daddy.pb", FileMode.Append))
                 {
                     Console.WriteLine(measurements.Count);
                     foreach (var measurement in measurements)
