@@ -63,7 +63,6 @@ namespace unwdmi.Parser
                 controller.SqlStringBuilder.Clear();
                 controller.SqlStringBuilder.AppendFormat(
                     "INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, WindSpeed, CloudCover)\nVALUES");
-                controller.SqlQueueCount = 0;
             }
             try
             {
@@ -76,29 +75,6 @@ namespace unwdmi.Parser
                 Console.WriteLine(e);
             }
             connection.Close();
-        }
-
-        public void CheckSqlQueue()
-        {
-            while (true)
-            {
-                if(controller.ActiveParsers > 0)
-                {
-                    Thread.Sleep(100);
-                    continue;
-                }
-
-                if (controller.OpenSockets == 0 || controller.SqlQueueCount == 0)
-                {
-                    Thread.Sleep(1000);
-                    continue;
-                }
-
-                // Check if every parser has added their data for that second and if so add the data to the Database
-                Console.WriteLine(controller.SqlQueueCount);
-                //AddData();
-
-            }
         }
 
         public void AddWeatherStations()
