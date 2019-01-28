@@ -19,7 +19,7 @@ namespace unwdmi.Parser
 
         private Socket _listener;
 
-        private Task onParsersFinishedTask = Task.CompletedTask;
+        private Task _onParsersFinishedTask = Task.CompletedTask;
 
         public void StartListening()
         {
@@ -83,8 +83,8 @@ namespace unwdmi.Parser
                                 Interlocked.Decrement(ref _controller.ActiveParsers);
                                 if (_controller.ActiveParsers == 0)
                                 {
-                                    if(onParsersFinishedTask.IsCompleted)
-                                        onParsersFinishedTask = Task.Run(async () =>
+                                    if(_onParsersFinishedTask.IsCompleted)
+                                        _onParsersFinishedTask = Task.Run(async () =>
                                         {
                                             await Task.Delay(100);
                                             while (_controller.ActiveReceivers != 0 && _controller.ActiveParsers != 0)

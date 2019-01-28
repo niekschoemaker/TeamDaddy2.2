@@ -193,7 +193,7 @@ namespace unwdmi.Parser
                 Measurement measurement = new Measurement()
                 {
                     CloudCover = cloudCover,
-                    DateTime = dateTime.ToBinary(),
+                    DateTime = ((DateTimeOffset)dateTime).ToUnixTimeSeconds(),
                     Humidity = humidity,
                     StationID = stationNumber,
                     WindSpeed = windSpeed
