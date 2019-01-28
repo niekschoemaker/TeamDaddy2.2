@@ -29,6 +29,7 @@ namespace unwdmi.Storage
         }
 
         public List<Measurement> CacheMeasurements = new List<Measurement>();
+        private const int minecraft = 25565;
 
         public void ReceiveCallback(IAsyncResult ar)
         {
@@ -36,10 +37,11 @@ namespace unwdmi.Storage
             var so = (StateObject) ar.AsyncState;
             var server = so.server;
             server.BeginAcceptTcpClient(new AsyncCallback(ReceiveCallback), so);
+
             using (TcpClient client = server.AcceptTcpClient())
             using (NetworkStream stream = client.GetStream())
             {
-                while (true)
+                while (client.Connected)
                 {
                     try
                     {
@@ -61,11 +63,14 @@ namespace unwdmi.Storage
                 }
             }
 
+            //Console.WriteLine(CacheMeasurements.Count() + "HACKER MAN <3");
+            _controller.Save();
+
         }
 
         public void StartListening()
         {
-            TcpListener server = new TcpListener(IPAddress.Any, 25565);
+            TcpListener server = new TcpListener(IPAddress.Any, minecraft);
             server.Start();
             var so = new StateObject()
             {

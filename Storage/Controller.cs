@@ -56,17 +56,14 @@ namespace unwdmi.Storage
 
             Task.Run(() => ListenerParser.StartListening());
 
-            Task.Run( async () =>
+            if(!Directory.Exists("Data"))
             {
-                while (true)
-                {
-                    Save();
-                    await Task.Delay(10);
-                }
-            });
+                Directory.CreateDirectory("Data");
+            }
+
         }
 
-        private void Save()
+        public void Save()
         {
             if (ListenerParser.CacheMeasurements.Count > 8000)
             {
@@ -78,7 +75,10 @@ namespace unwdmi.Storage
                     measurements = ListenerParser.CacheMeasurements.ToList();
                     ListenerParser.CacheMeasurements.Clear();
                 }
-                using (var output = File.OpenWrite($"/data/Daddy.pb-{count:yyyy-M-d-HH-mm-ss}"))
+
+
+
+                using (var output = File.OpenWrite($"./Data/Daddy.pb-{count:yyyy-M-d-HH-mm-ss}"))
                 {
                     Console.WriteLine(measurements.Count);
                     foreach (var measurement in measurements)
