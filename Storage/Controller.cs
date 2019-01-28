@@ -81,7 +81,12 @@ namespace unwdmi.Storage
                     ListenerParser.CacheMeasurements.Clear();
                 }
 
-                using (FileStream output = File.Open($"./Data/Daddy.pb", FileMode.Append))
+                if (!File.Exists($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb"))
+                {
+                    File.Create($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb").Dispose();
+                }
+
+                using (FileStream output = File.Open($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb", FileMode.Append))
                 {
                     Console.WriteLine(measurements.Count);
                     foreach (var measurement in measurements)
