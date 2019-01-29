@@ -8,7 +8,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Google.Protobuf;
 using unwdmi.Protobuf;
 
@@ -46,8 +45,9 @@ namespace unwdmi.Parser
         public int ActiveReceivers = 0;
 
         public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, WindSpeed, CloudCover)\nVALUES");
-        public const string hostname = "127.0.0.1";
-        public const int port = 25565;
+        public string Hostname = "127.0.0.1";
+        public IPAddress IpAddress;
+        public const int Port = 25565;
 
         public Dictionary<string, Country> Countries = new Dictionary<string, Country>();
         public ConcurrentBag<Measurement> MeasurementQueue = new ConcurrentBag<Measurement>();
@@ -66,6 +66,16 @@ namespace unwdmi.Parser
             ThreadPool.SetMaxThreads(20, 10);
             // Make sure you get exceptions in English. Can't quite Google something if it's Dutch.
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
+
+            if (!IPAddress.TryParse(Hostname, out IpAddress))
+            {
+                var ipAddresses = Dns.GetHostAddresses(Hostname);
+                if (ipAddresses.Length > 0)
+                {
+                    IpAddress = ipAddresses[0];
+                }
+            }
+            Console.WriteLine(IpAddress);
 
             Listener = new Listener(this);
             Parser = new Parser(this);
@@ -130,6 +140,7 @@ namespace unwdmi.Parser
                             {
                                 country.Ignore = ignore;
                                 SaveCountryData();
+                                UpdateWeatherStations();
                                 Console.WriteLine("Datahandling will " + (country.Ignore ? "now" : "no longer") + " ignore " + country.Country_);
                             }
                             else
@@ -137,6 +148,25 @@ namespace unwdmi.Parser
                                 Console.WriteLine("Invalid syntax, please only input true or false.");
                             }
                             
+                            break;
+
+                        case "host":
+                            if (consoleLine.Length == 2)
+                            {
+                                if (IPAddress.TryParse(consoleLine[1], out _))
+                                {
+                                    Hostname = consoleLine[1];
+                                    Console.WriteLine($"Set IPAdress to {Hostname}");
+                                }
+                                else
+                                {
+                                    var ipAddresses = Dns.GetHostAddresses(consoleLine[1]);
+                                    if (ipAddresses.Length > 0)
+                                    {
+                                        Hostname = ipAddresses[0].ToString();
+                                    }
+                                }
+                            }
                             break;
 
                         case "exit":
@@ -216,13 +246,15 @@ namespace unwdmi.Parser
         public void LoadWeatherStations()
         {
             Console.WriteLine("Loading WeatherStation Data...\n");
+
             if (!File.Exists(PathWeatherstations))
             {
                 Console.WriteLine($"{PathWeatherstations} file is missing, trying to update it from sql database...\n");
 
-                if (!UpdateWeatherStations())
+                if (!SaveWeatherStations())
                 {
                     File.Create(PathWeatherstations).Dispose();
+
                     Console.WriteLine("Failed to get data from Database, generated empty (default) WeatherStation data.\n");
                 }
                 else
@@ -239,31 +271,31 @@ namespace unwdmi.Parser
                     {
                         try
                         {
-                            var measurement = Protobuf.WeatherStation.Parser.ParseDelimitedFrom(fs);
-                            if (measurement == null)
+                            var weatherStationData = Protobuf.WeatherStation.Parser.ParseDelimitedFrom(fs);
+                            if (weatherStationData == null)
                             {
                                 break;
                             }
-                            WeatherStation weatherStation = new WeatherStation(measurement.StationNumber, measurement.Name, measurement.Country,
-                                measurement.Latitude, measurement.Longitude, measurement.Elevation, measurement.IgnoreStation);
+                            WeatherStation weatherStation = new WeatherStation(weatherStationData.StationNumber, weatherStationData.Name, weatherStationData.Country,
+                                weatherStationData.Latitude, weatherStationData.Longitude, weatherStationData.Elevation, weatherStationData.IgnoreStation);
                             weatherStation.IgnoreStation =
                                 (weatherStation.Latitude < 36 || weatherStation.Latitude > 72) ||
                                 (weatherStation.Longitude < -13 || weatherStation.Longitude > 41);
 
                             Country country;
-                            if (!Countries.TryGetValue(measurement.Country, out country))
+                            if (!Countries.TryGetValue(weatherStationData.Country, out country))
                             {
                                 country = new Country()
                                 {
-                                    Country_ = measurement.Country,
-                                    Ignore = measurement.IgnoreStation
+                                    Country_ = weatherStationData.Country,
+                                    Ignore = weatherStationData.IgnoreStation
                                 };
-                                Countries.Add(measurement.Country, country);
+                                Countries.Add(weatherStationData.Country, country);
                             }
 
                             weatherStation.IgnoreStation = country.Ignore;
 
-                            WeatherStations.Add(measurement.StationNumber, weatherStation);
+                            WeatherStations.Add(weatherStationData.StationNumber, weatherStation);
 
                         }
                         catch
@@ -289,14 +321,14 @@ namespace unwdmi.Parser
             }
         }
 
-        public bool UpdateWeatherStations()
+        public bool SaveWeatherStations()
         {
-            if (File.Exists(PathWeatherstations))
+            if (!File.Exists(PathWeatherstations))
             {
-                File.Delete(PathWeatherstations);
+                File.Create(PathWeatherstations);
             }
 
-            using (FileStream fs = File.OpenWrite(PathWeatherstations))
+            using (FileStream fs = File.Open(PathWeatherstations, FileMode.Truncate, FileAccess.Write, FileShare.None))
             {
                 foreach (var weatherStation in WeatherStations.Values)
                 {
@@ -316,6 +348,25 @@ namespace unwdmi.Parser
             return true;
         }
 
+        public void UpdateWeatherStations()
+        {
+            foreach (var weatherStation in WeatherStations)
+            {
+                Country countryData;
+                if (!Countries.TryGetValue(weatherStation.Value.Country, out countryData))
+                {
+                    countryData = new Country()
+                    {
+                        Country_ = weatherStation.Value.Country,
+                        Ignore = weatherStation.Value.IgnoreStation
+                    };
+                    Countries.Add(weatherStation.Value.Country, countryData);
+                }
+
+                weatherStation.Value.IgnoreStation = countryData.Ignore;
+            }
+        }
+
         /// <summary>
         /// Hook called when all parsers are finished. DO NOT CALL THIS METHOD!
         /// </summary>
@@ -328,7 +379,7 @@ namespace unwdmi.Parser
                 measurements = MeasurementQueue.ToList();
                 MeasurementQueue = new ConcurrentBag<Measurement>();
             }
-            DataSender.SendData(IPAddress.Loopback, port, measurements);
+            DataSender.SendData(IpAddress, Port, measurements);
         }
     }
 
@@ -345,8 +396,6 @@ namespace unwdmi.Parser
         public double Elevation;
         public bool IgnoreStation;
 
-        public float TemperatureTotal;
-        public float DewpointTotal;
         public double HumidityTotal;
         public float WindSpeedTotal;
         public float CloudCoverTotal;
