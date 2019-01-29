@@ -1,0 +1,13 @@
+table{
+	border: 1px;
+	margin-top: 10px;
+}
+
+td{
+	width: 24vw;
+	padding: 2px 1px;
+}
+
+tr:first-child{
+	text-align: center;
+}
