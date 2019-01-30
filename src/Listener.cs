@@ -86,11 +86,7 @@ namespace unwdmi.Parser
                                     if(_onParsersFinishedTask.IsCompleted)
                                         _onParsersFinishedTask = Task.Run(async () =>
                                         {
-                                            await Task.Delay(100);
-                                            while (_controller.ActiveReceivers != 0 && _controller.ActiveParsers != 0)
-                                            {
-                                                await Task.Delay(50);
-                                            }
+                                            Console.WriteLine("onParsersFinished called\n.");
                                             _controller.OnParsersFinished();
                                         });
                                 }

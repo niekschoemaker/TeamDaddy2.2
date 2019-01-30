@@ -20,18 +20,32 @@ namespace unwdmi.Parser
             _controller = controller;
         }
 
+        byte[] buffer = new byte[320000];
+
         public void SendData(IPAddress ip, int port, ICollection<Measurement> measurements)
         {
+            IPEndPoint ipEndPoint = new IPEndPoint(ip, port);
             using (var client = new TcpClient())
             {
-                client.Connect(ip, 25565);
+                try
+                {
+                    client.Connect(ipEndPoint);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
                 Console.WriteLine(client.Connected);
                 using (var stream = client.GetStream())
                 {
+                    MemoryStream byteStream = new MemoryStream(buffer); 
                     foreach (var measurement in measurements)
                     {
-                        measurement.WriteDelimitedTo(stream);
+                        measurement.WriteDelimitedTo(byteStream);
                     }
+                    stream.Write(buffer, 0, (int)byteStream.Position);
+                    byteStream.Dispose();
                 }
             }
         }
