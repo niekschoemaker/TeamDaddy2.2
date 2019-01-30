@@ -8,8 +8,8 @@ global buffer
 #buffer = ''
 
 def openProto(file):
-    with open(file,'rb') as f:
-        buf = f.read()
+    with open(file, 'rb') as f:
+        buf = f.readall()
         f.close()
         global buffer
         buffer = buf
