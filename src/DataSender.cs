@@ -44,7 +44,7 @@ namespace unwdmi.Parser
                     {
                         measurement.WriteDelimitedTo(byteStream);
                     }
-                    stream.Write(buffer, 0, (int)byteStream.Position);
+                    stream.WriteAsync(buffer, 0, (int)byteStream.Position);
                     byteStream.Dispose();
                 }
             }
