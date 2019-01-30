@@ -55,8 +55,8 @@ server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 website_pb2_grpc.add_UNWDMIServicer_to_server(UNWDMI(), server)
 
 # listen port 50000
-print('Starting server. Listening on port 50000.')
-server.add_insecure_port('[::]:50000')
+print('Starting server. Listening on port 443.')
+server.add_insecure_port('[::]:443')
 server.start()
 
 
