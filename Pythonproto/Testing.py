@@ -69,18 +69,64 @@ def getStation(name):
         s = Stations[i].Name
         if s == Name:
             print(Stations[i].StationNumber)
+            return Stations[i].StationNumber
             
         i += 1
 
-def getHumidity():
-    #Return humidity
+def getHumidity(name):
+    i = 0
+    Answer = {}
+    stationid = getStation(name)
+    while i < len(measurements):
+        s = measurements[i].StationID
+        if s == stationid:
+            time = convertDateTime(measurements[i].DateTime)
+            Answer[time] = round(measurements[i].Humidity,2)
+            
+        i += 1
+    
+    for x, y in Answer.items():
+        print(x,y)
+
+    
+def convertDateTime(Datetime):
+    ts = Datetime
+    x = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+    return x
+
+def getWindspeed(name):
+    i = 0
+    Answer = {}
+    stationid = getStation(name)
+    while i < len(measurements):
+        s = measurements[i].StationID
+        if s == stationid:
+            time = convertDateTime(measurements[i].DateTime)
+            Answer[time] = round(measurements[i].WindSpeed,2)
+            
+        i += 1
+    
+    for x, y in Answer.items():
+        print(x,y)
+
+
+
     pass
 
-def getWindspeed():
-    #Return windspeed
-    pass
+def getTopten(Land):
+    array = []
+    array2 = []
+    i = 0
+    hallo = Land.upper()
+    while i < len(Stations):
+        Country = Stations[i].Country
+        if Country == hallo:
+            array.append(Stations[i].Humidity)
+        i += 1
+    print(array)
+        
 
-def getTopten():
+    
     #Return top 10 humid places in Czech
     pass
 #Variabelen
@@ -91,26 +137,34 @@ test = "Daddy-2019-1-31-14-21.pb"
 #Threads aanmaken
 OpenThread = MyThread(1,"OpenThread",2)
 LeesThread = MyThread(2,"LeesThread",2)
-OpdrachtThread= MyThread(3,"OpdrachtenThread",1)
-
+OpdrachtThread = MyThread(3,"OpdrachtenThread",1)
+OpdrachtThread1 = MyThread(4,"OpdrachtenThread2",1)
+OpdrachtThread2 = MyThread(5,"OpdrachtenThread3",1)
 
 #Threads starten
 OpenThread.run(openProto,test)
 LeesThread.run(parseProto,buffer)
+t3 = time.time()
 OpenThread.run(openProto,Start)
 LeesThread.run(parseDat,buffer)
-OpdrachtThread.run(getStation,"jan mayen")
 
+OpdrachtThread.run(getStation,"jan mayen")
+OpdrachtThread1.run(getHumidity,"jan mayen")
+OpdrachtThread2.run(getWindspeed,"jan mayen")
+OpdrachtThread.run(getTopten,"Czech")
 #time kijken
 t2 = time.time()
 print(t2-t1)
+print(t3-t1)
+
+#print(Stations)
 #print(len(measurements))
 #print(measurements[0].StationID)
 #print(measurements[0].WindSpeed)
 #print(measurements[0].DateTime)
-#print(Stations[0])
-ts= measurements[0].DateTime
+#print(Stations[0].Country)
+#ts= measurements[0].DateTime
     
-x = datetime.utcfromtimestamp(ts).strftime("%Y%m%d%H%M%S")
-measurements[0].DateTime = int(x)
+#x = datetime.utcfromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+#measurements[0].DateTime = int(x)
 #print (measurements[0].DateTime)
