@@ -30,11 +30,14 @@ namespace unwdmi.Storage
         }
 
         public List<Measurement> CacheMeasurements = new List<Measurement>();
+        //Is a concurrent Dictionary since it is used in an async function, shouldn't be necessary, but just in case since it doens't really cost extra performance.
         public static ConcurrentDictionary<uint, WeatherStation> weatherStations = new ConcurrentDictionary<uint, WeatherStation>();
         public int Minute = DateTime.UtcNow.Minute;
         private const int minecraft = 25565;
+        /// <summary>
+        /// Contains HumidityTopTens from the last 30 minutes (stores top ten of each minute)
+        /// </summary>
         public Queue<List<KeyValuePair<uint, float>>> HumidityTopTen30 = new Queue<List<KeyValuePair<uint, float>>>(30);
-        private List<KeyValuePair<uint, float>> HumdityTopTen = new List<KeyValuePair<uint, float>>();
 
         public void ReceiveCallback(IAsyncResult ar)
         {
@@ -65,7 +68,11 @@ namespace unwdmi.Storage
                                 };
                                 weatherStations.TryAdd(weatherStation.StationID, weatherStation);
                             }
-                            weatherStation.Measurements.Add(measurement);
+
+                            weatherStation.WindSpeedTotal += measurement.WindSpeed;
+                            weatherStation.HumidityTotal += (float)measurement.Humidity;
+                            weatherStation.CloudCoverTotal += measurement.WindSpeed;
+                            weatherStation.Count++;
                         }
                     }
                     catch
@@ -79,8 +86,13 @@ namespace unwdmi.Storage
             if (Minute != DateTime.UtcNow.Minute)
             {
                 Minute = DateTime.UtcNow.Minute;
-                var a = Math.Floor((float)(Minute / 30));
-                Task.Run(() => _controller.Save());
+                ConcurrentDictionary<uint, WeatherStation> _weatherStations;
+                lock (weatherStations)
+                {
+                    _weatherStations = weatherStations;
+                    weatherStations = new ConcurrentDictionary<uint, WeatherStation>();
+                }
+                Task.Run(() => _controller.Save(_weatherStations));
             }
 
         }
@@ -113,9 +125,14 @@ namespace unwdmi.Storage
     public class WeatherStation
     {
         public uint StationID;
-        public List<Measurement> Measurements = new List<Measurement>(60);
-        public float HumidityAverage;
-        public float WindSpeedAverage;
-        public float CloudCoverAverage;
+
+        public int Count = 0;
+        public float HumidityAverage => HumidityTotal / 30;
+        public float WindSpeedAverage => WindSpeedTotal / 30;
+        public float CloudCoverAverage => CloudCoverTotal / 30;
+
+        public float HumidityTotal;
+        public float WindSpeedTotal;
+        public float CloudCoverTotal;
     }
 }

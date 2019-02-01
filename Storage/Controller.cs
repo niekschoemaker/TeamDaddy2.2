@@ -35,7 +35,7 @@ namespace unwdmi.Storage
 
 
         }
-        
+
         public ListenerParser ListenerParser;
         public ListenerWeb ListenerWeb;
         public static Controller Instance;
@@ -57,62 +57,52 @@ namespace unwdmi.Storage
 
             Task.Run(() => ListenerParser.StartListening());
 
-            if(!Directory.Exists("Data"))
+            if (!Directory.Exists("Data"))
             {
                 Directory.CreateDirectory("Data");
             }
 
-            if(!File.Exists("./Data/Daddy.pb"))
+            if (!File.Exists("./Data/Daddy.pb"))
             {
                 File.Create("./Data/Daddy.pb");
             }
 
         }
 
-        public void Save()
+        public void Save(ConcurrentDictionary<uint, WeatherStation> weatherStations)
         {
-                var count = DateTime.UtcNow;
-                List<Measurement> measurements;
-            ConcurrentDictionary<uint, WeatherStation> weatherStations;
-            lock (ListenerParser.weatherStations)
+            var count = DateTime.UtcNow;
+
+            if (!File.Exists($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb"))
             {
-                weatherStations = ListenerParser.weatherStations;
-                ListenerParser.weatherStations = new ConcurrentDictionary<uint, WeatherStation>();
+                File.Create($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb").Dispose();
             }
-                lock (ListenerParser.CacheMeasurements)
-                {
-                    measurements = ListenerParser.CacheMeasurements.ToList();
-                    ListenerParser.CacheMeasurements.Clear();
-                }
 
-                if (!File.Exists($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb"))
+            List<KeyValuePair<uint, float>> humidities = new List<KeyValuePair<uint, float>>();
+            using (FileStream output = File.Open($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb", FileMode.Append))
+            {
+                foreach (var weatherStation in weatherStations)
                 {
-                    File.Create($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb").Dispose();
-                }
-
-            List<KeyValuePair<uint, float>> Humidities = new List<KeyValuePair<uint, float>>();
-                using (FileStream output = File.Open($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb", FileMode.Append))
-                {
-                    Console.WriteLine(measurements.Count);
-                    foreach (var weatherStation in weatherStations)
+                    var mCount = weatherStation.Value.Count;
+                    var humidity = weatherStation.Value.HumidityTotal / mCount;
+                    new Measurement
                     {
-                        var humidity = weatherStation.Value.Measurements.Average(p => p.Humidity);
-                        new Measurement
-                        {
-                            CloudCover = weatherStation.Value.Measurements.Average(p => p.CloudCover),
-                            Humidity = humidity,
-                            StationID = weatherStation.Key,
-                            WindSpeed = weatherStation.Value.Measurements.Average(p => p.WindSpeed)
-                        };
-                        Humidities.Add(new KeyValuePair<uint, float>(weatherStation.Key, (float)humidity));
-                    }
+                        CloudCover = weatherStation.Value.CloudCoverTotal / mCount,
+                        Humidity = humidity,
+                        StationID = weatherStation.Key,
+                        WindSpeed = weatherStation.Value.WindSpeedTotal / mCount
+                    }.WriteDelimitedTo(output);
+                    humidities.Add(new KeyValuePair<uint, float>(weatherStation.Key, (float)humidity));
                 }
+            }
 
             if (ListenerParser.HumidityTopTen30.Count == 30)
             {
                 ListenerParser.HumidityTopTen30.Dequeue();
             }
-            ListenerParser.HumidityTopTen30.Enqueue(Humidities.OrderByDescending(p => p.Value).Take(10).ToList());
+            ListenerParser.HumidityTopTen30.Enqueue(humidities.OrderByDescending(p => p.Value).Take(10).ToList());
+
+
             Dictionary<uint, float> humidityKeyValuePairs = new Dictionary<uint, float>();
             foreach (var a in ListenerParser.HumidityTopTen30)
             {
