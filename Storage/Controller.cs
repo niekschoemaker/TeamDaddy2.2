@@ -56,23 +56,21 @@ namespace unwdmi.Storage
 
             Task.Run(() => ListenerParser.StartListening());
 
-            Task.Run(() =>
+            if(!Directory.Exists("Data"))
             {
-                while (true)
-                {
-                    Save();
-                }
-            });
+                Directory.CreateDirectory("Data");
+            }
 
-            //ListenerWeb.StartListening();
-
+            if(!File.Exists("./Data/Daddy.pb"))
+            {
+                File.Create("./Data/Daddy.pb");
+            }
 
         }
 
-        private async void Save()
+        public void Save()
         {
-            if (ListenerParser.CacheMeasurements.Count > 8000)
-            {
+                var count = DateTime.UtcNow;
                 List<Measurement> measurements;
                 lock (ListenerParser.CacheMeasurements)
                 {
@@ -80,7 +78,12 @@ namespace unwdmi.Storage
                     ListenerParser.CacheMeasurements.Clear();
                 }
 
-                using (var output = File.OpenWrite("Daddy.dat"))
+                if (!File.Exists($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb"))
+                {
+                    File.Create($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb").Dispose();
+                }
+
+                using (FileStream output = File.Open($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb", FileMode.Append))
                 {
                     Console.WriteLine(measurements.Count);
                     foreach (var measurement in measurements)
@@ -88,7 +91,6 @@ namespace unwdmi.Storage
                         measurement.WriteDelimitedTo(output);
                     }
                 }
-            }
         }
     }
 }

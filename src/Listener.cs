@@ -78,6 +78,8 @@ namespace unwdmi.Parser
                             finally
                             {
                                 Interlocked.Decrement(ref _controller.ActiveParsers);
+                                if (_controller.ActiveParsers == 0)
+                                    _controller.OnParsersFinished();
                             }
                         });
                         so.sb.Clear();

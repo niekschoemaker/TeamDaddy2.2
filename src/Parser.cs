@@ -63,6 +63,11 @@ namespace unwdmi.Parser
                 uint stationNumber;
                 uint.TryParse(reader.ReadElementString(), out stationNumber);
 
+                if (!_controller.WeatherStations.ContainsKey(stationNumber))
+                {
+                    _controller.WeatherStations.Add(stationNumber, new WeatherStation(stationNumber, string.Empty, string.Empty, 0.0, 0.0, 0.0));
+                }
+
                 var weatherStation = _controller.WeatherStations[stationNumber];
 
                 // reader.Skip skips one node (Skips to next start element in this XML file)
@@ -83,25 +88,13 @@ namespace unwdmi.Parser
                 var culture = NumberFormatInfo.InvariantInfo;
                 #region Temperature
 
+                bool humidityMissing = false;
                 // Cache value containing latest value read from XMLReader.
-                float temperature;
+                float temperature = 0f;
                 var currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out temperature))
                 {
-                    // If value fails to parse set the value to the average of last 30 seconds.
-                    temperature = weatherStation.TemperatureTotal / 30;
-                }
-                // Check if the data is not a peak. The not equals check is to avoid buggy behaviour when the value and average is 0.
-                else
-                {
-                    var temperatureAvg = weatherStation.TemperatureTotal / 30;
-                    if (temperature != temperatureAvg &&
-                        temperature <= temperatureAvg * 1.2 &&
-                        temperature >= temperatureAvg * 0.8)
-                    {
-                        temperature = temperatureAvg;
-                    }
-
+                    humidityMissing = true;
                 }
 
                 reader.Skip();
@@ -109,90 +102,21 @@ namespace unwdmi.Parser
 
                 #region DewPoint
 
-                float dewpoint;
+                float dewpoint = 0f;
                 currentValue = reader.ReadElementString();
                 if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out dewpoint))
                 {
-                    dewpoint = weatherStation.DewpointTotal / 30;
-                }
-                else
-                {
-                    var dewPointAvg = weatherStation.DewpointTotal / 30;
-                    if (dewpoint != dewPointAvg &&
-                        dewpoint <= dewPointAvg * 1.2 &&
-                        dewpoint >= dewPointAvg * 0.8)
-                    {
-                        dewpoint = dewPointAvg;
-                    }
+                    humidityMissing = true;
                 }
 
                 reader.Skip();
 #endregion
 
-                #region StationPressure
-
-                /*currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.StationPressure))
-                {
-                    measurement.StationPressure = weatherStation.StationPressureTotal / 30;
-                }
-                else
-                {
-                    var stationPressureAvg = weatherStation.StationPressureTotal / 30;
-                    if (measurement.StationPressure != stationPressureAvg &&
-                        measurement.StationPressure <= stationPressureAvg * 1.2 &&
-                        measurement.StationPressure >= stationPressureAvg * 0.8)
-                    {
-                        measurement.StationPressure = stationPressureAvg;
-                    }
-                }*/
+                reader.Skip();
 
                 reader.Skip();
-#endregion
-
-                #region SeaLevelPressure
-
-                /*currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.SeaLevelPressure))
-                {
-                    measurement.SeaLevelPressure = weatherStation.SeaLevelPressureTotal / 30;
-                }
-
-                else
-                {
-                    var seaLevelPressureAvg = weatherStation.SeaLevelPressureTotal / 30;
-                    if (measurement.SeaLevelPressure != seaLevelPressureAvg &&
-                        measurement.SeaLevelPressure <= seaLevelPressureAvg * 1.2 &&
-                        measurement.SeaLevelPressure >= seaLevelPressureAvg * 0.8)
-                    {
-                        measurement.SeaLevelPressure = seaLevelPressureAvg;
-                    }
-                }*/
 
                 reader.Skip();
-#endregion
-                
-                #region Visibility
-
-                /*currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStylePositive, culture, out measurement.Visibility))
-                {
-                    measurement.Visibility = weatherStation.VisibilityTotal / 30;
-                }
-
-                else
-                {
-                    var visibilityAverage = weatherStation.VisibilityTotal / 30;
-                    if (measurement.Visibility != visibilityAverage &&
-                    measurement.Visibility <= visibilityAverage * 1.2 &&
-                    measurement.Visibility >= visibilityAverage * 0.8)
-                    {
-                        measurement.Visibility = visibilityAverage;
-                    }
-                }*/
-
-                reader.Skip();
-#endregion
 
                 #region WindSpeed
 
@@ -218,68 +142,11 @@ namespace unwdmi.Parser
                 reader.Skip();
 #endregion
 
-                #region Precipitation
-
-                /*currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !double.TryParse(currentValue, numberStylePositive, culture, out measurement.Precipitation))
-                {
-                    measurement.Precipitation = weatherStation.PrecipitationTotal / 30;
-                }
-                else
-                {
-                    var precipitationAvg = weatherStation.PrecipitationTotal / 30;
-                    if (measurement.Precipitation != precipitationAvg &&
-                    measurement.Precipitation <= precipitationAvg * 1.2 &&
-                    measurement.Precipitation >= precipitationAvg * 0.8)
-                    {
-                        measurement.Precipitation = precipitationAvg;
-                    }
-                }*/
+                reader.Skip();
 
                 reader.Skip();
-#endregion
-
-                #region Snowfall
-
-                /*currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !float.TryParse(currentValue, numberStyleNegative, culture, out measurement.Snowfall))
-                {
-                    measurement.Snowfall = weatherStation.SnowfallTotal / 30;
-                }
-                else
-                {
-                    var snowFallAvg = weatherStation.SnowfallTotal / 30;
-                    if (measurement.Snowfall != snowFallAvg &&
-                    measurement.Snowfall <= snowFallAvg * 1.2 &&
-                    measurement.Snowfall >= snowFallAvg * 0.8)
-                    {
-                        measurement.Snowfall = snowFallAvg;
-                    }
-                }*/
 
                 reader.Skip();
-#endregion
-                #region Events
-
-                /*currentValue = reader.ReadElementString();
-                // If string IsNull skip frshtt calculation, used goto to reduce nesting.
-                if (string.IsNullOrEmpty(currentValue))
-                    goto CloudCover;
-
-                var frshtt = currentValue.ToCharArray();
-
-                byte total = 0;
-                if (frshtt.Length != 0)
-                {
-                    for (int i = 0; i < frshtt.Length; i++)
-                    {
-                        total += frshtt[i] == '0' ? (byte)0 : (byte)Math.Pow(2, 5 - i);
-                    }
-                }
-
-                measurement.Events = total;*/
-                reader.Skip();
-#endregion
 
                 #region CloudCover
 
@@ -304,32 +171,30 @@ namespace unwdmi.Parser
                 reader.Skip();
 #endregion
 
-                #region WindDirection
-
-                /*currentValue = reader.ReadElementString();
-                if (string.IsNullOrEmpty(currentValue) || !ushort.TryParse(currentValue, NumberStyles.None, NumberFormatInfo.InvariantInfo,
-                    out measurement.WindDirection))
+                reader.Skip();
+                double humidity;
+                if (!humidityMissing)
                 {
-                    measurement.WindDirection = (ushort)(weatherStation.WindDirectionTotal / 30);
+                    humidity = Math.Exp(17.625 * dewpoint / (243.03 + dewpoint)) / Math.Exp(17.625 * temperature / (243.04 + temperature));
+
+                    double humidityAvg = weatherStation.HumidityTotal / 30;
+                    if (humidity != humidityAvg &&
+                        humidity <= humidityAvg * 1.2 &&
+                        humidity >= humidityAvg * 0.8)
+                    {
+                        humidity = humidityAvg;
+                    }
                 }
                 else
                 {
-                    var windDirectionAvg = weatherStation.WindDirectionTotal / 30;
-                    if (measurement.WindDirection != windDirectionAvg &&
-                  measurement.WindDirection <= windDirectionAvg * 1.2 &&
-                  measurement.WindDirection >= windDirectionAvg * 0.8)
-                    {
-                        measurement.WindDirection = (ushort)windDirectionAvg;
-                    }
-                }*/
-#endregion
-
+                    humidity = weatherStation.HumidityTotal / 30;
+                }
 
                 Measurement measurement = new Measurement()
                 {
                     CloudCover = cloudCover,
                     DateTime = dateTime.ToBinary(),
-                    Humidity = (double)(Math.Exp(17.625*dewpoint/(243.03 + dewpoint))/Math.Exp(17.625*temperature/(243.04+temperature))),
+                    Humidity = humidity,
                     StationID = stationNumber,
                     WindSpeed = windSpeed
                 };

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+
+package opdracht;
+
+message top10request {
+    bool vraag = 1;}
+
+message top10response {
+    string nummer1 = 1;
+    string nummer2 = 2;
+    string nummer3 = 3;
+    string nummer4 = 4;
+    string nummer5 = 5;
+    string nummer6 = 6;
+    string nummer7 = 7;
+    string nummer8 = 8;
+    string nummer9 = 9;
+    string nummer10 = 10;
+}
+
+message windspeedrequest {
+    bool vraag = 1;}
+
+message windspeedresponse {
+    string reactie = 1;}
+
+service UNWDMI {
+    rpc Windspeed (windspeedrequest) returns (windspeedresponse) {}
+    rpc toptien(top10request) returns (top10response) {}
+}
+
+
