@@ -18,20 +18,10 @@ message WeatherStation {
 	double Latitude = 4;
 	double Longitude = 5;
 	double Elevation = 6;
+	bool IgnoreStation = 7;
 }
 
-message Request {
-	enum Command {
-		WeatherData = 0;
-		CloudCover = 1;
-	}
-	Command command = 1;
-}
-
-message WeatherData {
-	
-}
-
-message CloudCover {
-	
+message Country {
+	string Country = 1;
+	bool Ignore = 2;
 }

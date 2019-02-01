@@ -93,7 +93,7 @@ namespace unwdmi.Parser
                     var longitude = reader.GetDouble("longitude");
                     var elevation = reader.GetDouble("elevation");
                     controller.WeatherStations.Add(STN,
-                        new WeatherStation(STN, name, country, latitude, longitude, elevation));
+                        new WeatherStation(STN, name, country, latitude, longitude, elevation, false));
                 }
             }
         }
