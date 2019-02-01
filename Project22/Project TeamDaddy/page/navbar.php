@@ -8,6 +8,7 @@
 		<ul>
 			<li><a href="login.php">Home</a></li>
 			<li><a href="data.php">Data</a></li>
+			<li><a href="map.php">Map</a></li>
 			<!-- <li><a href="#">Login</a></li>
 			<li><a href="#">Logout</a></li> -->
 		</ul>

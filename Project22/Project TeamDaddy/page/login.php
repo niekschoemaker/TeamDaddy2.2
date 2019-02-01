@@ -1,3 +1,27 @@
+<?php 
+//Set username password
+$users = array(
+	'user'=>'user',
+	'admin'=>'admin'
+);
+
+//Session info
+session_start();
+
+if(isset($_SESSION['login'])){
+	header('Location: data.php');
+}else{
+//login script
+	if(isset($_POST['Username']) && isset($_POST['Password'])){
+		if($users[$_POST['Username']] == $_POST['Password']){
+			$_SESSION['login'] = true;
+			header('Location: data.php');
+		}
+	}
+}
+
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,13 +33,13 @@
 <?php 
 	include 'navbar.php';
 ?>
-<form action="data.php" method="post">
+<form action="login.php" method="post">
 	<div class="container">
 		<label for="Username"><strong>Username</strong></label>	
-		<input type=text placeholder="Username" id="Username" required>
+		<input type=text placeholder="Username" name="Username" required>
 
 		<label for="Password"><strong>Password</strong></label>	
-		<input type=password placeholder="Password" id="Password" required>
+		<input type=password placeholder="Password" name="Password" required>
 
 		<button type="submit">Login</button>
 	</div>
