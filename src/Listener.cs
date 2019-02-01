@@ -19,6 +19,8 @@ namespace unwdmi.Parser
 
         private Socket _listener;
 
+        private Task _onParsersFinishedTask = Task.CompletedTask;
+
         public void StartListening()
         {
             IPEndPoint ip = new IPEndPoint(IPAddress.Any, 7789);
@@ -49,6 +51,7 @@ namespace unwdmi.Parser
 
         void ReceiveCallback(IAsyncResult ar)
         {
+            Interlocked.Increment(ref _controller.ActiveReceivers);
             var so = (StateObject) ar.AsyncState;
             var workSocket = so.workSocket;
             try
@@ -79,7 +82,14 @@ namespace unwdmi.Parser
                             {
                                 Interlocked.Decrement(ref _controller.ActiveParsers);
                                 if (_controller.ActiveParsers == 0)
-                                    _controller.OnParsersFinished();
+                                {
+                                    if(_onParsersFinishedTask.IsCompleted)
+                                        _onParsersFinishedTask = Task.Run(async () =>
+                                        {
+                                            Console.WriteLine("onParsersFinished called\n.");
+                                            _controller.OnParsersFinished();
+                                        });
+                                }
                             }
                         });
                         so.sb.Clear();
@@ -104,6 +114,7 @@ namespace unwdmi.Parser
             {
                 Console.WriteLine(e);
             }
+            Interlocked.Decrement(ref _controller.ActiveReceivers);
         }
     }
 
