@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -33,7 +34,7 @@ namespace unwdmi.Storage
         //Is a concurrent Dictionary since it is used in an async function, shouldn't be necessary, but just in case since it doens't really cost extra performance.
         public static ConcurrentDictionary<uint, WeatherStation> weatherStations = new ConcurrentDictionary<uint, WeatherStation>();
         public int Minute = DateTime.UtcNow.Minute;
-        private const int minecraft = 25565;
+        private const int minecraft = 25566;
         /// <summary>
         /// Contains HumidityTopTens from the last 30 minutes (stores top ten of each minute)
         /// </summary>
@@ -48,13 +49,22 @@ namespace unwdmi.Storage
 
 
             using (TcpClient client = server.AcceptTcpClient())
-            using (NetworkStream stream = client.GetStream())
+            using (var stream = client.GetStream())
+            using (var sslStream = new SslStream(stream))
             {
-                while (client.Connected)
+                try
+                {
+                    sslStream.AuthenticateAsServer(Controller.serverCertificate);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                while (true)
                 {
                     try
                     {
-                        var measurement = Measurement.Parser.ParseDelimitedFrom(stream);
+                        var measurement = Measurement.Parser.ParseDelimitedFrom(sslStream);
                         if (measurement == null)
                         {
                             break;

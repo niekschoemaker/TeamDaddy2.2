@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +44,7 @@ namespace unwdmi.Storage
 
         public DateTime TimeStarted;
         public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
+        public static X509Certificate2 serverCertificate = null;
 
         public Controller()
         {
@@ -55,6 +57,10 @@ namespace unwdmi.Storage
             ThreadPool.SetMinThreads(1, 0);
             ThreadPool.SetMaxThreads(20, 10);
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
+
+            serverCertificate = new X509Certificate2("client.p12", "DaddyCool");
+
+
 
             Task.Run(() => ListenerParser.StartListening());
 

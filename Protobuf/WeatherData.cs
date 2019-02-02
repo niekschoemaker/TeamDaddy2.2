@@ -27,27 +27,26 @@ namespace unwdmi.Protobuf {
             "ChFXZWF0aGVyRGF0YS5wcm90bxILV2VhdGhlckRhdGEiawoLTWVhc3VyZW1l",
             "bnQSEQoJU3RhdGlvbklEGAEgASgNEhAKCERhdGVUaW1lGAIgASgDEhAKCEh1",
             "bWlkaXR5GAMgASgBEhEKCVdpbmRTcGVlZBgEIAEoAhISCgpDbG91ZENvdmVy",
-            "GAUgASgCIpUBCg5XZWF0aGVyU3RhdGlvbhIVCg1TdGF0aW9uTnVtYmVyGAEg",
-            "ASgNEgwKBE5hbWUYAiABKAkSDwoHQ291bnRyeRgDIAEoCRIQCghMYXRpdHVk",
-            "ZRgEIAEoARIRCglMb25naXR1ZGUYBSABKAESEQoJRWxldmF0aW9uGAYgASgB",
-            "EhUKDUlnbm9yZVN0YXRpb24YByABKAgiKgoHQ291bnRyeRIPCgdDb3VudHJ5",
-            "GAEgASgJEg4KBklnbm9yZRgCIAEoCCLCAwoGVG9wVGVuEhcKD1dlYXRoZXJT",
-            "dGF0aW9uMRgBIAEoDRIRCglIdW1pZGl0eTEYAiABKAISFwoPV2VhdGhlclN0",
-            "YXRpb24yGAMgASgNEhEKCUh1bWlkaXR5MhgEIAEoAhIXCg9XZWF0aGVyU3Rh",
-            "dGlvbjMYBSABKA0SEQoJSHVtaWRpdHkzGAYgASgCEhcKD1dlYXRoZXJTdGF0",
-            "aW9uNBgHIAEoDRIRCglIdW1pZGl0eTQYCCABKAISFwoPV2VhdGhlclN0YXRp",
-            "b241GAkgASgNEhEKCUh1bWlkaXR5NRgKIAEoAhIXCg9XZWF0aGVyU3RhdGlv",
-            "bjYYCyABKA0SEQoJSHVtaWRpdHk2GAwgASgCEhcKD1dlYXRoZXJTdGF0aW9u",
-            "NxgNIAEoDRIRCglIdW1pZGl0eTcYDiABKAISFwoPV2VhdGhlclN0YXRpb244",
-            "GA8gASgNEhEKCUh1bWlkaXR5OBgQIAEoAhIXCg9XZWF0aGVyU3RhdGlvbjkY",
-            "ESABKA0SEQoJSHVtaWRpdHk5GBIgASgCEhgKEFdlYXRoZXJTdGF0aW9uMTAY",
-            "EyABKA0SEgoKSHVtaWRpdHkxMBgUIAEoAkISqgIPdW53ZG1pLlByb3RvYnVm",
-            "YgZwcm90bzM="));
+            "GAUgASgCIn4KDldlYXRoZXJTdGF0aW9uEhUKDVN0YXRpb25OdW1iZXIYASAB",
+            "KA0SDAoETmFtZRgCIAEoCRIPCgdDb3VudHJ5GAMgASgJEhAKCExhdGl0dWRl",
+            "GAQgASgBEhEKCUxvbmdpdHVkZRgFIAEoARIRCglFbGV2YXRpb24YBiABKAEi",
+            "KgoHQ291bnRyeRIPCgdDb3VudHJ5GAEgASgJEg4KBklnbm9yZRgCIAEoCCLC",
+            "AwoGVG9wVGVuEhcKD1dlYXRoZXJTdGF0aW9uMRgBIAEoDRIRCglIdW1pZGl0",
+            "eTEYAiABKAISFwoPV2VhdGhlclN0YXRpb24yGAMgASgNEhEKCUh1bWlkaXR5",
+            "MhgEIAEoAhIXCg9XZWF0aGVyU3RhdGlvbjMYBSABKA0SEQoJSHVtaWRpdHkz",
+            "GAYgASgCEhcKD1dlYXRoZXJTdGF0aW9uNBgHIAEoDRIRCglIdW1pZGl0eTQY",
+            "CCABKAISFwoPV2VhdGhlclN0YXRpb241GAkgASgNEhEKCUh1bWlkaXR5NRgK",
+            "IAEoAhIXCg9XZWF0aGVyU3RhdGlvbjYYCyABKA0SEQoJSHVtaWRpdHk2GAwg",
+            "ASgCEhcKD1dlYXRoZXJTdGF0aW9uNxgNIAEoDRIRCglIdW1pZGl0eTcYDiAB",
+            "KAISFwoPV2VhdGhlclN0YXRpb244GA8gASgNEhEKCUh1bWlkaXR5OBgQIAEo",
+            "AhIXCg9XZWF0aGVyU3RhdGlvbjkYESABKA0SEQoJSHVtaWRpdHk5GBIgASgC",
+            "EhgKEFdlYXRoZXJTdGF0aW9uMTAYEyABKA0SEgoKSHVtaWRpdHkxMBgUIAEo",
+            "AkISqgIPdW53ZG1pLlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Measurement), global::unwdmi.Protobuf.Measurement.Parser, new[]{ "StationID", "DateTime", "Humidity", "WindSpeed", "CloudCover" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherStation), global::unwdmi.Protobuf.WeatherStation.Parser, new[]{ "StationNumber", "Name", "Country", "Latitude", "Longitude", "Elevation", "IgnoreStation" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherStation), global::unwdmi.Protobuf.WeatherStation.Parser, new[]{ "StationNumber", "Name", "Country", "Latitude", "Longitude", "Elevation" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Country), global::unwdmi.Protobuf.Country.Parser, new[]{ "Country_", "Ignore" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.TopTen), global::unwdmi.Protobuf.TopTen.Parser, new[]{ "WeatherStation1", "Humidity1", "WeatherStation2", "Humidity2", "WeatherStation3", "Humidity3", "WeatherStation4", "Humidity4", "WeatherStation5", "Humidity5", "WeatherStation6", "Humidity6", "WeatherStation7", "Humidity7", "WeatherStation8", "Humidity8", "WeatherStation9", "Humidity9", "WeatherStation10", "Humidity10" }, null, null, null)
           }));
@@ -328,7 +327,6 @@ namespace unwdmi.Protobuf {
       latitude_ = other.latitude_;
       longitude_ = other.longitude_;
       elevation_ = other.elevation_;
-      ignoreStation_ = other.ignoreStation_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -403,17 +401,6 @@ namespace unwdmi.Protobuf {
       }
     }
 
-    /// <summary>Field number for the "IgnoreStation" field.</summary>
-    public const int IgnoreStationFieldNumber = 7;
-    private bool ignoreStation_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool IgnoreStation {
-      get { return ignoreStation_; }
-      set {
-        ignoreStation_ = value;
-      }
-    }
-
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as WeatherStation);
@@ -433,7 +420,6 @@ namespace unwdmi.Protobuf {
       if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Latitude, other.Latitude)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Longitude, other.Longitude)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Elevation, other.Elevation)) return false;
-      if (IgnoreStation != other.IgnoreStation) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -446,7 +432,6 @@ namespace unwdmi.Protobuf {
       if (Latitude != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Latitude);
       if (Longitude != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Longitude);
       if (Elevation != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Elevation);
-      if (IgnoreStation != false) hash ^= IgnoreStation.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -484,10 +469,6 @@ namespace unwdmi.Protobuf {
         output.WriteRawTag(49);
         output.WriteDouble(Elevation);
       }
-      if (IgnoreStation != false) {
-        output.WriteRawTag(56);
-        output.WriteBool(IgnoreStation);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -513,9 +494,6 @@ namespace unwdmi.Protobuf {
       }
       if (Elevation != 0D) {
         size += 1 + 8;
-      }
-      if (IgnoreStation != false) {
-        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -545,9 +523,6 @@ namespace unwdmi.Protobuf {
       }
       if (other.Elevation != 0D) {
         Elevation = other.Elevation;
-      }
-      if (other.IgnoreStation != false) {
-        IgnoreStation = other.IgnoreStation;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -582,10 +557,6 @@ namespace unwdmi.Protobuf {
           }
           case 49: {
             Elevation = input.ReadDouble();
-            break;
-          }
-          case 56: {
-            IgnoreStation = input.ReadBool();
             break;
           }
         }

@@ -47,7 +47,7 @@ namespace unwdmi.Parser
         public StringBuilder SqlStringBuilder = new StringBuilder("INSERT INTO measurements (StationNumber, DateTime, Temperature, Dewpoint, WindSpeed, CloudCover)\nVALUES");
         public string Hostname = "127.0.0.1";
         public IPAddress IpAddress;
-        public const int Port = 25565;
+        public const int Port = 25566;
 
         public Dictionary<string, Country> Countries = new Dictionary<string, Country>();
         public ConcurrentBag<Measurement> MeasurementQueue = new ConcurrentBag<Measurement>();
@@ -277,23 +277,10 @@ namespace unwdmi.Parser
                                 break;
                             }
                             WeatherStation weatherStation = new WeatherStation(weatherStationData.StationNumber, weatherStationData.Name, weatherStationData.Country,
-                                weatherStationData.Latitude, weatherStationData.Longitude, weatherStationData.Elevation, weatherStationData.IgnoreStation);
+                                weatherStationData.Latitude, weatherStationData.Longitude, weatherStationData.Elevation, false);
                             weatherStation.IgnoreStation =
                                 (weatherStation.Latitude < 36 || weatherStation.Latitude > 72) ||
                                 (weatherStation.Longitude < -13 || weatherStation.Longitude > 41);
-
-                            Country country;
-                            if (!Countries.TryGetValue(weatherStationData.Country, out country))
-                            {
-                                country = new Country()
-                                {
-                                    Country_ = weatherStationData.Country,
-                                    Ignore = weatherStationData.IgnoreStation
-                                };
-                                Countries.Add(weatherStationData.Country, country);
-                            }
-
-                            weatherStation.IgnoreStation = country.Ignore;
 
                             WeatherStations.Add(weatherStationData.StationNumber, weatherStation);
 
@@ -304,7 +291,6 @@ namespace unwdmi.Parser
                         }
                     }
                 }
-                SaveCountryData();
                 Console.WriteLine("Succesfully loaded WeatherStation data.");
             }
             catch
@@ -340,7 +326,6 @@ namespace unwdmi.Parser
                         Latitude = weatherStation.Latitude,
                         Longitude = weatherStation.Longitude,
                         Elevation = weatherStation.Elevation,
-                        IgnoreStation = weatherStation.IgnoreStation
                     }.WriteDelimitedTo(fs);
                 }
             }
@@ -362,8 +347,6 @@ namespace unwdmi.Parser
                     };
                     Countries.Add(weatherStation.Value.Country, countryData);
                 }
-
-                weatherStation.Value.IgnoreStation = countryData.Ignore;
             }
         }
 

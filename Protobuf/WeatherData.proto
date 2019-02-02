@@ -18,7 +18,6 @@ message WeatherStation {
 	double Latitude = 4;
 	double Longitude = 5;
 	double Elevation = 6;
-	bool IgnoreStation = 7;
 }
 
 message Country {
