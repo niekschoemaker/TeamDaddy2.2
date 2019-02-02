@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
+using Newtonsoft.Json;
 using unwdmi.Protobuf;
 
 /*
@@ -81,6 +82,7 @@ namespace unwdmi.Storage
             List<KeyValuePair<uint, float>> humidities = new List<KeyValuePair<uint, float>>();
             using (FileStream output = File.Open($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb", FileMode.Append))
             {
+                Console.WriteLine(weatherStations.Count);
                 foreach (var weatherStation in weatherStations)
                 {
                     var mCount = weatherStation.Value.Count;
@@ -122,7 +124,19 @@ namespace unwdmi.Storage
                 }
             }
 
-            var humidityTopTen = humidityKeyValuePairs.OrderByDescending(p => p.Value).Take(10);
+            var humidityTopTen = humidityKeyValuePairs.OrderByDescending(p => p.Value).Take(10).ToArray();
+            var topTen = new Protobuf.TopTen();
+            for(int i = 0; i < humidityTopTen.Count(); i++)
+            {
+                // Was trying to figure out reflection, this should work pretty nicely, is a nice version of "Humidity1 = value", "Humidity2 = value", etc
+                topTen.GetType().GetProperty("Humidity" + (i + 1)).SetValue(topTen, humidityTopTen[i].Value);
+
+                topTen.GetType().GetProperty("WeatherStation" + (i + 1)).SetValue(topTen, humidityTopTen[i].Key);
+            }
+
+            // Save latest top 10 to disk.
+            using(var file = File.OpenWrite("TopTen.pb"))
+                topTen.WriteTo(file);
         }
     }
 }
