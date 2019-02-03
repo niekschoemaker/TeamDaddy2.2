@@ -357,8 +357,9 @@ namespace unwdmi.Parser
             {
                 DataSender.SendData(IpAddress, Port, measurements);
             }
-            catch
+            catch(Exception e)
             {
+                Debug.WriteLine(e.ToString());
                 // ignored, nothing to see here
             }
         }
