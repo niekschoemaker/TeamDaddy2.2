@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.6.1" />
+    <PackageReference Include="PrettyBin" Version="1.1.0" />
   </ItemGroup>
 
 </Project>

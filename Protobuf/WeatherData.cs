@@ -27,18 +27,28 @@ namespace unwdmi.Protobuf {
             "ChFXZWF0aGVyRGF0YS5wcm90bxILV2VhdGhlckRhdGEiawoLTWVhc3VyZW1l",
             "bnQSEQoJU3RhdGlvbklEGAEgASgNEhAKCERhdGVUaW1lGAIgASgDEhAKCEh1",
             "bWlkaXR5GAMgASgBEhEKCVdpbmRTcGVlZBgEIAEoAhISCgpDbG91ZENvdmVy",
-            "GAUgASgCIpUBCg5XZWF0aGVyU3RhdGlvbhIVCg1TdGF0aW9uTnVtYmVyGAEg",
-            "ASgNEgwKBE5hbWUYAiABKAkSDwoHQ291bnRyeRgDIAEoCRIQCghMYXRpdHVk",
-            "ZRgEIAEoARIRCglMb25naXR1ZGUYBSABKAESEQoJRWxldmF0aW9uGAYgASgB",
-            "EhUKDUlnbm9yZVN0YXRpb24YByABKAgiKgoHQ291bnRyeRIPCgdDb3VudHJ5",
-            "GAEgASgJEg4KBklnbm9yZRgCIAEoCEISqgIPdW53ZG1pLlByb3RvYnVmYgZw",
-            "cm90bzM="));
+            "GAUgASgCIn4KDldlYXRoZXJTdGF0aW9uEhUKDVN0YXRpb25OdW1iZXIYASAB",
+            "KA0SDAoETmFtZRgCIAEoCRIPCgdDb3VudHJ5GAMgASgJEhAKCExhdGl0dWRl",
+            "GAQgASgBEhEKCUxvbmdpdHVkZRgFIAEoARIRCglFbGV2YXRpb24YBiABKAEi",
+            "KgoHQ291bnRyeRIPCgdDb3VudHJ5GAEgASgJEg4KBklnbm9yZRgCIAEoCCLC",
+            "AwoGVG9wVGVuEhcKD1dlYXRoZXJTdGF0aW9uMRgBIAEoDRIRCglIdW1pZGl0",
+            "eTEYAiABKAISFwoPV2VhdGhlclN0YXRpb24yGAMgASgNEhEKCUh1bWlkaXR5",
+            "MhgEIAEoAhIXCg9XZWF0aGVyU3RhdGlvbjMYBSABKA0SEQoJSHVtaWRpdHkz",
+            "GAYgASgCEhcKD1dlYXRoZXJTdGF0aW9uNBgHIAEoDRIRCglIdW1pZGl0eTQY",
+            "CCABKAISFwoPV2VhdGhlclN0YXRpb241GAkgASgNEhEKCUh1bWlkaXR5NRgK",
+            "IAEoAhIXCg9XZWF0aGVyU3RhdGlvbjYYCyABKA0SEQoJSHVtaWRpdHk2GAwg",
+            "ASgCEhcKD1dlYXRoZXJTdGF0aW9uNxgNIAEoDRIRCglIdW1pZGl0eTcYDiAB",
+            "KAISFwoPV2VhdGhlclN0YXRpb244GA8gASgNEhEKCUh1bWlkaXR5OBgQIAEo",
+            "AhIXCg9XZWF0aGVyU3RhdGlvbjkYESABKA0SEQoJSHVtaWRpdHk5GBIgASgC",
+            "EhgKEFdlYXRoZXJTdGF0aW9uMTAYEyABKA0SEgoKSHVtaWRpdHkxMBgUIAEo",
+            "AkISqgIPdW53ZG1pLlByb3RvYnVmYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Measurement), global::unwdmi.Protobuf.Measurement.Parser, new[]{ "StationID", "DateTime", "Humidity", "WindSpeed", "CloudCover" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherStation), global::unwdmi.Protobuf.WeatherStation.Parser, new[]{ "StationNumber", "Name", "Country", "Latitude", "Longitude", "Elevation", "IgnoreStation" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Country), global::unwdmi.Protobuf.Country.Parser, new[]{ "Country_", "Ignore" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.WeatherStation), global::unwdmi.Protobuf.WeatherStation.Parser, new[]{ "StationNumber", "Name", "Country", "Latitude", "Longitude", "Elevation" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.Country), global::unwdmi.Protobuf.Country.Parser, new[]{ "Country_", "Ignore" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::unwdmi.Protobuf.TopTen), global::unwdmi.Protobuf.TopTen.Parser, new[]{ "WeatherStation1", "Humidity1", "WeatherStation2", "Humidity2", "WeatherStation3", "Humidity3", "WeatherStation4", "Humidity4", "WeatherStation5", "Humidity5", "WeatherStation6", "Humidity6", "WeatherStation7", "Humidity7", "WeatherStation8", "Humidity8", "WeatherStation9", "Humidity9", "WeatherStation10", "Humidity10" }, null, null, null)
           }));
     }
     #endregion
@@ -317,7 +327,6 @@ namespace unwdmi.Protobuf {
       latitude_ = other.latitude_;
       longitude_ = other.longitude_;
       elevation_ = other.elevation_;
-      ignoreStation_ = other.ignoreStation_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -392,17 +401,6 @@ namespace unwdmi.Protobuf {
       }
     }
 
-    /// <summary>Field number for the "IgnoreStation" field.</summary>
-    public const int IgnoreStationFieldNumber = 7;
-    private bool ignoreStation_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool IgnoreStation {
-      get { return ignoreStation_; }
-      set {
-        ignoreStation_ = value;
-      }
-    }
-
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
       return Equals(other as WeatherStation);
@@ -422,7 +420,6 @@ namespace unwdmi.Protobuf {
       if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Latitude, other.Latitude)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Longitude, other.Longitude)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Elevation, other.Elevation)) return false;
-      if (IgnoreStation != other.IgnoreStation) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -435,7 +432,6 @@ namespace unwdmi.Protobuf {
       if (Latitude != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Latitude);
       if (Longitude != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Longitude);
       if (Elevation != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Elevation);
-      if (IgnoreStation != false) hash ^= IgnoreStation.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -473,10 +469,6 @@ namespace unwdmi.Protobuf {
         output.WriteRawTag(49);
         output.WriteDouble(Elevation);
       }
-      if (IgnoreStation != false) {
-        output.WriteRawTag(56);
-        output.WriteBool(IgnoreStation);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -502,9 +494,6 @@ namespace unwdmi.Protobuf {
       }
       if (Elevation != 0D) {
         size += 1 + 8;
-      }
-      if (IgnoreStation != false) {
-        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -534,9 +523,6 @@ namespace unwdmi.Protobuf {
       }
       if (other.Elevation != 0D) {
         Elevation = other.Elevation;
-      }
-      if (other.IgnoreStation != false) {
-        IgnoreStation = other.IgnoreStation;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -571,10 +557,6 @@ namespace unwdmi.Protobuf {
           }
           case 49: {
             Elevation = input.ReadDouble();
-            break;
-          }
-          case 56: {
-            IgnoreStation = input.ReadBool();
             break;
           }
         }
@@ -732,6 +714,667 @@ namespace unwdmi.Protobuf {
           }
           case 16: {
             Ignore = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  public sealed partial class TopTen : pb::IMessage<TopTen> {
+    private static readonly pb::MessageParser<TopTen> _parser = new pb::MessageParser<TopTen>(() => new TopTen());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<TopTen> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::unwdmi.Protobuf.WeatherDataReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TopTen() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TopTen(TopTen other) : this() {
+      weatherStation1_ = other.weatherStation1_;
+      humidity1_ = other.humidity1_;
+      weatherStation2_ = other.weatherStation2_;
+      humidity2_ = other.humidity2_;
+      weatherStation3_ = other.weatherStation3_;
+      humidity3_ = other.humidity3_;
+      weatherStation4_ = other.weatherStation4_;
+      humidity4_ = other.humidity4_;
+      weatherStation5_ = other.weatherStation5_;
+      humidity5_ = other.humidity5_;
+      weatherStation6_ = other.weatherStation6_;
+      humidity6_ = other.humidity6_;
+      weatherStation7_ = other.weatherStation7_;
+      humidity7_ = other.humidity7_;
+      weatherStation8_ = other.weatherStation8_;
+      humidity8_ = other.humidity8_;
+      weatherStation9_ = other.weatherStation9_;
+      humidity9_ = other.humidity9_;
+      weatherStation10_ = other.weatherStation10_;
+      humidity10_ = other.humidity10_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public TopTen Clone() {
+      return new TopTen(this);
+    }
+
+    /// <summary>Field number for the "WeatherStation1" field.</summary>
+    public const int WeatherStation1FieldNumber = 1;
+    private uint weatherStation1_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation1 {
+      get { return weatherStation1_; }
+      set {
+        weatherStation1_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity1" field.</summary>
+    public const int Humidity1FieldNumber = 2;
+    private float humidity1_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity1 {
+      get { return humidity1_; }
+      set {
+        humidity1_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "WeatherStation2" field.</summary>
+    public const int WeatherStation2FieldNumber = 3;
+    private uint weatherStation2_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation2 {
+      get { return weatherStation2_; }
+      set {
+        weatherStation2_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity2" field.</summary>
+    public const int Humidity2FieldNumber = 4;
+    private float humidity2_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity2 {
+      get { return humidity2_; }
+      set {
+        humidity2_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "WeatherStation3" field.</summary>
+    public const int WeatherStation3FieldNumber = 5;
+    private uint weatherStation3_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation3 {
+      get { return weatherStation3_; }
+      set {
+        weatherStation3_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity3" field.</summary>
+    public const int Humidity3FieldNumber = 6;
+    private float humidity3_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity3 {
+      get { return humidity3_; }
+      set {
+        humidity3_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "WeatherStation4" field.</summary>
+    public const int WeatherStation4FieldNumber = 7;
+    private uint weatherStation4_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation4 {
+      get { return weatherStation4_; }
+      set {
+        weatherStation4_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity4" field.</summary>
+    public const int Humidity4FieldNumber = 8;
+    private float humidity4_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity4 {
+      get { return humidity4_; }
+      set {
+        humidity4_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "WeatherStation5" field.</summary>
+    public const int WeatherStation5FieldNumber = 9;
+    private uint weatherStation5_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation5 {
+      get { return weatherStation5_; }
+      set {
+        weatherStation5_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity5" field.</summary>
+    public const int Humidity5FieldNumber = 10;
+    private float humidity5_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity5 {
+      get { return humidity5_; }
+      set {
+        humidity5_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "WeatherStation6" field.</summary>
+    public const int WeatherStation6FieldNumber = 11;
+    private uint weatherStation6_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation6 {
+      get { return weatherStation6_; }
+      set {
+        weatherStation6_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity6" field.</summary>
+    public const int Humidity6FieldNumber = 12;
+    private float humidity6_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity6 {
+      get { return humidity6_; }
+      set {
+        humidity6_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "WeatherStation7" field.</summary>
+    public const int WeatherStation7FieldNumber = 13;
+    private uint weatherStation7_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation7 {
+      get { return weatherStation7_; }
+      set {
+        weatherStation7_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity7" field.</summary>
+    public const int Humidity7FieldNumber = 14;
+    private float humidity7_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity7 {
+      get { return humidity7_; }
+      set {
+        humidity7_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "WeatherStation8" field.</summary>
+    public const int WeatherStation8FieldNumber = 15;
+    private uint weatherStation8_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation8 {
+      get { return weatherStation8_; }
+      set {
+        weatherStation8_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity8" field.</summary>
+    public const int Humidity8FieldNumber = 16;
+    private float humidity8_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity8 {
+      get { return humidity8_; }
+      set {
+        humidity8_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "WeatherStation9" field.</summary>
+    public const int WeatherStation9FieldNumber = 17;
+    private uint weatherStation9_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation9 {
+      get { return weatherStation9_; }
+      set {
+        weatherStation9_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity9" field.</summary>
+    public const int Humidity9FieldNumber = 18;
+    private float humidity9_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity9 {
+      get { return humidity9_; }
+      set {
+        humidity9_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "WeatherStation10" field.</summary>
+    public const int WeatherStation10FieldNumber = 19;
+    private uint weatherStation10_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public uint WeatherStation10 {
+      get { return weatherStation10_; }
+      set {
+        weatherStation10_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Humidity10" field.</summary>
+    public const int Humidity10FieldNumber = 20;
+    private float humidity10_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Humidity10 {
+      get { return humidity10_; }
+      set {
+        humidity10_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as TopTen);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(TopTen other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (WeatherStation1 != other.WeatherStation1) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity1, other.Humidity1)) return false;
+      if (WeatherStation2 != other.WeatherStation2) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity2, other.Humidity2)) return false;
+      if (WeatherStation3 != other.WeatherStation3) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity3, other.Humidity3)) return false;
+      if (WeatherStation4 != other.WeatherStation4) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity4, other.Humidity4)) return false;
+      if (WeatherStation5 != other.WeatherStation5) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity5, other.Humidity5)) return false;
+      if (WeatherStation6 != other.WeatherStation6) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity6, other.Humidity6)) return false;
+      if (WeatherStation7 != other.WeatherStation7) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity7, other.Humidity7)) return false;
+      if (WeatherStation8 != other.WeatherStation8) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity8, other.Humidity8)) return false;
+      if (WeatherStation9 != other.WeatherStation9) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity9, other.Humidity9)) return false;
+      if (WeatherStation10 != other.WeatherStation10) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Humidity10, other.Humidity10)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (WeatherStation1 != 0) hash ^= WeatherStation1.GetHashCode();
+      if (Humidity1 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity1);
+      if (WeatherStation2 != 0) hash ^= WeatherStation2.GetHashCode();
+      if (Humidity2 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity2);
+      if (WeatherStation3 != 0) hash ^= WeatherStation3.GetHashCode();
+      if (Humidity3 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity3);
+      if (WeatherStation4 != 0) hash ^= WeatherStation4.GetHashCode();
+      if (Humidity4 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity4);
+      if (WeatherStation5 != 0) hash ^= WeatherStation5.GetHashCode();
+      if (Humidity5 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity5);
+      if (WeatherStation6 != 0) hash ^= WeatherStation6.GetHashCode();
+      if (Humidity6 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity6);
+      if (WeatherStation7 != 0) hash ^= WeatherStation7.GetHashCode();
+      if (Humidity7 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity7);
+      if (WeatherStation8 != 0) hash ^= WeatherStation8.GetHashCode();
+      if (Humidity8 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity8);
+      if (WeatherStation9 != 0) hash ^= WeatherStation9.GetHashCode();
+      if (Humidity9 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity9);
+      if (WeatherStation10 != 0) hash ^= WeatherStation10.GetHashCode();
+      if (Humidity10 != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Humidity10);
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (WeatherStation1 != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(WeatherStation1);
+      }
+      if (Humidity1 != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(Humidity1);
+      }
+      if (WeatherStation2 != 0) {
+        output.WriteRawTag(24);
+        output.WriteUInt32(WeatherStation2);
+      }
+      if (Humidity2 != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Humidity2);
+      }
+      if (WeatherStation3 != 0) {
+        output.WriteRawTag(40);
+        output.WriteUInt32(WeatherStation3);
+      }
+      if (Humidity3 != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Humidity3);
+      }
+      if (WeatherStation4 != 0) {
+        output.WriteRawTag(56);
+        output.WriteUInt32(WeatherStation4);
+      }
+      if (Humidity4 != 0F) {
+        output.WriteRawTag(69);
+        output.WriteFloat(Humidity4);
+      }
+      if (WeatherStation5 != 0) {
+        output.WriteRawTag(72);
+        output.WriteUInt32(WeatherStation5);
+      }
+      if (Humidity5 != 0F) {
+        output.WriteRawTag(85);
+        output.WriteFloat(Humidity5);
+      }
+      if (WeatherStation6 != 0) {
+        output.WriteRawTag(88);
+        output.WriteUInt32(WeatherStation6);
+      }
+      if (Humidity6 != 0F) {
+        output.WriteRawTag(101);
+        output.WriteFloat(Humidity6);
+      }
+      if (WeatherStation7 != 0) {
+        output.WriteRawTag(104);
+        output.WriteUInt32(WeatherStation7);
+      }
+      if (Humidity7 != 0F) {
+        output.WriteRawTag(117);
+        output.WriteFloat(Humidity7);
+      }
+      if (WeatherStation8 != 0) {
+        output.WriteRawTag(120);
+        output.WriteUInt32(WeatherStation8);
+      }
+      if (Humidity8 != 0F) {
+        output.WriteRawTag(133, 1);
+        output.WriteFloat(Humidity8);
+      }
+      if (WeatherStation9 != 0) {
+        output.WriteRawTag(136, 1);
+        output.WriteUInt32(WeatherStation9);
+      }
+      if (Humidity9 != 0F) {
+        output.WriteRawTag(149, 1);
+        output.WriteFloat(Humidity9);
+      }
+      if (WeatherStation10 != 0) {
+        output.WriteRawTag(152, 1);
+        output.WriteUInt32(WeatherStation10);
+      }
+      if (Humidity10 != 0F) {
+        output.WriteRawTag(165, 1);
+        output.WriteFloat(Humidity10);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (WeatherStation1 != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation1);
+      }
+      if (Humidity1 != 0F) {
+        size += 1 + 4;
+      }
+      if (WeatherStation2 != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation2);
+      }
+      if (Humidity2 != 0F) {
+        size += 1 + 4;
+      }
+      if (WeatherStation3 != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation3);
+      }
+      if (Humidity3 != 0F) {
+        size += 1 + 4;
+      }
+      if (WeatherStation4 != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation4);
+      }
+      if (Humidity4 != 0F) {
+        size += 1 + 4;
+      }
+      if (WeatherStation5 != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation5);
+      }
+      if (Humidity5 != 0F) {
+        size += 1 + 4;
+      }
+      if (WeatherStation6 != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation6);
+      }
+      if (Humidity6 != 0F) {
+        size += 1 + 4;
+      }
+      if (WeatherStation7 != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation7);
+      }
+      if (Humidity7 != 0F) {
+        size += 1 + 4;
+      }
+      if (WeatherStation8 != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation8);
+      }
+      if (Humidity8 != 0F) {
+        size += 2 + 4;
+      }
+      if (WeatherStation9 != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation9);
+      }
+      if (Humidity9 != 0F) {
+        size += 2 + 4;
+      }
+      if (WeatherStation10 != 0) {
+        size += 2 + pb::CodedOutputStream.ComputeUInt32Size(WeatherStation10);
+      }
+      if (Humidity10 != 0F) {
+        size += 2 + 4;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(TopTen other) {
+      if (other == null) {
+        return;
+      }
+      if (other.WeatherStation1 != 0) {
+        WeatherStation1 = other.WeatherStation1;
+      }
+      if (other.Humidity1 != 0F) {
+        Humidity1 = other.Humidity1;
+      }
+      if (other.WeatherStation2 != 0) {
+        WeatherStation2 = other.WeatherStation2;
+      }
+      if (other.Humidity2 != 0F) {
+        Humidity2 = other.Humidity2;
+      }
+      if (other.WeatherStation3 != 0) {
+        WeatherStation3 = other.WeatherStation3;
+      }
+      if (other.Humidity3 != 0F) {
+        Humidity3 = other.Humidity3;
+      }
+      if (other.WeatherStation4 != 0) {
+        WeatherStation4 = other.WeatherStation4;
+      }
+      if (other.Humidity4 != 0F) {
+        Humidity4 = other.Humidity4;
+      }
+      if (other.WeatherStation5 != 0) {
+        WeatherStation5 = other.WeatherStation5;
+      }
+      if (other.Humidity5 != 0F) {
+        Humidity5 = other.Humidity5;
+      }
+      if (other.WeatherStation6 != 0) {
+        WeatherStation6 = other.WeatherStation6;
+      }
+      if (other.Humidity6 != 0F) {
+        Humidity6 = other.Humidity6;
+      }
+      if (other.WeatherStation7 != 0) {
+        WeatherStation7 = other.WeatherStation7;
+      }
+      if (other.Humidity7 != 0F) {
+        Humidity7 = other.Humidity7;
+      }
+      if (other.WeatherStation8 != 0) {
+        WeatherStation8 = other.WeatherStation8;
+      }
+      if (other.Humidity8 != 0F) {
+        Humidity8 = other.Humidity8;
+      }
+      if (other.WeatherStation9 != 0) {
+        WeatherStation9 = other.WeatherStation9;
+      }
+      if (other.Humidity9 != 0F) {
+        Humidity9 = other.Humidity9;
+      }
+      if (other.WeatherStation10 != 0) {
+        WeatherStation10 = other.WeatherStation10;
+      }
+      if (other.Humidity10 != 0F) {
+        Humidity10 = other.Humidity10;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            WeatherStation1 = input.ReadUInt32();
+            break;
+          }
+          case 21: {
+            Humidity1 = input.ReadFloat();
+            break;
+          }
+          case 24: {
+            WeatherStation2 = input.ReadUInt32();
+            break;
+          }
+          case 37: {
+            Humidity2 = input.ReadFloat();
+            break;
+          }
+          case 40: {
+            WeatherStation3 = input.ReadUInt32();
+            break;
+          }
+          case 53: {
+            Humidity3 = input.ReadFloat();
+            break;
+          }
+          case 56: {
+            WeatherStation4 = input.ReadUInt32();
+            break;
+          }
+          case 69: {
+            Humidity4 = input.ReadFloat();
+            break;
+          }
+          case 72: {
+            WeatherStation5 = input.ReadUInt32();
+            break;
+          }
+          case 85: {
+            Humidity5 = input.ReadFloat();
+            break;
+          }
+          case 88: {
+            WeatherStation6 = input.ReadUInt32();
+            break;
+          }
+          case 101: {
+            Humidity6 = input.ReadFloat();
+            break;
+          }
+          case 104: {
+            WeatherStation7 = input.ReadUInt32();
+            break;
+          }
+          case 117: {
+            Humidity7 = input.ReadFloat();
+            break;
+          }
+          case 120: {
+            WeatherStation8 = input.ReadUInt32();
+            break;
+          }
+          case 133: {
+            Humidity8 = input.ReadFloat();
+            break;
+          }
+          case 136: {
+            WeatherStation9 = input.ReadUInt32();
+            break;
+          }
+          case 149: {
+            Humidity9 = input.ReadFloat();
+            break;
+          }
+          case 152: {
+            WeatherStation10 = input.ReadUInt32();
+            break;
+          }
+          case 165: {
+            Humidity10 = input.ReadFloat();
             break;
           }
         }

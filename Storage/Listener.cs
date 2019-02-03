@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -30,23 +31,37 @@ namespace unwdmi.Storage
         }
 
         public List<Measurement> CacheMeasurements = new List<Measurement>();
+        //Is a concurrent Dictionary since it is used in an async function, shouldn't be necessary, but just in case since it doens't really cost extra performance.
         public static ConcurrentDictionary<uint, WeatherStation> weatherStations = new ConcurrentDictionary<uint, WeatherStation>();
         public int Minute = DateTime.UtcNow.Minute;
-        private const int minecraft = 25565;
+        private const int minecraft = 25566;
+        /// <summary>
+        /// Contains HumidityTopTens from the last 30 minutes (stores top ten of each minute)
+        /// </summary>
         public Queue<List<KeyValuePair<uint, float>>> HumidityTopTen30 = new Queue<List<KeyValuePair<uint, float>>>(30);
-        private List<KeyValuePair<uint, float>> HumdityTopTen = new List<KeyValuePair<uint, float>>();
 
         public void ReceiveCallback(IAsyncResult ar)
         {
-            Console.WriteLine("Accepted TcpClient");
             var so = (StateObject) ar.AsyncState;
             var server = so.server;
             server.BeginAcceptTcpClient(new AsyncCallback(ReceiveCallback), so);
 
             using (TcpClient client = server.AcceptTcpClient())
-            using (NetworkStream stream = client.GetStream())
+            using (var stream = client.GetStream())
+            //using (var sslStream = new SslStream(stream, false, validate))
             {
-                while (client.Connected)
+                _controller.Log($"Accepted a connection from {client.Client.RemoteEndPoint}", Controller.ErrorLevel.Debug);
+                try
+                {
+                    //sslStream.AuthenticateAsServer(Controller.serverCertificate);
+                    
+                }
+                catch (Exception e)
+                {
+                    _controller.Log(e.Message);
+                    _controller.Log(e.ToString(), Controller.ErrorLevel.Debug);
+                }
+                while (true)
                 {
                     try
                     {
@@ -65,7 +80,11 @@ namespace unwdmi.Storage
                                 };
                                 weatherStations.TryAdd(weatherStation.StationID, weatherStation);
                             }
-                            weatherStation.Measurements.Add(measurement);
+
+                            weatherStation.WindSpeedTotal += measurement.WindSpeed;
+                            weatherStation.HumidityTotal += (float)measurement.Humidity;
+                            weatherStation.CloudCoverTotal += measurement.WindSpeed;
+                            weatherStation.Count++;
                         }
                     }
                     catch
@@ -79,8 +98,13 @@ namespace unwdmi.Storage
             if (Minute != DateTime.UtcNow.Minute)
             {
                 Minute = DateTime.UtcNow.Minute;
-                var a = Math.Floor((float)(Minute / 30));
-                Task.Run(() => _controller.Save());
+                ConcurrentDictionary<uint, WeatherStation> _weatherStations;
+                lock (weatherStations)
+                {
+                    _weatherStations = weatherStations;
+                    weatherStations = new ConcurrentDictionary<uint, WeatherStation>();
+                }
+                Task.Run(() => _controller.Save(_weatherStations));
             }
 
         }
@@ -105,17 +129,19 @@ namespace unwdmi.Storage
     public class StateObject
     {
         public TcpListener server;
-        // 4096 fits all the XML files, so the checks don't have to be done as often, saves a bit of CPU, costs a bit more ram.
-        public const int BUFFER_SIZE = 4096;
-        public byte[] buffer = new byte[BUFFER_SIZE];
     }
 
     public class WeatherStation
     {
         public uint StationID;
-        public List<Measurement> Measurements = new List<Measurement>(60);
-        public float HumidityAverage;
-        public float WindSpeedAverage;
-        public float CloudCoverAverage;
+
+        public int Count = 0;
+        public float HumidityAverage => HumidityTotal / 30;
+        public float WindSpeedAverage => WindSpeedTotal / 30;
+        public float CloudCoverAverage => CloudCoverTotal / 30;
+
+        public float HumidityTotal;
+        public float WindSpeedTotal;
+        public float CloudCoverTotal;
     }
 }
