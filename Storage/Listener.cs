@@ -48,12 +48,13 @@ namespace unwdmi.Storage
 
             using (TcpClient client = server.AcceptTcpClient())
             using (var stream = client.GetStream())
-            using (var sslStream = new SslStream(stream))
+            //using (var sslStream = new SslStream(stream, false, validate))
             {
                 _controller.Log($"Accepted a connection from {client.Client.RemoteEndPoint}", Controller.ErrorLevel.Debug);
                 try
                 {
-                    sslStream.AuthenticateAsServer(Controller.serverCertificate);
+                    //sslStream.AuthenticateAsServer(Controller.serverCertificate);
+                    
                 }
                 catch (Exception e)
                 {
@@ -64,7 +65,7 @@ namespace unwdmi.Storage
                 {
                     try
                     {
-                        var measurement = Measurement.Parser.ParseDelimitedFrom(sslStream);
+                        var measurement = Measurement.Parser.ParseDelimitedFrom(stream);
                         if (measurement == null)
                         {
                             break;

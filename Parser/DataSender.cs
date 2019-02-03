@@ -49,11 +49,11 @@ namespace unwdmi.Parser
                 _retryCount = 0;
 
                 using (var stream = client.GetStream())
-                using (var sslStream = new SslStream(stream, false, ValidateServerCertificate, null))
+                //using (var sslStream = new SslStream(stream, false, ValidateServerCertificate, null))
                 {
                     try
                     {
-                        sslStream.AuthenticateAsClient("unwdmi.Parser");
+                        //sslStream.AuthenticateAsClient("unwdmi.Parser");
                     }
                     catch (AuthenticationException e)
                     {
@@ -65,7 +65,7 @@ namespace unwdmi.Parser
                         return;
                     }
 
-                    var byteStream = new BufferedStream(sslStream, 4096);
+                    var byteStream = new BufferedStream(stream, 4096);
                     foreach (var measurement in measurements) measurement.WriteDelimitedTo(byteStream);
 
                     //stream.Write(buffer, 0, (int) byteStream.Position);
