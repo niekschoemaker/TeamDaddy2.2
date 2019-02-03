@@ -45,7 +45,7 @@ namespace unwdmi.Storage
         public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
         public static X509Certificate2 serverCertificate = null;
         private const string ConfigFile = "config.json";
-        public StorageConfig _config;
+        public Config _config;
 
         public Controller()
         {
@@ -138,7 +138,7 @@ namespace unwdmi.Storage
             if (!File.Exists("config.json"))
             {
                 Log("Config file not found, generating a new one.");
-                _config = new StorageConfig();
+                _config = new Config();
                 File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(_config));
             }
 
@@ -149,19 +149,14 @@ namespace unwdmi.Storage
 
             try
             {
-                _config = JsonConvert.DeserializeObject<StorageConfig>(File.ReadAllText(ConfigFile));
+                _config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(ConfigFile));
                 Log("Succesfully loaded config file.", ErrorLevel.Info);
             }
-            catch
-#if DEBUG
-            (Exception e)
-#endif
+            catch (Exception e)
             {
                 Log("Something went wrong while loading the config file.\n" +
                                   "\tRemoving the config file should fix this issue.", ErrorLevel.Error);
-#if DEBUG
-                Console.WriteLine(e);
-#endif
+                Log(e.ToString(), ErrorLevel.Debug);
             }
 
             bool changed = false;
@@ -184,9 +179,8 @@ namespace unwdmi.Storage
                 }
             }
             serverCertificate = new X509Certificate2(_config.CertificateFilePath, "DaddyCool");
-
-            if (changed)
-                SaveConfig();
+            
+            SaveConfig();
 
             Log("Succesfully loaded certificate.");
 
@@ -203,16 +197,22 @@ namespace unwdmi.Storage
             }
         }
 
-        public class StorageConfig
+        public class Config
         {
             [JsonProperty("Certificate File Path")]
             public string CertificateFilePath = "server.p12";
+
+            [JsonProperty("Minimum log level for log file (1 = Debug, 2 = Info, 3 = Error, 4 = Fatal)")]
+            public int LogLevel = (int)ErrorLevel.Error;
+
+            [JsonProperty("Minimum log level for console (1 = Debug, 2 = Info, 3 = Error, 4 = Fatal)")]
+            public int ConsoleLogLevel = (int)ErrorLevel.Info;
         }
 
         public enum ErrorLevel
         {
-            Info = 1,
-            Debug = 2,
+            Debug = 1,
+            Info = 2,
             Error = 3,
             Fatal = 4
         }
@@ -237,15 +237,17 @@ namespace unwdmi.Storage
             }
 
             message = DateTime.Now.ToString("hh:mm:ss") + " " +  message;
-            File.AppendAllText("./logs/" + DateTime.Today.ToString("yyyy-MM-dd") + ".txt", message + Environment.NewLine);
-            Console.WriteLine(message);
+            if((int)level >= _config?.LogLevel)
+                File.AppendAllText("./logs/" + DateTime.Today.ToString("yyyy-MM-dd") + ".txt", message + Environment.NewLine);
+            if ((int)level >= _config?.ConsoleLogLevel)
+                Console.WriteLine(message);
 
             Console.ResetColor();
         }
 
         public void SaveConfig()
         {
-            File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(_config));
+            File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(_config, Formatting.Indented));
         }
     }
 }

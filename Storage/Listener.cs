@@ -50,14 +50,15 @@ namespace unwdmi.Storage
             using (var stream = client.GetStream())
             using (var sslStream = new SslStream(stream))
             {
-                _controller.Log($"Accepted a connection from {client.Client.RemoteEndPoint}");
+                _controller.Log($"Accepted a connection from {client.Client.RemoteEndPoint}", Controller.ErrorLevel.Debug);
                 try
                 {
                     sslStream.AuthenticateAsServer(Controller.serverCertificate);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    _controller.Log(e.Message);
+                    _controller.Log(e.ToString(), Controller.ErrorLevel.Debug);
                 }
                 while (true)
                 {
@@ -127,9 +128,6 @@ namespace unwdmi.Storage
     public class StateObject
     {
         public TcpListener server;
-        // 4096 fits all the XML files, so the checks don't have to be done as often, saves a bit of CPU, costs a bit more ram.
-        public const int BUFFER_SIZE = 4096;
-        public byte[] buffer = new byte[BUFFER_SIZE];
     }
 
     public class WeatherStation
