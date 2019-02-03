@@ -26,13 +26,12 @@ namespace unwdmi.Parser
 
         public void SendData(IPAddress ip, int port, ICollection<Measurement> measurements)
         {
-            var ipEndPoint = new IPEndPoint(ip, port);
             using (var client = new TcpClient())
             {
                 Connect:
                 try
                 {
-                    client.Connect(ipEndPoint);
+                    client.Connect(ip, port);
                 }
                 catch (Exception e)
                 {
@@ -47,9 +46,8 @@ namespace unwdmi.Parser
                 }
 
                 _retryCount = 0;
-
                 using (var stream = client.GetStream())
-                using (var sslStream = new SslStream(stream, false, ValidateServerCertificate, null))
+                using (var sslStream = new SslStream(stream, true, ValidateServerCertificate, null))
                 {
                     try
                     {
@@ -65,14 +63,10 @@ namespace unwdmi.Parser
                         return;
                     }
 
-                    var byteStream = new BufferedStream(sslStream, 4096);
-                    foreach (var measurement in measurements) measurement.WriteDelimitedTo(byteStream);
+                    foreach (var measurement in measurements) measurement.WriteDelimitedTo(sslStream);
 
                     //stream.Write(buffer, 0, (int) byteStream.Position);
-                    byteStream.Dispose();
                 }
-                client.Client.Shutdown(SocketShutdown.Both);
-                client.Client.Disconnect(false);
             }
         }
 
@@ -84,12 +78,6 @@ namespace unwdmi.Parser
             X509Chain chain,
             SslPolicyErrors sslPolicyErrors)
         {
-            if (sslPolicyErrors == SslPolicyErrors.None)
-                return true;
-
-            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
-
-            // Do not allow this client to communicate with unauthenticated servers.
             return true;
         }
     }

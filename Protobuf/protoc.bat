@@ -1,2 +1,2 @@
-.\protoc --csharp_out=.\ .\WeatherData.proto
+.\protoc --python_out=.\ .\WeatherData.proto
 pause

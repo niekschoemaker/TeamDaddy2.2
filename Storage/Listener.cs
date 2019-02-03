@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,17 +47,21 @@ namespace unwdmi.Storage
             var server = so.server;
             server.BeginAcceptTcpClient(new AsyncCallback(ReceiveCallback), so);
 
+            Console.WriteLine($"Receive call back");
+
             using (TcpClient client = server.AcceptTcpClient())
             using (var stream = client.GetStream())
-            using (var sslStream = new SslStream(stream))
+            using (var sslStream = new SslStream(stream, true, ValidateServerCertificate, null))
             {
                 _controller.Log($"Accepted a connection from {client.Client.RemoteEndPoint}", Controller.ErrorLevel.Debug);
+                Console.WriteLine($"Accepted a connection from {client.Client.RemoteEndPoint}");
                 try
                 {
                     sslStream.AuthenticateAsServer(Controller.serverCertificate);
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine(e);
                     _controller.Log(e.Message);
                     _controller.Log(e.ToString(), Controller.ErrorLevel.Debug);
                 }
@@ -117,6 +122,15 @@ namespace unwdmi.Storage
                 server = server
             };
             server.BeginAcceptTcpClient(new AsyncCallback(ReceiveCallback), so);
+        }
+
+        public static bool ValidateServerCertificate(
+            object sender,
+            X509Certificate certificate,
+            X509Chain chain,
+            SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
         }
     }
 

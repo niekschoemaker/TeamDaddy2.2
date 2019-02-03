@@ -18,7 +18,7 @@ namespace unwdmi.Parser
         private Socket _listener;
 
         private Task _onParsersFinishedTask = Task.CompletedTask;
-        private DateTime lastRun;
+        private DateTime lastRun = DateTime.UtcNow;
 
         public Listener(Controller instance)
         {
@@ -84,9 +84,7 @@ namespace unwdmi.Parser
                             finally
                             {
                                 Interlocked.Decrement(ref _controller.ActiveParsers);
-                                if (_controller.ActiveParsers == 0 &&
-                                    _controller.MeasurementQueue.Count >= _controller.OpenSockets * 10 &&
-                                    (DateTime.UtcNow - lastRun).Milliseconds > 500)
+                                if (_controller.ActiveParsers == 0 && _onParsersFinishedTask.IsCompleted)
                                 {
                                     List<Measurement> measurements;
                                     lock (_controller.MeasurementQueue)
