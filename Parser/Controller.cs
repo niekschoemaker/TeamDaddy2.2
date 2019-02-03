@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -352,7 +353,14 @@ namespace unwdmi.Parser
         // Add things which have to be executed right after all parsers are finished here.
         public void OnParsersFinished(List<Measurement> measurements)
         {
-            DataSender.SendData(IpAddress, Port, measurements);
+            try
+            {
+                DataSender.SendData(IpAddress, Port, measurements);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         public void SaveConfig()

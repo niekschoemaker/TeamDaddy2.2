@@ -48,9 +48,8 @@ namespace unwdmi.Parser
 
                 _retryCount = 0;
 
-                using (var stream = client.GetStream())
+                var stream = client.GetStream();
                 //using (var sslStream = new SslStream(stream, false, ValidateServerCertificate, null))
-                {
                     try
                     {
                         //sslStream.AuthenticateAsClient("unwdmi.Parser");
@@ -68,11 +67,12 @@ namespace unwdmi.Parser
                     var byteStream = new BufferedStream(stream, 4096);
                     foreach (var measurement in measurements) measurement.WriteDelimitedTo(byteStream);
 
+                byteStream.Flush();
                     //stream.Write(buffer, 0, (int) byteStream.Position);
-                    byteStream.Dispose();
-                }
                 client.Client.Shutdown(SocketShutdown.Both);
                 client.Client.Disconnect(false);
+                byteStream.Dispose();
+                stream.Dispose();
             }
         }
 
