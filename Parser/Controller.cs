@@ -10,6 +10,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using Google.Protobuf;
+using Newtonsoft.Json;
 using unwdmi.Protobuf;
 
 namespace unwdmi.Parser
@@ -29,10 +30,10 @@ namespace unwdmi.Parser
 
         public Dictionary<string, Country> Countries = new Dictionary<string, Country>();
         public DataSender DataSender;
-        public string Hostname = "127.0.0.1";
         public IPAddress IpAddress;
         public Listener Listener;
         public ConcurrentBag<Measurement> MeasurementQueue = new ConcurrentBag<Measurement>();
+        public Config _config;
 
         /// <summary> Sockets currently open (# of established connections with WeatherStations) </summary>
         public int OpenSockets = 0;
@@ -55,13 +56,21 @@ namespace unwdmi.Parser
             // Make sure you get exceptions in English. Can't quite Google something if it's Dutch.
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
 
-            if (!IPAddress.TryParse(Hostname, out IpAddress))
+            if (!File.Exists("config.json"))
             {
-                var ipAddresses = Dns.GetHostAddresses(Hostname);
+                _config = new Config();
+                SaveConfig();
+            }
+
+            _config = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+
+            if (!IPAddress.TryParse(_config.HostIp, out IpAddress))
+            {
+                var ipAddresses = Dns.GetHostAddresses(_config.HostIp);
                 if (ipAddresses.Length > 0) IpAddress = ipAddresses[0];
             }
 
-            Console.WriteLine(IpAddress);
+            Console.WriteLine($"Hostname currently set to: {IpAddress}");
 
             Listener = new Listener(this);
             Parser = new Parser(this);
@@ -147,13 +156,18 @@ namespace unwdmi.Parser
                             {
                                 if (IPAddress.TryParse(consoleLine[1], out _))
                                 {
-                                    Hostname = consoleLine[1];
-                                    Console.WriteLine($"Set IPAdress to {Hostname}");
+                                    _config.HostIp = consoleLine[1];
+                                    Console.WriteLine($"Set IPAdress to {_config.HostIp}");
                                 }
                                 else
                                 {
                                     var ipAddresses = Dns.GetHostAddresses(consoleLine[1]);
-                                    if (ipAddresses.Length > 0) Hostname = ipAddresses[0].ToString();
+                                    if (ipAddresses.Length > 0)
+                                    {
+                                        _config.HostIp = consoleLine[1];
+                                        IpAddress = ipAddresses[0];
+                                        SaveConfig();
+                                    }
                                 }
                             }
 
@@ -340,6 +354,11 @@ namespace unwdmi.Parser
         {
             DataSender.SendData(IpAddress, Port, measurements);
         }
+
+        public void SaveConfig()
+        {
+            File.WriteAllText("config.json", JsonConvert.SerializeObject(_config, Formatting.Indented));
+        }
     }
 
     public class WeatherStation
@@ -422,4 +441,11 @@ namespace unwdmi.Parser
 
         #endregion Fields
     }
+
+    public class Config
+    {
+        [JsonProperty("IP or hostname of storage server")]
+        public string HostIp = "127.0.0.1";
+    }
+
 }

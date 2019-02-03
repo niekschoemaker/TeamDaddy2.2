@@ -48,7 +48,6 @@ namespace unwdmi.Parser
 
                 _retryCount = 0;
 
-                Console.WriteLine(client.Connected);
                 using (var stream = client.GetStream())
                 using (var sslStream = new SslStream(stream, false, ValidateServerCertificate, null))
                 {
