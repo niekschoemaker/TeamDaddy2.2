@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'homepage/default.css' %}">
+	{% block head %}
+	{% endblock %}
+</head>
+<body>
+	<span id='navbar'>
+		<ul>
+			<li><a href="">Home</a></li>
+			<li><a href="/data">Data</a></li>
+			<li><a href="#">Login</a></li>
+			<li><a href="#">Logout</a></li>
+		</ul>
+	</span>
+{% block content %}
+{% endblock %}
+</body>
+</html>

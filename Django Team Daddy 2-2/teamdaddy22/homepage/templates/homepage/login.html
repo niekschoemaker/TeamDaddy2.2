@@ -1,0 +1,28 @@
+{% extends "homepage/default.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+	{% block head %}
+	<title>Login - TeamDaddy2.2</title>
+	{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'homepage/login.css' %}">
+	{% endblock %}
+</head>
+<body>
+{% block content %}
+<!--login-->
+<form action="#" method="post">
+	{% csrf_token %}
+	<div class="container">
+		<label for="Username"><strong>Username</strong></label>	
+		<input type=text placeholder="Username" id="Username">
+
+		<label for="Password"><strong>Password</strong></label>	
+		<input type=password placeholder="Password" id="Password">
+
+		<button type="submit">Login</button>
+	</div>
+</form>
+{% endblock %}
+</body>
+</html>
