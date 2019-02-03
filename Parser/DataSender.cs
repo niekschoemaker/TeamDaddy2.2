@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -36,12 +37,16 @@ namespace unwdmi.Parser
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
                     _retryCount++;
                     if (_retryCount > 5)
                     {
                         Console.WriteLine("Failed to connect 5 times, cancelling data sending.");
                         return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Something went wrong while trying to connect, retrying.");
+                        Debug.WriteLine(e);
                     }
                     goto Connect;
                 }

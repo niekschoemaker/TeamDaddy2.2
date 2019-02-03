@@ -238,7 +238,15 @@ namespace unwdmi.Storage
 
             message = DateTime.Now.ToString("hh:mm:ss") + " " +  message;
             if((int)level >= _config?.LogLevel)
-                File.AppendAllText("./logs/" + DateTime.Today.ToString("yyyy-MM-dd") + ".txt", message + Environment.NewLine);
+                try
+                {
+                    File.AppendAllText("./logs/" + DateTime.Today.ToString("yyyy-MM-dd") + ".txt",
+                        message + Environment.NewLine);
+                }
+                catch
+                {
+                }
+
             if ((int)level >= _config?.ConsoleLogLevel)
                 Console.WriteLine(message);
 
