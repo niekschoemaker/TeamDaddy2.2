@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using unwdmi.Protobuf;
+using Newtonsoft.Json;
 
 /*
  *  Автор: Sean Visser
@@ -43,9 +44,12 @@ namespace unwdmi.Storage
         public DateTime TimeStarted;
         public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
         public static X509Certificate2 serverCertificate = null;
+        private const string ConfigFile = "config.json";
+        public StorageConfig _config;
 
         public Controller()
         {
+            Log("Starting unwdmi Storage.");
             Instance = this;
             ListenerParser = new ListenerParser(this);
             //ListenerWeb = new ListenerWeb(this);
@@ -56,22 +60,7 @@ namespace unwdmi.Storage
             ThreadPool.SetMaxThreads(20, 10);
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-us");
 
-            serverCertificate = new X509Certificate2("client.p12", "DaddyCool");
-
-
-
-            Task.Run(() => ListenerParser.StartListening());
-
-            if (!Directory.Exists("Data"))
-            {
-                Directory.CreateDirectory("Data");
-            }
-
-            if (!File.Exists("./Data/Daddy.pb"))
-            {
-                File.Create("./Data/Daddy.pb");
-            }
-
+            InitFiles();
         }
 
         public void Save(ConcurrentDictionary<uint, WeatherStation> weatherStations)
@@ -87,6 +76,7 @@ namespace unwdmi.Storage
             using (FileStream output = File.Open($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb", FileMode.Append))
             {
                 Console.WriteLine(weatherStations.Count);
+                Log($"Saving data for {weatherStations.Count} weatherstations.");
                 foreach (var weatherStation in weatherStations)
                 {
                     var mCount = weatherStation.Value.Count;
@@ -141,6 +131,121 @@ namespace unwdmi.Storage
             // Save latest top 10 to disk.
             using(var file = File.OpenWrite("TopTen.pb"))
                 topTen.WriteTo(file);
+        }
+
+        public void InitFiles()
+        {
+            if (!File.Exists("config.json"))
+            {
+                Log("Config file not found, generating a new one.");
+                _config = new StorageConfig();
+                File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(_config));
+            }
+
+            if (!Directory.Exists("logs"))
+            {
+                Directory.CreateDirectory("logs");
+            }
+
+            try
+            {
+                _config = JsonConvert.DeserializeObject<StorageConfig>(File.ReadAllText(ConfigFile));
+                Log("Succesfully loaded config file.", ErrorLevel.Info);
+            }
+            catch
+#if DEBUG
+            (Exception e)
+#endif
+            {
+                Log("Something went wrong while loading the config file.\n" +
+                                  "\tRemoving the config file should fix this issue.", ErrorLevel.Error);
+#if DEBUG
+                Console.WriteLine(e);
+#endif
+            }
+
+            bool changed = false;
+            ReadFile:
+            if (!File.Exists(_config.CertificateFilePath))
+            {
+                Log($"Certificate file not found at {_config.CertificateFilePath}", ErrorLevel.Fatal);
+                Log("Please add the certificate file or give the correct name of the file:", ErrorLevel.Fatal);
+                Log("Leave the following line blank to exit the program.", ErrorLevel.Fatal);
+                var readLine = Console.ReadLine();
+                if (string.IsNullOrEmpty(readLine))
+                {
+                    Environment.Exit(1);
+                }
+                else
+                {
+                    _config.CertificateFilePath = readLine;
+                    changed = true;
+                    goto ReadFile;
+                }
+            }
+            serverCertificate = new X509Certificate2(_config.CertificateFilePath, "DaddyCool");
+
+            if (changed)
+                SaveConfig();
+
+            Log("Succesfully loaded certificate.");
+
+            Task.Run(() => ListenerParser.StartListening());
+
+            if (!Directory.Exists("Data"))
+            {
+                Directory.CreateDirectory("Data");
+            }
+
+            if (!File.Exists("./Data/Daddy.pb"))
+            {
+                File.Create("./Data/Daddy.pb");
+            }
+        }
+
+        public class StorageConfig
+        {
+            [JsonProperty("Certificate File Path")]
+            public string CertificateFilePath = "server.p12";
+        }
+
+        public enum ErrorLevel
+        {
+            Info = 1,
+            Debug = 2,
+            Error = 3,
+            Fatal = 4
+        }
+
+        public void Log(string message, ErrorLevel level = ErrorLevel.Info)
+        {
+            switch (level)
+            {
+                case ErrorLevel.Debug:
+                    message = "[DEBUG] " + message;
+                    break;
+                case ErrorLevel.Fatal:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    message = "[FATAL] " + message;
+                    break;
+                case ErrorLevel.Error:
+                    message = "[ERROR] " + message;
+                    break;
+                case ErrorLevel.Info:
+                    message = "[Info] " + message;
+                    break;
+            }
+
+            message = DateTime.Now.ToString("hh:mm:ss") + " " +  message;
+            File.AppendAllText("./logs/" + DateTime.Today.ToString("yyyy-MM-dd") + ".txt", message + Environment.NewLine);
+            Console.WriteLine(message);
+
+            Console.ResetColor();
+        }
+
+        public void SaveConfig()
+        {
+            File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(_config));
         }
     }
 }

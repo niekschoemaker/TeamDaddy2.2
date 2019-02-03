@@ -336,15 +336,8 @@ namespace unwdmi.Parser
         ///     Hook called when all parsers are finished. DO NOT CALL THIS METHOD!
         /// </summary>
         // Add things which have to be executed right after all parsers are finished here.
-        public void OnParsersFinished()
+        public void OnParsersFinished(List<Measurement> measurements)
         {
-            List<Measurement> measurements;
-            lock (MeasurementQueue)
-            {
-                measurements = MeasurementQueue.ToList();
-                MeasurementQueue = new ConcurrentBag<Measurement>();
-            }
-
             DataSender.SendData(IpAddress, Port, measurements);
         }
     }

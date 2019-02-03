@@ -16,6 +16,7 @@ namespace unwdmi.Parser
     {
         private Controller _controller;
 
+        private int _retryCount = 0;
         private readonly byte[] buffer = new byte[320000];
 
         public DataSender(Controller controller)
@@ -23,11 +24,12 @@ namespace unwdmi.Parser
             _controller = controller;
         }
 
-        public async void SendData(IPAddress ip, int port, ICollection<Measurement> measurements)
+        public void SendData(IPAddress ip, int port, ICollection<Measurement> measurements)
         {
             var ipEndPoint = new IPEndPoint(ip, port);
             using (var client = new TcpClient())
             {
+                Connect:
                 try
                 {
                     client.Connect(ipEndPoint);
@@ -35,16 +37,24 @@ namespace unwdmi.Parser
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
+                    _retryCount++;
+                    if (_retryCount > 5)
+                    {
+                        Console.WriteLine("Failed to connect 5 times, cancelling data sending.");
+                        return;
+                    }
+                    goto Connect;
                 }
+
+                _retryCount = 0;
 
                 Console.WriteLine(client.Connected);
                 using (var stream = client.GetStream())
                 using (var sslStream = new SslStream(stream, false, ValidateServerCertificate, null))
                 {
-                    Task task;
                     try
                     {
-                        task = sslStream.AuthenticateAsClientAsync("unwdmi.Parser");
+                        sslStream.AuthenticateAsClient("unwdmi.Parser");
                     }
                     catch (AuthenticationException e)
                     {
@@ -56,14 +66,14 @@ namespace unwdmi.Parser
                         return;
                     }
 
-                    var byteStream = new MemoryStream(buffer);
+                    var byteStream = new BufferedStream(sslStream, 4096);
                     foreach (var measurement in measurements) measurement.WriteDelimitedTo(byteStream);
 
-                    await task;
-                    task = stream.WriteAsync(buffer, 0, (int) byteStream.Position);
+                    //stream.Write(buffer, 0, (int) byteStream.Position);
                     byteStream.Dispose();
-                    await task;
                 }
+                client.Client.Shutdown(SocketShutdown.Both);
+                client.Client.Disconnect(false);
             }
         }
 

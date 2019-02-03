@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using unwdmi.Protobuf;
 
 namespace unwdmi.Parser
 {
@@ -14,6 +18,7 @@ namespace unwdmi.Parser
         private Socket _listener;
 
         private Task _onParsersFinishedTask = Task.CompletedTask;
+        private DateTime lastRun;
 
         public Listener(Controller instance)
         {
@@ -79,12 +84,23 @@ namespace unwdmi.Parser
                             finally
                             {
                                 Interlocked.Decrement(ref _controller.ActiveParsers);
-                                if (_controller.ActiveParsers == 0)
-                                    if (_onParsersFinishedTask.IsCompleted)
-                                        _onParsersFinishedTask = Task.Run(async () =>
-                                        {
-                                            _controller.OnParsersFinished();
-                                        });
+                                if (_controller.ActiveParsers == 0 &&
+                                    _controller.MeasurementQueue.Count >= _controller.OpenSockets * 10 &&
+                                    (DateTime.UtcNow - lastRun).Milliseconds > 500)
+                                {
+                                    List<Measurement> measurements;
+                                    lock (_controller.MeasurementQueue)
+                                    {
+                                        measurements = _controller.MeasurementQueue.ToList();
+                                        _controller.MeasurementQueue = new ConcurrentBag<Measurement>();
+                                    }
+
+                                    lastRun = DateTime.UtcNow;
+                                    _onParsersFinishedTask = Task.Run(() =>
+                                    {
+                                        _controller.OnParsersFinished(measurements);
+                                    });
+                                }
                             }
                         });
                         so.sb.Clear();

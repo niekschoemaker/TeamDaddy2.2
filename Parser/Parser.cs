@@ -61,11 +61,15 @@ namespace unwdmi.Parser
                 uint stationNumber;
                 uint.TryParse(reader.ReadElementString(), out stationNumber);
 
-                if (!_controller.WeatherStations.ContainsKey(stationNumber))
-                    _controller.WeatherStations.Add(stationNumber,
-                        new WeatherStation(stationNumber, string.Empty, string.Empty, 0.0, 0.0, 0.0, false));
+                WeatherStation weatherStation;
+                if (!_controller.WeatherStations.TryGetValue(stationNumber, out weatherStation))
+                {
+                    weatherStation =
+                        new WeatherStation(stationNumber, string.Empty, string.Empty, 0.0, 0.0, 0.0, false);
+                    _controller.WeatherStations.Add(stationNumber, weatherStation);
+                }
 
-                var weatherStation = _controller.WeatherStations[stationNumber];
+
 
                 if (weatherStation.IgnoreStation) return;
                 // reader.Skip skips one node (Skips to next start element in this XML file)

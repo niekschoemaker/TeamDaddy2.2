@@ -42,16 +42,15 @@ namespace unwdmi.Storage
 
         public void ReceiveCallback(IAsyncResult ar)
         {
-            Console.WriteLine("Accepted TcpClient");
             var so = (StateObject) ar.AsyncState;
             var server = so.server;
             server.BeginAcceptTcpClient(new AsyncCallback(ReceiveCallback), so);
-
 
             using (TcpClient client = server.AcceptTcpClient())
             using (var stream = client.GetStream())
             using (var sslStream = new SslStream(stream))
             {
+                _controller.Log($"Accepted a connection from {client.Client.RemoteEndPoint}");
                 try
                 {
                     sslStream.AuthenticateAsServer(Controller.serverCertificate);
