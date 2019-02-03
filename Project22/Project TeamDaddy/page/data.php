@@ -6,6 +6,8 @@
 	// }
 
 	include 'navbar.php';
+	
+	header("Refresh: 60;");
 
 	//mock data1
 	$dataset1=array();
@@ -111,7 +113,7 @@ function toggleDataSeries(e) {
 </script>
 </head>
 <body>
-<div id="chartContainer" style="height: 370px; width: 100%;">
+<div id="chartContainer">
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </div>
 </body>

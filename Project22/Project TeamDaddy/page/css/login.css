@@ -28,3 +28,32 @@ button[type=submit]{
 button:hover{
 	background-color: #89CE25; 
 }
+
+
+#cardContainer{
+	display: flex;
+	height: 80vh;
+	width: 80vw;
+	margin: auto;
+	justify-content: center;
+}
+
+.homepageCard{
+	background-image: url(https://s.hswstatic.com/gif/humid-air-heavier-1.jpg);
+	background: #79BE15;
+	/*filter: blur(10px);*/
+	width: 32%;
+	height: 100%;
+	margin: 1%;
+	text-align: center;
+	text-decoration: none;
+	font-size: 2em;
+	color: white;
+}
+
+.homepageCard div{
+	margin: auto;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%); 
+}

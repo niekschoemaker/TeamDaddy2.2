@@ -13,28 +13,10 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Simple Map</title>
+		<title>Map - TeamDaddy</title>
+		<link rel="stylesheet" type="text/css" href="css/map.css">
 		<meta name="viewport" content="initial-scale=1.0">
 		<meta charset="utf-8">
-		<style>
-			/* Always set the map height explicitly to define the size of the div
-			* element that contains the map. */
-			#map {
-				height: 100%;
-			}
-			/* Optional: Makes the sample page fill the window. */
-			html, body {
-				height: 100%;
-				margin: 0;
-				padding: 0;
-			}
-
-			.container{
-				margin: auto;
-				width: 90vw;
-				height: 90vh;
-			}
-		</style>
 	</head>
 	<body>
 		<div class="container">
@@ -90,7 +72,7 @@
 					var marker = new google.maps.Marker({
 						position: {lat: stations[i][3][0], lng: stations[i][3][1]},
 						map: map,
-						title: toString(i),
+						title: i.toString(),
 						info: "This is marker "+i+"</br> Temprature: "+stations[i][0]+"</br> Windspeed: "+stations[i][1]+"</br> Humidity: "+stations[2]+"</br> At: "+stations[i][3][0] +", "+stations[i][3][1]+" </br><a href='station.php?station_id="+i+"'>More info</a>"
 					})
 					//Add info to the text box
