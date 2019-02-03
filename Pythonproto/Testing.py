@@ -6,11 +6,17 @@ import time
 import threading
 import mmap
 
-
+#Maakt hier globale variabelen aan waar alles ingelezen wordt.
 global buffer
 measurements = []
 Stations = []
-Start = "WeatherStations (1).dat"
+
+#Deze kan zo blijven staan.
+Start = "WeatherStations.dat"
+#Deze moet nog dynamic gemaakt worden.
+test = "Daddy-2019-1-31-14-21.pb"
+
+#Class om threads mee te maken
 class MyThread (threading.Thread):
         def __init__(self, threadID, name, counter):
                 threading.Thread.__init__(self)
@@ -19,18 +25,11 @@ class MyThread (threading.Thread):
                 self.Counter = counter
 
         def run(self, command, inputs):
-                #Dit wordt gedaan zodat het bestand zeker geopend is voor andere threads bezig gaan
-                if self.ThreadID == 1:
-                        threadlock = threading.Lock()
-                        threadlock.acquire()
-                        command(inputs)
-                        threadlock.release()
-                else:
-                        command(inputs)
                 
+                command(inputs)
                 print(self.Name,"Done")
 
-
+#Functie voor het openen van .pb/.dat bestanden.
 def openProto(file):
     with open(file, 'rb',buffering=2000000) as f:
         m = mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ)
@@ -38,7 +37,7 @@ def openProto(file):
         global buffer
         buffer = buf
         
-    
+#Functie voor het decrypten van .pb bestanden.    
 def parseProto(buf):
     n = 0
     while n < len(buf):
@@ -50,6 +49,7 @@ def parseProto(buf):
         read_daddy_measurement.ParseFromString(msg_buf)
         measurements.append(read_daddy_measurement)
 
+#Functie voor het decrypten van .dat bestanden.
 def parseDat(buf):
     n = 0
     while n < len(buf):
@@ -61,7 +61,12 @@ def parseDat(buf):
         Daddy_WeatherStations.ParseFromString(msg_buf)
         Stations.append(Daddy_WeatherStations)
 
+#Functie om getStation aan te roepen in een thread.
+def Stationthread(name):
+    OpdrachtThread3.run(getStation,name)
 
+
+#Functie om het stationid van een station op te halen aan de hand van de naam
 def getStation(name):
     Name = str(name).upper()
     i = 0
@@ -73,6 +78,12 @@ def getStation(name):
             
         i += 1
 
+#Functie om getHumidity aan te roepen in een thread.
+def Humiditythread(name):
+    OpdrachtThread2.run(getHumidity,name)
+
+
+#Functie om Humidity op te halen van een station aan de hand van de naam.
 def getHumidity(name):
     i = 0
     Answer = {}
@@ -88,12 +99,18 @@ def getHumidity(name):
     for x, y in Answer.items():
         print(x,y)
 
-    
+
+#Functie om de timestamp te converten naar de juiste tijd.
 def convertDateTime(Datetime):
     ts = Datetime
     x = datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
     return x
 
+#Functie om getWindspeed aan te roepen in een thread.
+def Windspeedthread(name):
+    OpdrachtThread1.run(getWindspeed,name)
+
+#Functie om Windspeed op te halen van een station aan de hand van de naam.
 def getWindspeed(name):
     i = 0
     Answer = {}
@@ -109,58 +126,50 @@ def getWindspeed(name):
     for x, y in Answer.items():
         print(x,y)
 
+#Functie om getTopten te starten met een thread, hierin wordt het bestand ook gelijk geopend door een andere thread
+def Toptenthread(land):
+    OpenThread.run(openProto, "TopTen.pb")
+    OpdrachtThread.run(getTopten, buffer)
+    
+#Functie om de topten humid places op te halen.
+def getTopten(buf):
+    n = 0
+    while n < len(buf):
+        msg_len, new_pos = _DecodeVarint32(buf, n)
+        n = new_pos
+        msg_buf = buf[n:n+msg_len]
+        n += msg_len
+        Daddy_topten = weather.Topten()
+        Daddy_topten.ParseFromString(msg_buf)
+        TopTen.append(Daddy_topten)
 
-def getTopten(Land):
-    array = []
-    i = 0
-    hallo = Land.upper()
-    while i < len(Stations):
-        Country = Stations[i].Country
-        if Country == hallo:
-            array.append(Stations[i].Humidity)
-        i += 1
-    print(array)
+    return TopTen
     #Return top 10 humid places in Czech
     
-#Variabelen
-t1 = time.time()
-test = "Daddy-2019-1-31-14-21.pb"
 
+t1 = time.time()
 
 #Threads aanmaken
 OpenThread = MyThread(1,"OpenThread",2)
+OpenThread2 = MyThread(7,"OpenThread2",2)
 LeesThread = MyThread(2,"LeesThread",2)
-OpdrachtThread = MyThread(3,"OpdrachtenThread",1)
+LeesThread2 = MyThread(8,"LeesThread",2)
+OpdrachtThread = MyThread(3,"OpdrachtenThread1",1)
 OpdrachtThread1 = MyThread(4,"OpdrachtenThread2",1)
 OpdrachtThread2 = MyThread(5,"OpdrachtenThread3",1)
+OpdrachtThread3 = MyThread(6,"OpdrachtThread4",1)
 
 #Threads starten
 OpenThread.run(openProto,test)
 LeesThread.run(parseProto,buffer)
 t3 = time.time()
-OpenThread.run(openProto,Start)
-LeesThread.run(parseDat,buffer)
+OpenThread2.run(openProto,Start)
+LeesThread2.run(parseDat,buffer)
 
-#OpdrachtThread.run(getStation,"jan mayen")
-#OpdrachtThread1.run(getHumidity,"jan mayen")
-#OpdrachtThread2.run(getWindspeed,"jan mayen")
-OpdrachtThread.run(getTopten,"Czech")
 #time kijken
 t2 = time.time()
 print(t2-t1)
 print(t3-t1)
-#k= 0
-#while k < len(Stations):
-#    print(Stations[k].Country)
-#    k += 1
 
-#print(len(measurements))
-#print(measurements[0].StationID)
-#print(measurements[0].WindSpeed)
-#print(measurements[0].DateTime)
-#ts= measurements[0].DateTime
  
-#x = datetime.utcfromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
-#measurements[0].DateTime = int(x)
-#print (measurements[0].DateTime)
 

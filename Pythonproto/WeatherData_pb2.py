@@ -19,32 +19,10 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='WeatherData',
   syntax='proto3',
   serialized_options=_b('\252\002\017unwdmi.Protobuf'),
-  serialized_pb=_b('\n\x11WeatherData.proto\x12\x0bWeatherData\"k\n\x0bMeasurement\x12\x11\n\tStationID\x18\x01 \x01(\r\x12\x10\n\x08\x44\x61teTime\x18\x02 \x01(\x03\x12\x10\n\x08Humidity\x18\x03 \x01(\x01\x12\x11\n\tWindSpeed\x18\x04 \x01(\x02\x12\x12\n\nCloudCover\x18\x05 \x01(\x02\"~\n\x0eWeatherStation\x12\x15\n\rStationNumber\x18\x01 \x01(\r\x12\x0c\n\x04Name\x18\x02 \x01(\t\x12\x0f\n\x07\x43ountry\x18\x03 \x01(\t\x12\x10\n\x08Latitude\x18\x04 \x01(\x01\x12\x11\n\tLongitude\x18\x05 \x01(\x01\x12\x11\n\tElevation\x18\x06 \x01(\x01\"d\n\x07Request\x12-\n\x07\x63ommand\x18\x01 \x01(\x0e\x32\x1c.WeatherData.Request.Command\"*\n\x07\x43ommand\x12\x0f\n\x0bWeatherData\x10\x00\x12\x0e\n\nCloudCover\x10\x01\"\r\n\x0bWeatherData\"\x0c\n\nCloudCoverB\x12\xaa\x02\x0funwdmi.Protobufb\x06proto3')
+  serialized_pb=_b('\n\x11WeatherData.proto\x12\x0bWeatherData\"k\n\x0bMeasurement\x12\x11\n\tStationID\x18\x01 \x01(\r\x12\x10\n\x08\x44\x61teTime\x18\x02 \x01(\x03\x12\x10\n\x08Humidity\x18\x03 \x01(\x01\x12\x11\n\tWindSpeed\x18\x04 \x01(\x02\x12\x12\n\nCloudCover\x18\x05 \x01(\x02\"~\n\x0eWeatherStation\x12\x15\n\rStationNumber\x18\x01 \x01(\r\x12\x0c\n\x04Name\x18\x02 \x01(\t\x12\x0f\n\x07\x43ountry\x18\x03 \x01(\t\x12\x10\n\x08Latitude\x18\x04 \x01(\x01\x12\x11\n\tLongitude\x18\x05 \x01(\x01\x12\x11\n\tElevation\x18\x06 \x01(\x01\"*\n\x07\x43ountry\x12\x0f\n\x07\x43ountry\x18\x01 \x01(\t\x12\x0e\n\x06Ignore\x18\x02 \x01(\x08\"\xc2\x03\n\x06TopTen\x12\x17\n\x0fWeatherStation1\x18\x01 \x01(\r\x12\x11\n\tHumidity1\x18\x02 \x01(\x02\x12\x17\n\x0fWeatherStation2\x18\x03 \x01(\r\x12\x11\n\tHumidity2\x18\x04 \x01(\x02\x12\x17\n\x0fWeatherStation3\x18\x05 \x01(\r\x12\x11\n\tHumidity3\x18\x06 \x01(\x02\x12\x17\n\x0fWeatherStation4\x18\x07 \x01(\r\x12\x11\n\tHumidity4\x18\x08 \x01(\x02\x12\x17\n\x0fWeatherStation5\x18\t \x01(\r\x12\x11\n\tHumidity5\x18\n \x01(\x02\x12\x17\n\x0fWeatherStation6\x18\x0b \x01(\r\x12\x11\n\tHumidity6\x18\x0c \x01(\x02\x12\x17\n\x0fWeatherStation7\x18\r \x01(\r\x12\x11\n\tHumidity7\x18\x0e \x01(\x02\x12\x17\n\x0fWeatherStation8\x18\x0f \x01(\r\x12\x11\n\tHumidity8\x18\x10 \x01(\x02\x12\x17\n\x0fWeatherStation9\x18\x11 \x01(\r\x12\x11\n\tHumidity9\x18\x12 \x01(\x02\x12\x18\n\x10WeatherStation10\x18\x13 \x01(\r\x12\x12\n\nHumidity10\x18\x14 \x01(\x02\x42\x12\xaa\x02\x0funwdmi.Protobufb\x06proto3')
 )
 
 
-
-_REQUEST_COMMAND = _descriptor.EnumDescriptor(
-  name='Command',
-  full_name='WeatherData.Request.Command',
-  filename=None,
-  file=DESCRIPTOR,
-  values=[
-    _descriptor.EnumValueDescriptor(
-      name='WeatherData', index=0, number=0,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='CloudCover', index=1, number=1,
-      serialized_options=None,
-      type=None),
-  ],
-  containing_type=None,
-  serialized_options=None,
-  serialized_start=329,
-  serialized_end=371,
-)
-_sym_db.RegisterEnumDescriptor(_REQUEST_COMMAND)
 
 
 _MEASUREMENT = _descriptor.Descriptor(
@@ -172,17 +150,24 @@ _WEATHERSTATION = _descriptor.Descriptor(
 )
 
 
-_REQUEST = _descriptor.Descriptor(
-  name='Request',
-  full_name='WeatherData.Request',
+_COUNTRY = _descriptor.Descriptor(
+  name='Country',
+  full_name='WeatherData.Country',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='command', full_name='WeatherData.Request.command', index=0,
-      number=1, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
+      name='Country', full_name='WeatherData.Country.Country', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Ignore', full_name='WeatherData.Country.Ignore', index=1,
+      number=2, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -191,7 +176,6 @@ _REQUEST = _descriptor.Descriptor(
   ],
   nested_types=[],
   enum_types=[
-    _REQUEST_COMMAND,
   ],
   serialized_options=None,
   is_extendable=False,
@@ -200,17 +184,157 @@ _REQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=271,
-  serialized_end=371,
+  serialized_end=313,
 )
 
 
-_WEATHERDATA = _descriptor.Descriptor(
-  name='WeatherData',
-  full_name='WeatherData.WeatherData',
+_TOPTEN = _descriptor.Descriptor(
+  name='TopTen',
+  full_name='WeatherData.TopTen',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
+    _descriptor.FieldDescriptor(
+      name='WeatherStation1', full_name='WeatherData.TopTen.WeatherStation1', index=0,
+      number=1, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity1', full_name='WeatherData.TopTen.Humidity1', index=1,
+      number=2, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='WeatherStation2', full_name='WeatherData.TopTen.WeatherStation2', index=2,
+      number=3, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity2', full_name='WeatherData.TopTen.Humidity2', index=3,
+      number=4, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='WeatherStation3', full_name='WeatherData.TopTen.WeatherStation3', index=4,
+      number=5, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity3', full_name='WeatherData.TopTen.Humidity3', index=5,
+      number=6, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='WeatherStation4', full_name='WeatherData.TopTen.WeatherStation4', index=6,
+      number=7, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity4', full_name='WeatherData.TopTen.Humidity4', index=7,
+      number=8, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='WeatherStation5', full_name='WeatherData.TopTen.WeatherStation5', index=8,
+      number=9, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity5', full_name='WeatherData.TopTen.Humidity5', index=9,
+      number=10, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='WeatherStation6', full_name='WeatherData.TopTen.WeatherStation6', index=10,
+      number=11, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity6', full_name='WeatherData.TopTen.Humidity6', index=11,
+      number=12, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='WeatherStation7', full_name='WeatherData.TopTen.WeatherStation7', index=12,
+      number=13, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity7', full_name='WeatherData.TopTen.Humidity7', index=13,
+      number=14, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='WeatherStation8', full_name='WeatherData.TopTen.WeatherStation8', index=14,
+      number=15, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity8', full_name='WeatherData.TopTen.Humidity8', index=15,
+      number=16, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='WeatherStation9', full_name='WeatherData.TopTen.WeatherStation9', index=16,
+      number=17, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity9', full_name='WeatherData.TopTen.Humidity9', index=17,
+      number=18, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='WeatherStation10', full_name='WeatherData.TopTen.WeatherStation10', index=18,
+      number=19, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='Humidity10', full_name='WeatherData.TopTen.Humidity10', index=19,
+      number=20, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -223,41 +347,14 @@ _WEATHERDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=340,
-  serialized_end=353,
+  serialized_start=316,
+  serialized_end=766,
 )
 
-
-_CLOUDCOVER = _descriptor.Descriptor(
-  name='CloudCover',
-  full_name='WeatherData.CloudCover',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=123,
-  serialized_end=135,
-)
-
-_REQUEST.fields_by_name['command'].enum_type = _REQUEST_COMMAND
-_REQUEST_COMMAND.containing_type = _REQUEST
 DESCRIPTOR.message_types_by_name['Measurement'] = _MEASUREMENT
 DESCRIPTOR.message_types_by_name['WeatherStation'] = _WEATHERSTATION
-DESCRIPTOR.message_types_by_name['Request'] = _REQUEST
-DESCRIPTOR.message_types_by_name['WeatherData'] = _WEATHERDATA
-DESCRIPTOR.message_types_by_name['CloudCover'] = _CLOUDCOVER
+DESCRIPTOR.message_types_by_name['Country'] = _COUNTRY
+DESCRIPTOR.message_types_by_name['TopTen'] = _TOPTEN
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Measurement = _reflection.GeneratedProtocolMessageType('Measurement', (_message.Message,), dict(
@@ -274,26 +371,19 @@ WeatherStation = _reflection.GeneratedProtocolMessageType('WeatherStation', (_me
   ))
 _sym_db.RegisterMessage(WeatherStation)
 
-Request = _reflection.GeneratedProtocolMessageType('Request', (_message.Message,), dict(
-  DESCRIPTOR = _REQUEST,
+Country = _reflection.GeneratedProtocolMessageType('Country', (_message.Message,), dict(
+  DESCRIPTOR = _COUNTRY,
   __module__ = 'WeatherData_pb2'
-  # @@protoc_insertion_point(class_scope:WeatherData.Request)
+  # @@protoc_insertion_point(class_scope:WeatherData.Country)
   ))
-_sym_db.RegisterMessage(Request)
+_sym_db.RegisterMessage(Country)
 
-WeatherData = _reflection.GeneratedProtocolMessageType('WeatherData', (_message.Message,), dict(
-  DESCRIPTOR = _WEATHERDATA,
+TopTen = _reflection.GeneratedProtocolMessageType('TopTen', (_message.Message,), dict(
+  DESCRIPTOR = _TOPTEN,
   __module__ = 'WeatherData_pb2'
-  # @@protoc_insertion_point(class_scope:WeatherData.WeatherData)
+  # @@protoc_insertion_point(class_scope:WeatherData.TopTen)
   ))
-_sym_db.RegisterMessage(WeatherData)
-
-CloudCover = _reflection.GeneratedProtocolMessageType('CloudCover', (_message.Message,), dict(
-  DESCRIPTOR = _CLOUDCOVER,
-  __module__ = 'WeatherData_pb2'
-  # @@protoc_insertion_point(class_scope:WeatherData.CloudCover)
-  ))
-_sym_db.RegisterMessage(CloudCover)
+_sym_db.RegisterMessage(TopTen)
 
 
 DESCRIPTOR._options = None
