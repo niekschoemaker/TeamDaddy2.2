@@ -31,7 +31,7 @@ if(isset($_POST['Username']) && isset($_POST['Password'])){
 	if(isset($_SESSION['login'])) {
 		print('
 			<div id="cardContainer">
-				<a href="" class="homepageCard"><div id="top10"><span>Top 10 most humid</span></div></a>
+				<a href="data.php" class="homepageCard"><div id="top10"><span>Top 10 most humid</span></div></a>
 				<a href="map.php" class="homepageCard"><div id="map"><span>Map</span></div></a>
 				<a href="station.php" class="homepageCard"><div id="stations"><span>Stations</span></div></a>
 			</div>

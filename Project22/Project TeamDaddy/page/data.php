@@ -25,6 +25,10 @@ $hello="Czech";
 	}
 
 	include 'navbar.php';
+
+	include 'php_top10.php';
+
+	$top10 = getTopTen();
 	
 	header("Refresh: 60;");
 
@@ -35,18 +39,16 @@ $hello="Czech";
 
 	//Data for graph
 	$dataPoints = array(
-		array("label"=> "Jan", "y"=> array(4, 8)),
-		array("label"=> "Feb", "y"=> array(3, 8)),
-		array("label"=> "Mar", "y"=> array(5, 11)),
-		array("label"=> "Apr", "y"=> array(8, 18)),
-		array("label"=> "May", "y"=> array(12, 20)),
-		array("label"=> "Jun", "y"=> array(17, 26)),
-		array("label"=> "Jul", "y"=> array(19, 28)),
-		array("label"=> "Aug", "y"=> array(19, 28)),
-		array("label"=> "Sep", "y"=> array(16, 25)),
-		array("label"=> "Oct", "y"=> array(12, 19)),
-		array("label"=> "Nov", "y"=> array(9, 14)),
-		array("label"=> "Dec", "y"=> array(6, 10))
+		array("label"=> $top10[0][0], "y"=> array(0, $top10[0][1])),
+		array("label"=> $top10[2][0], "y"=> array(0, $top10[2][1])),
+		array("label"=> $top10[4][0], "y"=> array(0, $top10[4][1])),
+		array("label"=> $top10[6][0], "y"=> array(0, $top10[6][1])),
+		array("label"=> $top10[8][0], "y"=> array(0, $top10[8][1])),
+		array("label"=> $top10[10][0], "y"=> array(0, $top10[10][1])),
+		array("label"=> $top10[12][0], "y"=> array(0, $top10[12][1])),
+		array("label"=> $top10[14][0], "y"=> array(0, $top10[14][1])),
+		array("label"=> $top10[16][0], "y"=> array(0, $top10[16][1])),
+		array("label"=> $top10[18][0], "y"=> array(0, $top10[18][1]))
 	);
 
 	//Mock data used during FM2
@@ -73,10 +75,10 @@ window.onload = function () {
 var chart = new CanvasJS.Chart("chartContainer", {
 	//theme: "light2",
 	title: {
-		text: "Temperature over the stations"
+		text: "humidity over the stations"
 	},
 	axisY: {
-		title: "Temperature (in °C)"
+		title: "humidity"
 	},
 	toolTip: {
 		shared: true
@@ -89,9 +91,9 @@ var chart = new CanvasJS.Chart("chartContainer", {
 	data: [{
 		type: "rangeArea",
 		markerSize: 0,
-		name: "Temperature Range (min/max)",
-		showInLegend: true,
-		toolTipContent: "{label}<br><span style=\"color:#6D77AC\">{name}</span><br>Min: {y[1]} °C<br>Max: {y[0]} °C",
+		name: "",
+		showInLegend: false,
+		toolTipContent: "{label}<br><span style=\"color:#6D77AC\">{name}</span><br>Min: {y[1]} <br>Max: {y[0]} ",
 		dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>
 	}]
 });
@@ -109,11 +111,11 @@ function addAverages() {
 	}
 	chart.options.data.push({
 		type: "line",
-		name: "Average",
-		showInLegend: true,
+		name: "",
+		showInLegend: false,
 		markerType: "triangle",
 		markerSize: 0,
-		yValueFormatString: "##.0 °C",
+		yValueFormatString: "##.0 %",
 		dataPoints: dps
 	});
 	chart.render();
@@ -135,5 +137,49 @@ function toggleDataSeries(e) {
 <div id="chartContainer">
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </div>
+
+<table>
+	<tr>
+		<td><?php echo($top10[0][0]); ?></td>
+		<td><?php echo($top10[0][1]); ?></td>
+	</tr>
+	<tr>
+		<td><?php echo($top10[1][0]); ?></td>
+		<td><?php echo($top10[1][1]); ?></td>
+	</tr>
+	<tr>
+		<td><?php echo($top10[2][0]); ?></td>
+		<td><?php echo($top10[2][1]); ?></td>
+	</tr>
+	<tr>
+		<td><?php echo($top10[3][0]); ?></td>
+		<td><?php echo($top10[3][1]); ?></td>
+	</tr>
+	<tr>
+		<td><?php echo($top10[4][0]); ?></td>
+		<td><?php echo($top10[4][1]); ?></td>
+	</tr>
+	<tr>
+		<td><?php echo($top10[5][0]); ?></td>
+		<td><?php echo($top10[5][1]); ?></td>
+	</tr>
+	<tr>
+		<td><?php echo($top10[6][0]); ?></td>
+		<td><?php echo($top10[6][1]); ?></td>
+	</tr>
+	<tr>
+		<td><?php echo($top10[7][0]); ?></td>
+		<td><?php echo($top10[7][1]); ?></td>
+	</tr>
+	<tr>
+		<td><?php echo($top10[8][0]); ?></td>
+		<td><?php echo($top10[8][1]); ?></td>
+	</tr>
+	<tr>
+		<td><?php echo($top10[9][0]); ?></td>
+		<td><?php echo($top10[9][1]); ?></td>
+	</tr>
+
+</table>
 </body>
 </html>

@@ -1,33 +1,23 @@
-<body>  
 <?php
 // define variables and set to empty values
-
+function getTopTen(){
 $text_content="";
 $hello="";
-if ($_SERVER["REQUEST_METHOD"] == "GET") {
+//if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
-$hello = $_GET['text_content'];
-
+//$hello = $_GET['text_content'];
+$top10 = array();
 
 $command="python get_top10.py ".$hello;
 exec($command , $out,$ret );
 #echo $ret;
 #echo $out;
-
+$i = 0;
 foreach ($out as $line){
-    print "$line\n";
+    $top10[$i] = explode(" ", $line);
+    $i++;
 	}
-
-  }
+ // }
+  return($top10);
+}
 ?>
-
-<form method="get" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">  
- <textarea name="text_content" value="<?php echo $text_content;?>" cols="400" rows="4"> 
-</textarea>
-
-  <input type="submit" name="submit" value="Submit">  
-</form>
-
-
-</body>
-</html>
