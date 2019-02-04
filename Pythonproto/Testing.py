@@ -16,7 +16,7 @@ Start = "WeatherStations.dat"
 global Data
 
 Data = "Daddy-2019-2-3-01-23.pb"
-def stringInterpolation():
+def stringInterpolation(back):
     x = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
     jaar = x[:4]
     if int(x[5:7]) < 10:
@@ -30,7 +30,7 @@ def stringInterpolation():
     
     uur = x[11:13]
     minuut = x[14:]
-    minuut = (int(minuut)-1)
+    minuut = (int(minuut)-back)
     global Data
     Data = ("../Storage/bin/Debug/Daddy-{0}-{1}-{2}-{3}-{4}.pb".format(jaar, maand , dag, uur, minuut))
     return Data
@@ -61,6 +61,8 @@ OpdrachtThread2 = MyThread(7,"OpdrachtenThread2",1)
 OpdrachtThread3 = MyThread(8,"OpdrachtThread3",1)
 OpdrachtThread4 = MyThread(9,"OpdrachtThread4",1)
 OpdrachtThread5 = MyThread(10,"OpdrachtThread5",1)
+OpdrachtThread6 = MyThread(11,"OpdrachtThread6",1)
+
 #Functie voor het openen van .pb/.dat bestanden.
 def openProto(file):
     with open(file, 'rb',buffering=2000000) as f:
@@ -201,6 +203,34 @@ def getWindspeed(name):
     
     return(Answer)
 
+def CloudCoverthread(name):
+    return OpdrachtThread6.run(getCloudcover,name)
+
+def getCloudcover(name):
+    i = 0
+    Answer = {}
+    if type(name) == str:
+        stationid = getStationID(name)
+    elif type(name) == int:
+        stationid = name
+    else:
+        x = "Enter valid argument."
+        return x
+    
+    while i < len(measurements):
+        s = measurements[i].StationID
+        if s == stationid:
+            if measurements[i].CloudCover == 0:
+                print("Station you are looking for is not in Europe.")
+            else:
+                time = datetime.utcnow().strftime("%Y-%m-%d %H:%M") 
+                Answer[time] = round(measurements[i].CloudCover,2)
+            
+        i += 1
+    
+    return(Answer)
+
+
 #Functie om getTopten te starten met een thread, hierin wordt het bestand ook gelijk geopend door een andere thread
 def Toptenthread(land):
     return OpdrachtThread.run(getTopten, "Random")
@@ -213,5 +243,22 @@ def getTopten(Random):
 
     return(Daddy_TopTen)
     #Return top 10 humid places in Czech
+
+def getpreviousData(minuten, stationID):
+    previousData = []
+    while minuten != 0:
+        x = stringInterpolation(minuten)
+        try:
+            OpenThread.run(openProto,x)
+        except:
+            return "bestand bestaat niet"
+        LeesThread.run(LeesThread,buffer)
+        minuten -= 1
+        s = stationID
+        i = 0
+        if measurements[i].StationID == s:
+            previousData.append(measurements[i])
+        i += 1
+    return previousData       
 
 
