@@ -40,6 +40,7 @@ namespace unwdmi.Parser
                     if (_retryCount > 5)
                     {
                         Console.WriteLine("Failed to connect 5 times, cancelling data sending.");
+                        _retryCount = 0;
                         return;
                     }
 
