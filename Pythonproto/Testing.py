@@ -12,11 +12,30 @@ Stations = []
 
 #Deze kan zo blijven staan.
 Start = "WeatherStations.dat"
-#Deze moet nog dynamic gemaakt worden.
-x = datetime.utcnow().strftime("%Y-%m-%d %H:%M") 
-print(x)
+global Data
+
 Data = "Daddy-2019-2-3-01-23.pb"
-#Data = 
+def stringInterpolation():
+    x = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+    jaar = x[:4]
+    if int(x[5:7]) < 10:
+        maand = (x[6:7])
+    else:
+        maand = x[5:7]
+    if int(x[8:10]) < 10:
+        dag = (x[9:10])
+    else:
+        dag = (x[8:10])
+    
+    uur = x[11:13]
+    minuut = x[14:]
+    minuut = (int(minuut)-1)
+    global Data
+    Data = ("Daddy-{0}-{1}-{2}-{3}-{4}.pb".format(jaar, maand , dag, uur, minuut))
+    return Data
+#print(stringInterpolation())
+
+
 #Class om threads mee te maken
 class MyThread (threading.Thread):
         def __init__(self, threadID, name, counter):
@@ -29,6 +48,7 @@ class MyThread (threading.Thread):
                 
                 x = command(inputs)
                 return (x)
+
 #Threads aanmaken
 OpenThread = MyThread(1,"OpenThread",2)
 OpenThread2 = MyThread(2,"OpenThread2",2)
@@ -39,6 +59,7 @@ OpdrachtThread1 = MyThread(6,"OpdrachtenThread1",1)
 OpdrachtThread2 = MyThread(7,"OpdrachtenThread2",1)
 OpdrachtThread3 = MyThread(8,"OpdrachtThread3",1)
 OpdrachtThread4 = MyThread(9,"OpdrachtThread4",1)
+OpdrachtThread5 = MyThread(10,"OpdrachtThread5",1)
 #Functie voor het openen van .pb/.dat bestanden.
 def openProto(file):
     with open(file, 'rb',buffering=2000000) as f:
@@ -78,8 +99,11 @@ LeesThread.run(parseProto,buffer)
 
 OpenThread2.run(openProto,Start)
 LeesThread2.run(parseDat,buffer)
+def getAllthread(random):
+    return OpdrachtThread5.run(getAll,"niks")
 
-
+def getAll(random):
+    return Stations
 
 #Functie om getStation aan te roepen in een thread.
 def StationIDthread(name):
@@ -129,7 +153,7 @@ def getHumidity(name):
     while i < len(measurements):
         s = measurements[i].StationID
         if s == stationid:
-            if measurements[i].humidity == 0:
+            if measurements[i].Humidity == 0:
                 print("Station you are looking for is not in Europe.")
             else:
                 time = datetime.utcnow().strftime("%Y-%m-%d %H:%M") 
@@ -188,5 +212,3 @@ def getTopten(Random):
 
     return(Daddy_TopTen)
     #Return top 10 humid places in Czech
-    
-
