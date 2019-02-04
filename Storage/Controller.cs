@@ -67,9 +67,9 @@ namespace unwdmi.Storage
         {
             var count = DateTime.UtcNow;
 
-            if (!File.Exists($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb"))
+            if (!File.Exists($"./Data/Daddy-{count:yyyy-MM-dd-HH-mm}.pb"))
             {
-                File.Create($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb").Dispose();
+                File.Create($"./Data/Daddy-{count:yyyy-MM-dd-HH-mm}.pb").Dispose();
             }
 
             List<KeyValuePair<uint, float>> humidities = new List<KeyValuePair<uint, float>>();
