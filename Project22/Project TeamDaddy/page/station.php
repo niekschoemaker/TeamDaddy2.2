@@ -9,9 +9,14 @@
 
 header("Refresh: 60;");
 
+include 'getall.php';
 include 'navbar.php';
 
-$stations = range(0, 8000);
+$stations = genStations();
+
+//print_r($stations);
+
+//$stations = range(0, 8000);
 
 //Get information of ?
 if(isset($_GET['station_id'])){
@@ -46,7 +51,7 @@ if(isset($_GET['station_id'])){
 }
 print('<div><form action="" method="GET"><select name=station_id>');
 for ($i=0; $i < sizeof($stations); $i++) { 
-	print('<option>'.$stations[$i].'</option>');
+	print('<option>'.$stations[$i][1].'</option>');
 }
 print('</select><button type="submit">Go</button></form></div>');
 

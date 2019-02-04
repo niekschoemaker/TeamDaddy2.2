@@ -5,6 +5,25 @@
 	// 	header('Location: login.php');
 	// }
 
+// define variables and set to empty values
+
+// $text_content="";
+$hello="Czech";
+// if ($_SERVER["REQUEST_METHOD"] == "GET") {
+
+	// $hello = $_GET['text_content'];
+
+
+	$command="python get_top10.py ".$hello;
+	exec($command , $out,$ret );
+	#echo $ret;
+	#echo $out;
+	$i = 0;
+	foreach ($out as $line){
+		$data[$i] = $line;
+		$i++;
+	}
+
 	include 'navbar.php';
 	
 	header("Refresh: 60;");

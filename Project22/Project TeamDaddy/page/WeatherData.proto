@@ -1,0 +1,49 @@
+syntax = "proto3";
+package WeatherData;
+
+option csharp_namespace = "unwdmi.Protobuf";
+
+message Measurement {
+	uint32 StationID = 1;
+	int64 DateTime = 2;
+	double Humidity = 3;
+	float WindSpeed = 4;
+	float CloudCover = 5;
+}
+
+message WeatherStation {
+	uint32 StationNumber = 1;
+	string Name = 2;
+	string Country = 3;
+	double Latitude = 4;
+	double Longitude = 5;
+	double Elevation = 6;
+}
+
+message Country {
+	string Country = 1;
+	bool Ignore = 2;
+}
+
+message TopTen {
+	uint32 WeatherStation1 = 1;
+	float Humidity1 = 2;
+	uint32 WeatherStation2 = 3;
+	float Humidity2 = 4;
+	uint32 WeatherStation3 = 5;
+	float Humidity3 = 6;
+	uint32 WeatherStation4 = 7;
+	float Humidity4 = 8;
+	uint32 WeatherStation5 = 9;
+	float Humidity5 = 10;
+	uint32 WeatherStation6 = 11;
+	float Humidity6 = 12;
+	uint32 WeatherStation7 = 13;
+	float Humidity7 = 14;
+	uint32 WeatherStation8 = 15;
+	float Humidity8 = 16;
+	uint32 WeatherStation9 = 17;
+	float Humidity9 = 18;
+	uint32 WeatherStation10 = 19;
+	float Humidity10 = 20;
+}

@@ -8,6 +8,9 @@
 	$apikey = 'AIzaSyB9h1UbkBdHO94Lkl-3vCMCpdIDeIKP_nA';
 
 	include 'navbar.php';
+	include 'getall.php';
+
+	$stations = genStations();
 ?>
 
 <!DOCTYPE html>
@@ -37,22 +40,9 @@
 				var marker = new google.maps.Marker({
 					position: {lat: 49.1972923, lng: 16.6039352},
 					map: map,
+					icon: { url: "https://www.clipartmax.com/png/middle/169-1692577_koko-%40-china-on-twitter-do-u-know-da-wae-sticker.png", scaledSize: new google.maps.Size(50, 50), origin: new google.maps.Point(0,0), anchor: new google.maps.Point(0, 0)},
 					title: 'University',
 					info: 'This marker is on the University <a href="station.php?station_id=1">More info</a>'
-				});
-
-				google.maps.event.addListener(marker, 'click', function() {
-					infowindow.close();
-					infowindow.setContent(this.info);
-					infowindow.open(map, this);
-				});
-
-				//Marker 2
-				var marker = new google.maps.Marker({
-					position: {lat: 50.1972923, lng: 17.6039352},
-					map: map,
-					title: 'test marker',
-					info: 'Marker 2 is a test marker'
 				});
 
 				google.maps.event.addListener(marker, 'click', function() {
@@ -64,16 +54,15 @@
 
 				//TODO Create marker generator
 				//Import list of stations and ID's
-				stations = [...Array(8000).keys()];
+				stations = <?php print(json_encode($stations)); ?>;
 				//Get data from these stations
 				for (var i = stations.length - 1; i >= 0; i--) {
-					stations[i] = [Math.floor((Math.random() * 100) + 1) /*Temprature*/, Math.floor((Math.random() * 100) + 1)/*Windspeed*/, Math.floor((Math.random() * 100) + 1)/*Humidity*/, [(Math.random() * 170) - 85/*latitude*/, (Math.random() * 300) - 150]/*longitude*/];
 					//Create marker
 					var marker = new google.maps.Marker({
-						position: {lat: stations[i][3][0], lng: stations[i][3][1]},
+						position: {lat: parseInt(stations[i][3], 10), lng: parseInt(stations[i][4], 10)},
 						map: map,
-						title: i.toString(),
-						info: "This is marker "+i+"</br> Temprature: "+stations[i][0]+"</br> Windspeed: "+stations[i][1]+"</br> Humidity: "+stations[2]+"</br> At: "+stations[i][3][0] +", "+stations[i][3][1]+" </br><a href='station.php?station_id="+i+"'>More info</a>"
+						title: stations[i][1],
+						info: "Name: "+stations[i][1]+" </br> Country: "+stations[i][2]+"</br> Latitude: "+stations[i][3]+"</br> Longitude: "+stations[i][4]+"</br> Elevation: "+stations[i][5]+"</br><a href='station.php?station_id="+stations[i][1]+"'>More info</a>"
 					})
 					//Add info to the text box
 					google.maps.event.addListener(marker, 'click', function() {
