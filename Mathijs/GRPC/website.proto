@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+
+package opdracht;
+
+message top10request {
+    string land = 1;}
+
+message top10response {
+    string nummer1 = 1;
+    string nummer2 = 2;
+    string nummer3 = 3;
+    string nummer4 = 4;
+    string nummer5 = 5;
+    string nummer6 = 6;
+    string nummer7 = 7;
+    string nummer8 = 8;
+    string nummer9 = 9;
+    string nummer10 = 10;
+}
+
+message windspeedrequest {
+    string station = 1;}
+
+message windspeedresponse {
+    string tijd = 1;
+    float windsnelheid = 2;}
+
+message humidity_request {
+    string station = 1;
+}
+
+message humidity_response {
+    string tijd = 1;
+    float humidity = 2;
+}
+
+service UNWDMI {
+    rpc Windspeed(windspeedrequest) returns (stream windspeedresponse) {}
+    rpc toptien(top10request) returns (top10response) {}
+    rpc Humidity(humidity_request) returns (stream humidity_response) {}
+}
+
+

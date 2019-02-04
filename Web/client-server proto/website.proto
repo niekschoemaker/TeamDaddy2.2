@@ -20,13 +20,17 @@ message top10response {
 }
 
 message windspeedrequest {
-    bool vraag = 1;}
+    string land = 1;
+}
 
 message windspeedresponse {
-    string reactie = 1;}
+    string tijd = 1;
+    string windsnelheid = 2
+    ;
+}
 
 service UNWDMI {
-    rpc Windspeed (windspeedrequest) returns (windspeedresponse) {}
+    rpc Windspeed (windspeedrequest) returns (stream windspeedresponse) {}
     rpc toptien(top10request) returns (top10response) {}
 }
 

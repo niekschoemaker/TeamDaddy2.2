@@ -14,7 +14,7 @@ class UNWDMIStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.Windspeed = channel.unary_unary(
+    self.Windspeed = channel.unary_stream(
         '/opdracht.UNWDMI/Windspeed',
         request_serializer=website__pb2.windspeedrequest.SerializeToString,
         response_deserializer=website__pb2.windspeedresponse.FromString,
@@ -47,7 +47,7 @@ class UNWDMIServicer(object):
 
 def add_UNWDMIServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'Windspeed': grpc.unary_unary_rpc_method_handler(
+      'Windspeed': grpc.unary_stream_rpc_method_handler(
           servicer.Windspeed,
           request_deserializer=website__pb2.windspeedrequest.FromString,
           response_serializer=website__pb2.windspeedresponse.SerializeToString,

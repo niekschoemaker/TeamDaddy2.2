@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='opdracht',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\rwebsite.proto\x12\x08opdracht\"\x1d\n\x0ctop10request\x12\r\n\x05vraag\x18\x01 \x01(\x08\"\xba\x01\n\rtop10response\x12\x0f\n\x07nummer1\x18\x01 \x01(\t\x12\x0f\n\x07nummer2\x18\x02 \x01(\t\x12\x0f\n\x07nummer3\x18\x03 \x01(\t\x12\x0f\n\x07nummer4\x18\x04 \x01(\t\x12\x0f\n\x07nummer5\x18\x05 \x01(\t\x12\x0f\n\x07nummer6\x18\x06 \x01(\t\x12\x0f\n\x07nummer7\x18\x07 \x01(\t\x12\x0f\n\x07nummer8\x18\x08 \x01(\t\x12\x0f\n\x07nummer9\x18\t \x01(\t\x12\x10\n\x08nummer10\x18\n \x01(\t\"!\n\x10windspeedrequest\x12\r\n\x05vraag\x18\x01 \x01(\x08\"$\n\x11windspeedresponse\x12\x0f\n\x07reactie\x18\x01 \x01(\t2\x8e\x01\n\x06UNWDMI\x12\x46\n\tWindspeed\x12\x1a.opdracht.windspeedrequest\x1a\x1b.opdracht.windspeedresponse\"\x00\x12<\n\x07toptien\x12\x16.opdracht.top10request\x1a\x17.opdracht.top10response\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\rwebsite.proto\x12\x08opdracht\"\x1d\n\x0ctop10request\x12\r\n\x05vraag\x18\x01 \x01(\x08\"\xba\x01\n\rtop10response\x12\x0f\n\x07nummer1\x18\x01 \x01(\t\x12\x0f\n\x07nummer2\x18\x02 \x01(\t\x12\x0f\n\x07nummer3\x18\x03 \x01(\t\x12\x0f\n\x07nummer4\x18\x04 \x01(\t\x12\x0f\n\x07nummer5\x18\x05 \x01(\t\x12\x0f\n\x07nummer6\x18\x06 \x01(\t\x12\x0f\n\x07nummer7\x18\x07 \x01(\t\x12\x0f\n\x07nummer8\x18\x08 \x01(\t\x12\x0f\n\x07nummer9\x18\t \x01(\t\x12\x10\n\x08nummer10\x18\n \x01(\t\" \n\x10windspeedrequest\x12\x0c\n\x04land\x18\x01 \x01(\t\"7\n\x11windspeedresponse\x12\x0c\n\x04tijd\x18\x01 \x01(\t\x12\x14\n\x0cwindsnelheid\x18\x02 \x01(\t2\x90\x01\n\x06UNWDMI\x12H\n\tWindspeed\x12\x1a.opdracht.windspeedrequest\x1a\x1b.opdracht.windspeedresponse\"\x00\x30\x01\x12<\n\x07toptien\x12\x16.opdracht.top10request\x1a\x17.opdracht.top10response\"\x00\x62\x06proto3')
 )
 
 
@@ -158,38 +158,7 @@ _WINDSPEEDREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='vraag', full_name='opdracht.windspeedrequest.vraag', index=0,
-      number=1, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=247,
-  serialized_end=280,
-)
-
-
-_WINDSPEEDRESPONSE = _descriptor.Descriptor(
-  name='windspeedresponse',
-  full_name='opdracht.windspeedresponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='reactie', full_name='opdracht.windspeedresponse.reactie', index=0,
+      name='land', full_name='opdracht.windspeedrequest.land', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -207,8 +176,46 @@ _WINDSPEEDRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=282,
-  serialized_end=318,
+  serialized_start=247,
+  serialized_end=279,
+)
+
+
+_WINDSPEEDRESPONSE = _descriptor.Descriptor(
+  name='windspeedresponse',
+  full_name='opdracht.windspeedresponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='tijd', full_name='opdracht.windspeedresponse.tijd', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='windsnelheid', full_name='opdracht.windspeedresponse.windsnelheid', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=281,
+  serialized_end=336,
 )
 
 DESCRIPTOR.message_types_by_name['top10request'] = _TOP10REQUEST
@@ -253,8 +260,8 @@ _UNWDMI = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=321,
-  serialized_end=463,
+  serialized_start=339,
+  serialized_end=483,
   methods=[
   _descriptor.MethodDescriptor(
     name='Windspeed',
