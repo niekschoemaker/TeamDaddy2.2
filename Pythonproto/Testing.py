@@ -5,7 +5,6 @@ import WeatherData_pb2 as weather
 import time
 import threading
 import mmap
-t4 = time.time()
 #Maakt hier globale variabelen aan waar alles ingelezen wordt.
 global buffer
 measurements = []
@@ -14,6 +13,8 @@ Stations = []
 #Deze kan zo blijven staan.
 Start = "WeatherStations.dat"
 #Deze moet nog dynamic gemaakt worden.
+x = datetime.utcnow().strftime("%Y-%m-%d %H:%M") 
+print(x)
 Data = "Daddy-2019-2-3-01-23.pb"
 #Data = 
 #Class om threads mee te maken
@@ -27,7 +28,6 @@ class MyThread (threading.Thread):
         def run(self, command, inputs):
                 
                 x = command(inputs)
-                print(self.Name,"Done")
                 return (x)
 #Threads aanmaken
 OpenThread = MyThread(1,"OpenThread",2)
@@ -72,13 +72,13 @@ def parseDat(buf):
         Stations.append(Daddy_WeatherStations)
 
 #Threads starten
-t1 = time.time()
+
 OpenThread.run(openProto,Data)
 LeesThread.run(parseProto,buffer)
-t3 = time.time()
+
 OpenThread2.run(openProto,Start)
 LeesThread2.run(parseDat,buffer)
-print(t3-t1)
+
 
 
 #Functie om getStation aan te roepen in een thread.
@@ -103,18 +103,11 @@ def StationNamethread(ids):
     
 def getStationName(ids):
     ID = int(ids)
-    i = 0
+    
     for s in Stations:
         if s.StationNumber == ID:
             x = s.Name
             return(x)
-    
-    
-    #while i < len(Stations):
-    #    s = Stations[i].StationNumber
-    #    if s == ID:
-    #        x = Stations[i].Name
-    #       return(x)
 
 
 #Functie om getHumidity aan te roepen in een thread.
@@ -126,12 +119,21 @@ def Humiditythread(name):
 def getHumidity(name):
     i = 0
     Answer = {}
-    stationid = getStation(name)
+    if type(name) == str:
+        stationid = getStationID(name)
+    elif type(name) == int:
+        stationid = name
+    else:
+        x = "Enter valid argument."
+        return x
     while i < len(measurements):
         s = measurements[i].StationID
         if s == stationid:
-            time = convertDateTime(measurements[i].DateTime)
-            Answer[time] = round(measurements[i].Humidity,2)
+            if measurements[i].humidity == 0:
+                print("Station you are looking for is not in Europe.")
+            else:
+                time = datetime.utcnow().strftime("%Y-%m-%d %H:%M") 
+                Answer[time] = round(measurements[i].Humidity,2)
             
         i += 1
     
@@ -148,16 +150,27 @@ def convertDateTime(Datetime):
 def Windspeedthread(name):
     return OpdrachtThread1.run(getWindspeed,name)
 
+
 #Functie om Windspeed op te halen van een station aan de hand van de naam.
 def getWindspeed(name):
     i = 0
     Answer = {}
-    stationid = getStation(name)
+    if type(name) == str:
+        stationid = getStationID(name)
+    elif type(name) == int:
+        stationid = name
+    else:
+        x = "Enter valid argument."
+        return x
+    
     while i < len(measurements):
         s = measurements[i].StationID
         if s == stationid:
-            time = convertDateTime(measurements[i].DateTime)
-            Answer[time] = round(measurements[i].WindSpeed,2)
+            if measurements[i].WindSpeed == 0:
+                print("Station you are looking for is not in Europe.")
+            else:
+                time = datetime.utcnow().strftime("%Y-%m-%d %H:%M") 
+                Answer[time] = round(measurements[i].WindSpeed,2)
             
         i += 1
     
@@ -176,7 +189,4 @@ def getTopten(Random):
     return(Daddy_TopTen)
     #Return top 10 humid places in Czech
     
-
-
- 
 
