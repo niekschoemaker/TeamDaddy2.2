@@ -7,7 +7,6 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using Google.Protobuf;
 using unwdmi.Protobuf;
 
@@ -15,10 +14,10 @@ namespace unwdmi.Parser
 {
     internal class DataSender
     {
+        private readonly byte[] buffer = new byte[320000];
         private Controller _controller;
 
-        private int _retryCount = 0;
-        private readonly byte[] buffer = new byte[320000];
+        private int _retryCount;
 
         public DataSender(Controller controller)
         {
@@ -43,11 +42,9 @@ namespace unwdmi.Parser
                         Console.WriteLine("Failed to connect 5 times, cancelling data sending.");
                         return;
                     }
-                    else
-                    {
-                        Console.WriteLine("Something went wrong while trying to connect, retrying.");
-                        Debug.WriteLine(e);
-                    }
+
+                    Console.WriteLine("Something went wrong while trying to connect, retrying.");
+                    Debug.WriteLine(e);
                     goto Connect;
                 }
 
@@ -55,25 +52,25 @@ namespace unwdmi.Parser
 
                 var stream = client.GetStream();
                 //using (var sslStream = new SslStream(stream, false, ValidateServerCertificate, null))
-                    try
-                    {
-                        //sslStream.AuthenticateAsClient("unwdmi.Parser");
-                    }
-                    catch (AuthenticationException e)
-                    {
-                        Console.WriteLine("Exception: {0}", e.Message);
-                        if (e.InnerException != null)
-                            Console.WriteLine("Inner exception: {0}", e.InnerException.Message);
-                        Console.WriteLine("Authentication failed - closing the connection.");
-                        client.Close();
-                        return;
-                    }
+                try
+                {
+                    //sslStream.AuthenticateAsClient("unwdmi.Parser");
+                }
+                catch (AuthenticationException e)
+                {
+                    Console.WriteLine("Exception: {0}", e.Message);
+                    if (e.InnerException != null)
+                        Console.WriteLine("Inner exception: {0}", e.InnerException.Message);
+                    Console.WriteLine("Authentication failed - closing the connection.");
+                    client.Close();
+                    return;
+                }
 
-                    var byteStream = new BufferedStream(stream, 4096);
-                    foreach (var measurement in measurements) measurement.WriteDelimitedTo(byteStream);
+                var byteStream = new BufferedStream(stream, 4096);
+                foreach (var measurement in measurements) measurement.WriteDelimitedTo(byteStream);
 
                 byteStream.Flush();
-                    //stream.Write(buffer, 0, (int) byteStream.Position);
+                //stream.Write(buffer, 0, (int) byteStream.Position);
                 client.Client.Shutdown(SocketShutdown.Both);
                 client.Client.Disconnect(false);
                 byteStream.Dispose();

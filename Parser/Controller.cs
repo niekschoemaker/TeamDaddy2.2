@@ -22,6 +22,7 @@ namespace unwdmi.Parser
         private const string PathCountries = "Countries.dat";
         public const int Port = 25566;
         public static Controller Instance;
+        public Config _config;
 
         // Trackers to keep track of the current state of the program.
         /// <summary> Active Threads (either queued or currently processing xml data) </summary>
@@ -34,7 +35,6 @@ namespace unwdmi.Parser
         public IPAddress IpAddress;
         public Listener Listener;
         public ConcurrentBag<Measurement> MeasurementQueue = new ConcurrentBag<Measurement>();
-        public Config _config;
 
         /// <summary> Sockets currently open (# of established connections with WeatherStations) </summary>
         public int OpenSockets = 0;
@@ -357,7 +357,7 @@ namespace unwdmi.Parser
             {
                 DataSender.SendData(IpAddress, Port, measurements);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.WriteLine(e.ToString());
                 // ignored, nothing to see here
@@ -456,5 +456,4 @@ namespace unwdmi.Parser
         [JsonProperty("IP or hostname of storage server")]
         public string HostIp = "127.0.0.1";
     }
-
 }

@@ -8,8 +8,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
-using unwdmi.Protobuf;
 using Newtonsoft.Json;
+using unwdmi.Protobuf;
 
 /*
  *  Автор: Sean Visser
@@ -19,33 +19,25 @@ using Newtonsoft.Json;
 
 namespace unwdmi.Storage
 {
-    class Controller
+    internal class Controller
     {
-        static void Main(string[] args)
+        public enum ErrorLevel
         {
-            Controller controller = new Controller();
-
-            while (true)
-            {
-                var _string = Console.ReadLine();
-                if (_string.ToLower() == "suka")
-                {
-                    Console.WriteLine("BLYAT");
-                }
-            }
-
-
+            Debug = 1,
+            Info = 2,
+            Error = 3,
+            Fatal = 4
         }
+
+        private const string ConfigFile = "config.json";
+        public static Controller Instance;
+        public static X509Certificate2 serverCertificate;
+        public Config _config;
 
         public ListenerParser ListenerParser;
         public ListenerWeb ListenerWeb;
-        public static Controller Instance;
 
         public DateTime TimeStarted;
-        public TimeSpan TimeSinceStartup => (DateTime.UtcNow - TimeStarted);
-        public static X509Certificate2 serverCertificate = null;
-        private const string ConfigFile = "config.json";
-        public Config _config;
 
         public Controller()
         {
@@ -63,19 +55,29 @@ namespace unwdmi.Storage
             InitFiles();
         }
 
+        public TimeSpan TimeSinceStartup => DateTime.UtcNow - TimeStarted;
+
+        private static void Main(string[] args)
+        {
+            var controller = new Controller();
+
+            while (true)
+            {
+                var _string = Console.ReadLine();
+                if (_string.ToLower() == "suka") Console.WriteLine("BLYAT");
+            }
+        }
+
         public void Save(ConcurrentDictionary<uint, WeatherStation> weatherStations)
         {
             var count = DateTime.UtcNow;
 
             if (!File.Exists($"./Data/Daddy-{count:yyyy-MM-dd-HH-mm}.pb"))
-            {
                 File.Create($"./Data/Daddy-{count:yyyy-MM-dd-HH-mm}.pb").Dispose();
-            }
 
-            List<KeyValuePair<uint, float>> humidities = new List<KeyValuePair<uint, float>>();
-            using (FileStream output = File.Open($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb", FileMode.Append))
+            var humidities = new List<KeyValuePair<uint, float>>();
+            using (var output = File.Open($"./Data/Daddy-{count:yyyy-M-d-HH-m}.pb", FileMode.Append))
             {
-                Console.WriteLine(weatherStations.Count);
                 Log($"Saving data for {weatherStations.Count} weatherstations.");
                 foreach (var weatherStation in weatherStations)
                 {
@@ -88,39 +90,29 @@ namespace unwdmi.Storage
                         StationID = weatherStation.Key,
                         WindSpeed = weatherStation.Value.WindSpeedTotal / mCount
                     }.WriteDelimitedTo(output);
-                    humidities.Add(new KeyValuePair<uint, float>(weatherStation.Key, (float)humidity));
+                    humidities.Add(new KeyValuePair<uint, float>(weatherStation.Key, humidity));
                 }
             }
 
-            if (ListenerParser.HumidityTopTen30.Count == 30)
-            {
-                ListenerParser.HumidityTopTen30.Dequeue();
-            }
+            if (ListenerParser.HumidityTopTen30.Count == 30) ListenerParser.HumidityTopTen30.Dequeue();
             ListenerParser.HumidityTopTen30.Enqueue(humidities.OrderByDescending(p => p.Value).Take(10).ToList());
 
 
-            Dictionary<uint, float> humidityKeyValuePairs = new Dictionary<uint, float>();
+            var humidityKeyValuePairs = new Dictionary<uint, float>();
             foreach (var a in ListenerParser.HumidityTopTen30)
-            {
-                foreach (var b in a)
+            foreach (var b in a)
+                if (humidityKeyValuePairs.TryGetValue(b.Key, out var humidity))
                 {
-                    if (humidityKeyValuePairs.TryGetValue(b.Key, out var humidity))
-                    {
-                        if (humidity < b.Value)
-                        {
-                            humidityKeyValuePairs[b.Key] = b.Value;
-                        }
-                    }
-                    else
-                    {
-                        humidityKeyValuePairs.Add(b.Key, b.Value);
-                    }
+                    if (humidity < b.Value) humidityKeyValuePairs[b.Key] = b.Value;
                 }
-            }
+                else
+                {
+                    humidityKeyValuePairs.Add(b.Key, b.Value);
+                }
 
             var humidityTopTen = humidityKeyValuePairs.OrderByDescending(p => p.Value).Take(10).ToArray();
-            var topTen = new Protobuf.TopTen();
-            for(int i = 0; i < humidityTopTen.Count(); i++)
+            var topTen = new TopTen();
+            for (var i = 0; i < humidityTopTen.Count(); i++)
             {
                 // Was trying to figure out reflection, this should work pretty nicely, is a nice version of "Humidity1 = value", "Humidity2 = value", etc
                 topTen.GetType().GetProperty("Humidity" + (i + 1)).SetValue(topTen, humidityTopTen[i].Value);
@@ -129,8 +121,10 @@ namespace unwdmi.Storage
             }
 
             // Save latest top 10 to disk.
-            using(var file = File.OpenWrite("TopTen.pb"))
+            using (var file = File.OpenWrite("TopTen.pb"))
+            {
                 topTen.WriteTo(file);
+            }
         }
 
         public void InitFiles()
@@ -142,10 +136,7 @@ namespace unwdmi.Storage
                 File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(_config));
             }
 
-            if (!Directory.Exists("logs"))
-            {
-                Directory.CreateDirectory("logs");
-            }
+            if (!Directory.Exists("logs")) Directory.CreateDirectory("logs");
 
             try
             {
@@ -155,11 +146,11 @@ namespace unwdmi.Storage
             catch (Exception e)
             {
                 Log("Something went wrong while loading the config file.\n" +
-                                  "\tRemoving the config file should fix this issue.", ErrorLevel.Error);
+                    "\tRemoving the config file should fix this issue.", ErrorLevel.Error);
                 Log(e.ToString(), ErrorLevel.Debug);
             }
 
-            bool changed = false;
+            var changed = false;
             ReadFile:
             if (!File.Exists(_config.CertificateFilePath))
             {
@@ -178,43 +169,18 @@ namespace unwdmi.Storage
                     goto ReadFile;
                 }
             }
+
             serverCertificate = new X509Certificate2(_config.CertificateFilePath, "DaddyCool");
-            
+
             SaveConfig();
 
             Log("Succesfully loaded certificate.");
 
             Task.Run(() => ListenerParser.StartListening());
 
-            if (!Directory.Exists("Data"))
-            {
-                Directory.CreateDirectory("Data");
-            }
+            if (!Directory.Exists("Data")) Directory.CreateDirectory("Data");
 
-            if (!File.Exists("./Data/Daddy.pb"))
-            {
-                File.Create("./Data/Daddy.pb");
-            }
-        }
-
-        public class Config
-        {
-            [JsonProperty("Certificate File Path")]
-            public string CertificateFilePath = "server.p12";
-
-            [JsonProperty("Minimum log level for log file (1 = Debug, 2 = Info, 3 = Error, 4 = Fatal)")]
-            public int LogLevel = (int)ErrorLevel.Error;
-
-            [JsonProperty("Minimum log level for console (1 = Debug, 2 = Info, 3 = Error, 4 = Fatal)")]
-            public int ConsoleLogLevel = (int)ErrorLevel.Info;
-        }
-
-        public enum ErrorLevel
-        {
-            Debug = 1,
-            Info = 2,
-            Error = 3,
-            Fatal = 4
+            if (!File.Exists("./Data/Daddy.pb")) File.Create("./Data/Daddy.pb");
         }
 
         public void Log(string message, ErrorLevel level = ErrorLevel.Info)
@@ -236,8 +202,8 @@ namespace unwdmi.Storage
                     break;
             }
 
-            message = DateTime.Now.ToString("hh:mm:ss") + " " +  message;
-            if((int)level >= _config?.LogLevel)
+            message = DateTime.Now.ToString("hh:mm:ss") + " " + message;
+            if ((int) level >= _config?.LogLevel)
                 try
                 {
                     File.AppendAllText("./logs/" + DateTime.Today.ToString("yyyy-MM-dd") + ".txt",
@@ -247,7 +213,7 @@ namespace unwdmi.Storage
                 {
                 }
 
-            if ((int)level >= _config?.ConsoleLogLevel)
+            if ((int) level >= _config?.ConsoleLogLevel)
                 Console.WriteLine(message);
 
             Console.ResetColor();
@@ -256,6 +222,18 @@ namespace unwdmi.Storage
         public void SaveConfig()
         {
             File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(_config, Formatting.Indented));
+        }
+
+        public class Config
+        {
+            [JsonProperty("Certificate File Path")]
+            public string CertificateFilePath = "server.p12";
+
+            [JsonProperty("Minimum log level for console (1 = Debug, 2 = Info, 3 = Error, 4 = Fatal)")]
+            public int ConsoleLogLevel = (int) ErrorLevel.Info;
+
+            [JsonProperty("Minimum log level for log file (1 = Debug, 2 = Info, 3 = Error, 4 = Fatal)")]
+            public int LogLevel = (int) ErrorLevel.Error;
         }
     }
 }

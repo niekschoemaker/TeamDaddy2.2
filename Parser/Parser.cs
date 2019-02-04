@@ -70,7 +70,6 @@ namespace unwdmi.Parser
                 }
 
 
-
                 if (weatherStation.IgnoreStation) return;
                 // reader.Skip skips one node (Skips to next start element in this XML file)
                 // Doesn't validate the XML so is quicker than calling .read multiple times
