@@ -359,7 +359,8 @@ namespace unwdmi.Parser
             }
             catch(Exception e)
             {
-                Console.WriteLine(e);
+                Debug.WriteLine(e.ToString());
+                // ignored, nothing to see here
             }
         }
 
