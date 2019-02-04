@@ -5,6 +5,7 @@ import WeatherData_pb2 as weather
 import time
 import threading
 import mmap
+import os
 #Maakt hier globale variabelen aan waar alles ingelezen wordt.
 global buffer
 measurements = []
@@ -31,9 +32,9 @@ def stringInterpolation():
     minuut = x[14:]
     minuut = (int(minuut)-1)
     global Data
-    Data = ("Daddy-{0}-{1}-{2}-{3}-{4}.pb".format(jaar, maand , dag, uur, minuut))
+    Data = ("../Storage/bin/Debug/Daddy-{0}-{1}-{2}-{3}-{4}.pb".format(jaar, maand , dag, uur, minuut))
     return Data
-#print(stringInterpolation())
+#stringInterpolation()
 
 
 #Class om threads mee te maken
@@ -206,9 +207,11 @@ def Toptenthread(land):
     
 #Functie om de topten humid places op te halen.
 def getTopten(Random):
-    with open("TopTen.pb", "rb") as f:
+    with open("../Storage/bin/Debug/TopTen.pb", "rb") as f:
         Daddy_TopTen = weather.TopTen()
         Daddy_TopTen.ParseFromString(f.read())
 
     return(Daddy_TopTen)
     #Return top 10 humid places in Czech
+
+
