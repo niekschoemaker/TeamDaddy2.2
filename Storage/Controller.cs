@@ -63,8 +63,7 @@ namespace unwdmi.Storage
 
             while (true)
             {
-                var _string = Console.ReadLine();
-                if (_string.ToLower() == "suka") Console.WriteLine("BLYAT");
+                Console.ReadLine();
             }
         }
 
