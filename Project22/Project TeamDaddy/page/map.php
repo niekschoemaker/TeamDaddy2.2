@@ -5,8 +5,6 @@
 		header('Location: login.php');
 	}
 
-	$apikey = 'AIzaSyB9h1UbkBdHO94Lkl-3vCMCpdIDeIKP_nA';
-
 	include 'navbar.php';
 	include 'getall.php';
 
@@ -74,7 +72,7 @@
 				}
 			}
 			</script>
-			<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9h1UbkBdHO94Lkl-3vCMCpdIDeIKP_nA&callback=initMap"
+			<script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap"
 			async defer></script>
 		</div>
 	</body>
